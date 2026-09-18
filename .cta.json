@@ -1,0 +1,23 @@
+{
+  "projectName": "poker-game",
+  "mode": "file-router",
+  "typescript": true,
+  "packageManager": "npm",
+  "includeExamples": true,
+  "tailwind": true,
+  "projectPreset": "default",
+  "addOnOptions": {},
+  "git": true,
+  "install": true,
+  "intent": true,
+  "routerOnly": false,
+  "version": 1,
+  "framework": "solid",
+  "chosenAddOns": [
+    "biome",
+    "vercel",
+    "store",
+    "tanstack-query",
+    "solid-ui"
+  ]
+}

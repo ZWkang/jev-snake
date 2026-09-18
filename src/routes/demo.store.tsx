@@ -1,0 +1,55 @@
+import { createFileRoute } from '@tanstack/solid-router'
+import { useStore } from '@tanstack/solid-store'
+
+import { fullName, store } from '../lib/demo-store'
+
+export const Route = createFileRoute('/demo/store')({
+  component: DemoStore,
+})
+
+function FirstName() {
+  const firstName = useStore(store, (state) => state.firstName)
+  return (
+    <input
+      type="text"
+      value={firstName()}
+      onInput={(e) =>
+        store.setState((state) => ({ ...state, firstName: e.target.value }))
+      }
+      class="demo-input"
+    />
+  )
+}
+
+function LastName() {
+  const lastName = useStore(store, (state) => state.lastName)
+  return (
+    <input
+      type="text"
+      value={lastName()}
+      onInput={(e) =>
+        store.setState((state) => ({ ...state, lastName: e.target.value }))
+      }
+      class="demo-input"
+    />
+  )
+}
+
+function FullName() {
+  const fName = useStore(fullName)
+  return <div class="demo-list-item font-medium">{fName()}</div>
+}
+
+function DemoStore() {
+  return (
+    <main class="demo-page demo-center">
+      <section class="demo-panel flex w-full max-w-xl flex-col gap-4">
+        <p class="island-kicker">TanStack Store</p>
+        <h1 class="demo-title mb-2">Store Example</h1>
+        <FirstName />
+        <LastName />
+        <FullName />
+      </section>
+    </main>
+  )
+}

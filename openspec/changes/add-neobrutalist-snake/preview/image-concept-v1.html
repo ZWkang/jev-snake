@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贪吃蛇 · 新粗野主义方案预览</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { color-scheme: light; --paper: #fff7e4; --ink: #171717; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    a { color: inherit; text-underline-offset: 4px; }
+    a:focus-visible { outline: 3px solid #171717; outline-offset: 5px; }
+    .bar { padding: 16px 28px; border-bottom: 3px solid var(--ink); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .bar strong { font-size: 15px; }
+    .bar nav { display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px; }
+    .tag { padding: 4px 10px; background: #f7f052; border: 2px solid var(--ink); margin-right: 12px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    main { max-width: 1480px; margin: 0 auto; padding: 20px 28px 64px; }
+    figure { margin: 0; }
+    .screen { display: block; width: 100%; height: auto; max-height: calc(100svh - 134px); object-fit: contain; }
+    figcaption { margin: 10px 0 0; font-size: 13px; color: #545044; text-align: center; }
+    .notes { margin-top: 52px; padding-top: 28px; border-top: 3px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; gap: 52px; }
+    h1 { font-size: clamp(25px, 3vw, 40px); line-height: 1.2; margin: 0 0 18px; letter-spacing: -1px; }
+    h2 { font-size: 23px; margin: 0 0 18px; }
+    p { margin: 12px 0; }
+    ul { margin: 16px 0; padding-left: 22px; }
+    li { margin: 10px 0; }
+    kbd { padding: 2px 6px; border: 1.5px solid; border-radius: 3px; background: #fffdf5; box-shadow: 2px 2px 0 var(--ink); font-size: 13px; }
+    .rewards { display: block; width: min(100%, 470px); height: auto; margin: 0 auto; }
+    .palette { display: flex; gap: 8px; margin-top: 22px; }
+    .swatch { width: 40px; height: 26px; border: 2px solid var(--ink); }
+    .documents { margin-top: 36px; padding: 20px 0; border-top: 2px solid var(--ink); display: flex; flex-wrap: wrap; gap: 12px 24px; }
+    .small { font-size: 13px; color: #545044; }
+    @media (max-width: 700px) {
+      .bar { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
+      .bar nav { gap: 16px; }
+      main { padding: 18px 12px 40px; }
+      .screen { max-height: none; }
+      .notes { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
+      .tag { display: inline-block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <strong><span class="tag">静态方案</span>新粗野主义 · 贪吃蛇</strong>
+    <nav aria-label="方案导航">
+      <a href="#plan">玩法与视觉</a>
+      <a href="#assets">奖励素材</a>
+      <a href="prompts.md">生成 / Seedance 提示词</a>
+    </nav>
+  </header>
+  <main>
+    <figure>
+      <a href="game-screen.png" aria-label="打开页面效果图原图"><img class="screen" src="game-screen.png" width="1536" height="1024" alt="贪吃蛇页面效果图：奶油白网格棋盘、粗黑边框、四色糖果蛇、随机纹理障碍、苹果和星星，右侧展示分数、速度滑块、加减和暂停重开按钮。"></a>
+      <figcaption>ImageGen 页面效果图 · 图中分数为示意，按钮不可操作；格数与规则以功能规格为准。</figcaption>
+    </figure>
+    <section class="notes" id="plan" aria-labelledby="plan-title">
+      <div>
+        <h1 id="plan-title">粗线条，彩色蛇，<br>简单但有手感。</h1>
+        <p>奶油白纸面、黑色硬阴影和高饱和撞色。蛇身分节交替上色，搭配糖果高光、朝向眼睛和吃到奖励时的局部弹跳反馈。</p>
+        <ul>
+          <li><strong>经典玩法：</strong>方向键 / WASD 移动，撞墙、障碍或身体结束。</li>
+          <li><strong>随机棋盘：</strong>24 × 18 格，每局 12 个固定随机障碍。</li>
+          <li><strong>奖励：</strong>苹果 +10 并增长；每吃 5 个苹果出现星星，8 秒内吃到 +30。</li>
+          <li><strong>调速：</strong>4–16 格/秒，默认 8；滑块与 <kbd>−</kbd> / <kbd>+</kbd> 快捷键同步。</li>
+        </ul>
+        <p><kbd>Enter</kbd> 开始　<kbd>Space</kbd> 暂停 / 继续　<kbd>R</kbd> 重开</p>
+        <div class="palette" aria-label="色板：珊瑚红、金黄、薄荷青、淡紫、奶油白">
+          <span class="swatch" style="background:#ff7180"></span><span class="swatch" style="background:#f7f052"></span><span class="swatch" style="background:#80dfc9"></span><span class="swatch" style="background:#aaa0f7"></span><span class="swatch" style="background:#fff7e4"></span>
+        </div>
+      </div>
+      <div id="assets">
+        <h2>奖励素材样稿</h2>
+        <img class="rewards" src="rewards-concept.png" width="1774" height="887" alt="ImageGen 生成的红苹果和金色四角星，带黑色轮廓、糖果高光和透明背景。">
+        <p>苹果与星星已生成，正式接入时分别整理尺寸并检查小尺寸可读性。蛇身由程序绘制，确保转弯和增长时连续。</p>
+        <p>反馈动效规划：吃奖励时短促缩放与加分提示；暂停冻结计时；开启减少动态效果时取消装饰动画。</p>
+        <p class="small">已预留 Seedance 片头与获胜短片提示词。视频为可选素材，首版游戏无需等待视频生成。</p>
+      </div>
+    </section>
+    <nav class="documents" aria-label="规划文档">
+      <a href="../proposal.md">功能提案</a>
+      <a href="../design.md">技术设计</a>
+      <a href="../tasks.md">实施任务</a>
+      <a href="prompts.md">完整素材提示词</a>
+      <a href="game-screen.png">页面原图</a>
+      <a href="rewards-concept.png">奖励原图</a>
+    </nav>
+    <p class="small">OpenSpec change：add-neobrutalist-snake。当前交付为规划与静态评审附件，游戏代码尚未实现。</p>
+  </main>
+</body>
+</html>

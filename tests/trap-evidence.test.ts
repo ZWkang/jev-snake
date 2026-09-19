@@ -3,10 +3,10 @@ import { inspectMove, move } from "../server/game/engine.js";
 import {
 	askJev,
 	decisionBodyV3 as decisionBody,
-	planBodyV3 as planBody,
 } from "../server/jev/client.js";
 import { advanceGeometry, staticSpace } from "../server/jev/context-v3.js";
 import { forcedPath } from "../server/jev/context.js";
+import { planBodyV3 as planBody } from "../server/jev/legacy-context.js";
 import { trappedRegion } from "../server/jev/trap-evidence.js";
 import {
 	decisionRequestSchema,

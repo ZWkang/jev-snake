@@ -3,10 +3,9 @@ import { move } from "../server/game/engine.js";
 import {
 	askJev,
 	buildDecisionContext,
-	buildPlanContext,
 	decisionBodyV3,
-	planBodyV3,
 } from "../server/jev/client.js";
+import { buildPlanContext, planBodyV3 } from "../server/jev/legacy-context.js";
 import {
 	witnessContinuity,
 	witnessDirections,

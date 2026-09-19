@@ -90,8 +90,7 @@ export function startServer(options: {
 					if (!service.fault)
 						for (const match of store.active())
 							service.command(match.id, {
-								protocolVersion:
-									match.config.decisionMode === "two_step_fallback" ? 2 : 1,
+								protocolVersion: 1,
 								requestId: randomUUID(),
 								type: "stop",
 								reason: "server_shutdown",

@@ -419,8 +419,7 @@ export class WatchChannel {
 	}
 	private stopMatch(match: PublicState, reason: string) {
 		const receipt = this.service.command(match.id, {
-			protocolVersion:
-				match.config.decisionMode === "two_step_fallback" ? 2 : 1,
+			protocolVersion: 1,
 			requestId: randomUUID(),
 			type: "stop",
 			reason,

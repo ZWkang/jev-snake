@@ -24,10 +24,25 @@ const config = () =>
 			SNAKE_WIDTH: "7",
 			SNAKE_HEIGHT: "1",
 			SNAKE_OBSTACLES: "0",
-			SNAKE_TICK_MS: "10",
 		},
 		{ "decision-mode": "single_step" },
 	);
+function finishMoves(service: MatchService, store: Store, id: string) {
+	while (store.get(id).status === "running") {
+		const c = service.decisionContext(id);
+		expect(
+			service.command(id, {
+				protocolVersion: 1,
+				type: "action",
+				requestId: randomUUID(),
+				observedSeq: c.observedSeq,
+				targetTick: c.targetTick,
+				expectedStateHash: c.expectedStateHash,
+				direction: c.state.direction,
+			}).status,
+		).toBe("applied");
+	}
+}
 function fixture(path = ":memory:", key = "test-model-key") {
 	vi.useFakeTimers();
 	const store = new Store(path),
@@ -78,7 +93,7 @@ function fixture(path = ":memory:", key = "test-model-key") {
 	const finish = async (i = jobs.length - 1) => {
 		await vi.advanceTimersByTimeAsync(100);
 		const id = jobs[i].options.state.id;
-		service.advance(id);
+		finishMoves(service, store, id);
 		const s = publicState(store.get(id));
 		expect(["won", "gameover"]).toContain(s.status);
 		jobs[i].resolve(s);
@@ -198,7 +213,7 @@ test("real runner errors, even next to a natural terminal event, fault visibly w
 	await vi.advanceTimersByTimeAsync(0);
 	const id = f.start();
 	await vi.advanceTimersByTimeAsync(100);
-	f.service.advance(id);
+	finishMoves(f.service, f.store, id);
 	expect(["gameover", "won"]).toContain(f.store.get(id).status);
 	f.jobs[0].reject(new Error("API failed test-model-key"));
 	await vi.advanceTimersByTimeAsync(0);

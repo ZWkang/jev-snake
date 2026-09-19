@@ -15,7 +15,7 @@ afterEach(async () => {
 });
 const origin = "http://localhost:3000",
 	secret = "owner-test-credential".repeat(3);
-async function fixture(twoStep = false) {
+async function fixture(legacyTick = false) {
 	const transport = globalThis.fetch;
 	vi.stubGlobal(
 		"fetch",
@@ -24,7 +24,9 @@ async function fixture(twoStep = false) {
 				return transport(input, init);
 			const body = JSON.parse(init?.body as string),
 				key = body.questions.plan ? "plan" : "direction",
-				choice = key === "plan" ? "right_right" : "right";
+				choice = body.state.player.direction;
+			expect(key).toBe("direction");
+			expect(body.state.timing.stepMode).toBe("response");
 			await new Promise<void>((resolve, reject) => {
 				const timer = setTimeout(resolve, 5);
 				init?.signal?.addEventListener(
@@ -66,9 +68,9 @@ async function fixture(twoStep = false) {
 						SNAKE_WIDTH: "7",
 						SNAKE_HEIGHT: "1",
 						SNAKE_OBSTACLES: "0",
-						SNAKE_TICK_MS: "50",
+						...(legacyTick ? { SNAKE_TICK_MS: "50" } : {}),
 					},
-					{ "decision-mode": twoStep ? "two_step_fallback" : "single_step" },
+					{ "decision-mode": "single_step" },
 				),
 			intermissionMs: 60,
 		},
@@ -217,9 +219,9 @@ test("hidden parameter grants no rights; same-origin session controls, logout re
 });
 
 test.each([false, true])(
-	"two real watchers follow two engine rounds and graceful stop (twoStep=%s)",
-	async (twoStep) => {
-		const f = await fixture(twoStep),
+	"two real watchers follow two engine rounds and graceful stop (legacyTick=%s)",
+	async (legacyTick) => {
+		const f = await fixture(legacyTick),
 			a = await watcher(f.base),
 			b = await watcher(f.base),
 			cookie = await f.login();
@@ -288,9 +290,9 @@ test.each([false, true])(
 );
 
 test.each([false, true])(
-	"service shutdown waits for controlled work and preserves intent (twoStep=%s)",
-	async (twoStep) => {
-		const f = await fixture(twoStep),
+	"service shutdown waits for controlled work and preserves intent (legacyTick=%s)",
+	async (legacyTick) => {
+		const f = await fixture(legacyTick),
 			w = await watcher(f.base),
 			cookie = await f.login();
 		await f.req(

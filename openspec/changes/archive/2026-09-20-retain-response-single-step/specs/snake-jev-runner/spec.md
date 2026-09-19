@@ -1,10 +1,4 @@
-# snake-jev-runner Specification
-
-## Purpose
-
-通过用户指定的 Typesafe 官方 JEV 1.13 做持续移动贪吃蛇的真实方向决策，保持模型请求和游戏循环独立，并将选择、概率、响应时间与是否生效作为可观察记录。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: 真实结构化决策
 
@@ -150,16 +144,10 @@ CLI 与连续频道 SHALL 共用唯一的响应单步运行能力，保留观察
 - **WHEN** 频道在第一局结束且清理成功后创建第二局
 - **THEN** 新局有独立 matchId、控制凭证和观察历史，旧请求不能控制新局
 
-### Requirement: 停止续局与停止模型调用分离
+## REMOVED Requirements
 
-所有者停止后续开局 SHALL 不取消已运行本局的模型请求，不改变其方向或强行结束。只有本局真实终局、既有明确错误或服务退出 SHALL 按既有规则取消请求和清理连接。正常终局同时出现真实 API 错误时 SHALL 保留错误，不把它吞掉并继续下一局。
+### Requirement: 显式选择和关闭备用模式
 
-#### Scenario: 所有者停止时模型还在等待
+**Reason**: 产品只保留响应单步，不再提供备用模式选择。
 
-- **WHEN** 本局正在等待模型响应，所有者停止连续开局
-- **THEN** 此请求继续等待，返回后按原目标和规则提交；频道只记住本局结束后不再开局
-
-#### Scenario: 终局与真实 API 错误相邻
-
-- **WHEN** 引擎已终局，但运行器仍报告真实 API、网络或解析错误
-- **THEN** 该错误仍使频道进入故障，不被当成成功清理而安排下一局
+**Migration**: 移除 two_step_fallback、fixed 和步长配置；可直接默认启动或显式声明 response/single_step。旧记录继续按原模式查看。

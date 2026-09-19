@@ -153,11 +153,11 @@ test("match creation, channel claim and event roll back together before publicat
 	store.close();
 });
 
-test("shared config preserves existing modes, overrides, seeds and validation", () => {
+test("shared config is response-only and preserves overrides, seeds and validation", () => {
 	expect(gameConfig({})).toMatchObject({
-		stepMode: "fixed",
-		decisionMode: "two_step_fallback",
-		tickIntervalMs: 300,
+		stepMode: "response",
+		decisionMode: "single_step",
+		tickIntervalMs: null,
 	});
 	expect(
 		gameConfig({ SNAKE_STEP_MODE: "response", SNAKE_TICK_MS: "bad" }),
@@ -171,12 +171,12 @@ test("shared config preserves existing modes, overrides, seeds and validation", 
 	expect(gameConfig({ SNAKE_WIDTH: "12" }, { width: "9" }).width).toBe(9);
 	expect(() =>
 		gameConfig({ SNAKE_STEP_MODE: "response" }, { "tick-ms": "100" }),
-	).toThrow("cannot be combined");
+	).toThrow("retired");
 	expect(() =>
 		gameConfig(
 			{ SNAKE_STEP_MODE: "response" },
 			{ "decision-mode": "two_step_fallback" },
 		),
-	).toThrow("cannot use");
+	).toThrow("Only single_step");
 	expect(() => gameConfig({ SNAKE_WIDTH: "bad" })).toThrow();
 });

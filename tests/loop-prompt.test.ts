@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
 import { expect, test, vi } from "vitest";
 import { inspectMove } from "../server/game/engine.js";
-import { askJev, decisionBody, planBody } from "../server/jev/client.js";
+import { askJev, decisionBody } from "../server/jev/client.js";
 import {
 	advanceGeometry,
 	analyzeAction,
 	staticSpace,
 } from "../server/jev/context-v3.js";
+import { planBody } from "../server/jev/legacy-context.js";
 import { ProgressHistory } from "../server/jev/progress.js";
 import {
 	decisionRequestSchema,

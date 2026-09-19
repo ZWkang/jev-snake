@@ -2,15 +2,14 @@ import { expect, test, vi } from "vitest";
 import { createState, move } from "../server/game/engine.js";
 import {
 	askJev,
-	askJevPlan,
 	decisionBody,
 	JEV_ENDPOINT,
 	JEV_MODEL,
-	planBody,
 } from "../server/jev/client.js";
 import { JEV_PROVIDERS, jevConfig } from "../server/jev/config.js";
 import { analyzeActions } from "../server/jev/context-v3.js";
 import { actionFacts } from "../server/jev/context.js";
+import { planBody } from "../server/jev/legacy-context.js";
 import {
 	decisionRequestSchema,
 	planRequestSchema,
@@ -236,105 +235,12 @@ test.each([
 	},
 );
 
-test("two-step request is one real Choice over ordered pairs using only the actual observed state", async () => {
-	const { askJevPlan, planBody } = await import("../server/jev/client.js");
-	const { planChoices } = await import("../shared/snake/types.js");
+test("legacy plan bodies remain readable offline without a plan transport", () => {
 	const before = structuredClone(state);
-	const probabilities = Object.fromEntries(
-		planChoices.map((c) => [c, c === "right_down" ? 0.99 : 0]),
-	);
-	const transport = vi.fn<typeof fetch>().mockResolvedValue(
-		Response.json({
-			model: "test-plan-model",
-			answers: {
-				plan: {
-					type: "choice",
-					choice: "right_down",
-					probabilities,
-					confidence: 0.98,
-				},
-			},
-			usage: { input_tokens: 321 },
-		}),
-	);
-	const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-	try {
-		const d = await askJevPlan("plan-test-secret", state, {
-			fetch: transport,
-			provider: "openrouter",
-		});
-		expect(transport).toHaveBeenCalledOnce();
-		expect(transport.mock.calls[0][0]).toBe(JEV_PROVIDERS.openrouter.endpoint);
-		expect(d).toMatchObject({
-			kind: "plan",
-			choice: "right_down",
-			model: "test-plan-model",
-			inputTokens: 321,
-			probabilities,
-		});
-		const req = JSON.parse(transport.mock.calls[0][1]?.body as string);
-		expect(d.request).toEqual(req);
-		expect(d.contextBuildMs).toBeGreaterThanOrEqual(0);
-		expect(d.requestBytes).toBe(
-			Buffer.byteLength(transport.mock.calls[0][1]?.body as string, "utf8"),
-		);
-		expect(planRequestSchema.safeParse(req).success).toBe(true);
-		expect(req.questions.direction).toBeUndefined();
-		expect(Object.keys(req.questions.plan.criteria)).toHaveLength(16);
-		expect(
-			Object.values(req.questions.plan.criteria).every(
-				(x) => typeof x === "object",
-			),
-		).toBe(true);
-		expect(req.state).toMatchObject({
-			contextVersion: "two-step-plan-v4",
-			planningHorizon: 2,
-			targetTicks: [1, 2],
-			player: { head: state.snake[0], length: state.snake.length },
-			timing: { stateIsProjected: false, observedTick: 0 },
-		});
-		expect(JSON.stringify(d)).not.toContain("plan-test-secret");
-		expect(state).toEqual(before);
-		expect(planBody(state).state.food).toEqual({
-			apple: state.apple,
-			star: state.star,
-		});
-		expect(warn).toHaveBeenCalledOnce();
-	} finally {
-		warn.mockRestore();
-	}
-	for (const patch of [
-		{ choice: "right" },
-		{ probabilities: { right_down: 1 } },
-		{ confidence: 2 },
-	]) {
-		await expect(
-			askJevPlan("test", state, {
-				fetch: vi.fn<typeof fetch>().mockResolvedValue(
-					Response.json({
-						model: "m",
-						answers: {
-							plan: {
-								type: "choice",
-								choice: "right_down",
-								probabilities,
-								confidence: 1,
-								...patch,
-							},
-						},
-					}),
-				),
-			}),
-		).rejects.toThrow("Invalid JEV");
-	}
-	await expect(askJevPlan("", state)).rejects.toThrow("TYPESAFE_API_KEY");
-	await expect(
-		askJevPlan("test", state, {
-			fetch: vi
-				.fn<typeof fetch>()
-				.mockResolvedValue(new Response("unavailable", { status: 503 })),
-		}),
-	).rejects.toThrow("503");
+	const request = planBody(state);
+	expect(planRequestSchema.parse(request)).toEqual(request);
+	expect(Object.keys(request.questions.plan.criteria)).toHaveLength(16);
+	expect(state).toEqual(before);
 });
 
 test("response requests describe one real move with observed elapsed time and no fixed deadline", async () => {
@@ -370,9 +276,7 @@ test("response requests describe one real move with observed elapsed time and no
 	expect(result.request).toEqual(body);
 	expect(responseState).toEqual(before);
 	expect(JSON.stringify(result)).not.toContain("response-test-key");
-	expect(() =>
-		askJevPlan("response-test-key", responseState, { fetch: transport }),
-	).toThrow("cannot use two_step_fallback");
+	expect(() => planBody(responseState)).toThrow("cannot use two_step_fallback");
 	expect(transport).toHaveBeenCalledOnce();
 });
 

@@ -55,7 +55,7 @@ async function connect(url: string, token?: string) {
 		},
 	};
 }
-test("real HTTP + WS: visitor read-only, clocks independent, reconnect recovers exact sequence", async () => {
+test("real HTTP + WS: visitor read-only, waiting never moves, reconnect recovers exact sequence", async () => {
 	const dir = mkdtempSync(join(tmpdir(), "snake-ws-"));
 	const adminToken = "admin".repeat(8);
 	const token = "controller".repeat(5);
@@ -81,7 +81,7 @@ test("real HTTP + WS: visitor read-only, clocks independent, reconnect recovers 
 			width: 24,
 			height: 18,
 			obstacleCount: 0,
-			tickIntervalMs: 60,
+			stepMode: "response",
 			seed: "ws",
 		},
 	};
@@ -120,6 +120,18 @@ test("real HTTP + WS: visitor read-only, clocks independent, reconnect recovers 
 	expect(
 		(await controller.waitFor((m) => m.type === "ack")).receipt?.status,
 	).toBe("applied");
+	for (let i = 0; i < 2; i++) {
+		const c = game.service.decisionContext(state.id);
+		game.service.command(state.id, {
+			protocolVersion: 1,
+			type: "action",
+			requestId: `move-${i}`,
+			observedSeq: c.observedSeq,
+			targetTick: c.targetTick,
+			expectedStateHash: c.expectedStateHash,
+			direction: "right",
+		});
+	}
 	const movement = await watcher.waitFor(
 		(m) => m.type === "event" && (m.event?.tick ?? 0) >= 2,
 	);
@@ -127,13 +139,24 @@ test("real HTTP + WS: visitor read-only, clocks independent, reconnect recovers 
 	watcher.socket.close();
 	controller.socket.close();
 	await new Promise((resolve) => setTimeout(resolve, 140));
+	expect(game.store.get(state.id).tick).toBe(2);
+	const c = game.service.decisionContext(state.id);
+	game.service.command(state.id, {
+		protocolVersion: 1,
+		type: "action",
+		requestId: "move-after-disconnect",
+		observedSeq: c.observedSeq,
+		targetTick: c.targetTick,
+		expectedStateHash: c.expectedStateHash,
+		direction: "right",
+	});
 	const reconnected = await connect(`${wsBase}/watch`);
 	reconnected.socket.send(
 		JSON.stringify({ type: "subscribe", afterSeq: cursor }),
 	);
 	const first = await reconnected.waitFor((m) => m.type === "event");
 	expect(first.event?.seq).toBe(cursor + 1);
-	expect(game.store.get(state.id).tick).toBeGreaterThanOrEqual(4);
+	expect(game.store.get(state.id).tick).toBe(3);
 	const collected = (await (
 		await fetch(`${base}/api/matches/${state.id}/events?afterSeq=-1`)
 	).json()) as { events: MatchEvent[] };
@@ -143,111 +166,42 @@ test("real HTTP + WS: visitor read-only, clocks independent, reconnect recovers 
 	);
 });
 
-test("v2 plans require control auth, persist before acknowledgment and replay ordered fallback events", async () => {
-	const { makePlan } = await import("./plan-fixture.js");
-	const dir = mkdtempSync(join(tmpdir(), "snake-v2-ws-"));
-	const token = "v2-control-secret".repeat(3);
-	const adminToken = "v2-admin-secret".repeat(3);
+test("health declares only v1 and authenticated v2 commands cannot execute", async () => {
 	const game = startServer({
-		path: join(dir, "game.sqlite"),
-		adminToken,
+		path: ":memory:",
+		adminToken: "a".repeat(32),
 		port: 0,
 	});
-	disposers.push(async () => {
-		await game.close();
-		rmSync(dir, { recursive: true, force: true });
-	});
-	if (!game.server.listening) await once(game.server, "listening");
+	disposers.push(() => game.close());
+	await game.ready;
 	const address = game.server.address();
 	if (!address || typeof address === "string") throw new Error("No address");
 	const base = `http://127.0.0.1:${address.port}`;
-	const health = await (await fetch(`${base}/api/health`)).json();
-	expect(health.supportedProtocolVersions).toEqual([1, 2]);
-	const response = await fetch(`${base}/api/matches`, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${adminToken}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			requestId: "v2-create",
-			controlToken: token,
-			agentName: "V2 test only",
-			config: {
-				width: 24,
-				height: 18,
-				obstacleCount: 0,
-				tickIntervalMs: 500,
-				seed: "v2",
-				decisionMode: "two_step_fallback",
-			},
-		}),
+	expect(
+		(await (await fetch(`${base}/api/health`)).json())
+			.supportedProtocolVersions,
+	).toEqual([1]);
+	const token = "response-control-".repeat(3);
+	const created = game.service.create({
+		requestId: "create",
+		controlToken: token,
+		agentName: "Protocol test",
+		config: { seed: "ws-retirement", obstacleCount: 0 },
 	});
-	expect(response.status).toBe(201);
-	const state = await response.json();
-	const wsBase = `${base.replace("http", "ws")}/ws/matches/${state.id}`;
+	const wsBase = `${base.replace("http", "ws")}/ws/matches/${created.id}`;
 	const unauthorized = new WebSocket(`${wsBase}/control`);
 	const [req, denied] = await once(unauthorized, "unexpected-response");
 	expect(denied.statusCode).toBe(401);
 	req.destroy();
 	const controller = await connect(`${wsBase}/control`, token);
 	controller.socket.send(
-		JSON.stringify({
-			protocolVersion: 2,
-			type: "start",
-			requestId: "v2-start",
-		}),
-	);
-	await controller.waitFor((m) => m.type === "ack");
-	const contextResponse = await fetch(
-		`${base}/api/matches/${state.id}/decision-context`,
-		{ headers: { Authorization: `Bearer ${token}` } },
-	);
-	const plan = makePlan(await contextResponse.json());
-	const watcher = await connect(`${wsBase}/watch`);
-	watcher.socket.send(JSON.stringify(plan));
-	expect((await watcher.waitFor((m) => m.type === "error")).error?.code).toBe(
-		"readonly",
-	);
-	watcher.socket.send(JSON.stringify({ type: "subscribe", afterSeq: -1 }));
-	controller.socket.send(JSON.stringify(plan));
-	await controller.waitFor(
-		(m) => m.type === "ack" && m.receipt?.status === "accepted",
+		JSON.stringify({ protocolVersion: 2, type: "start", requestId: "retired" }),
 	);
 	expect(
-		game.store.request(state.id, plan.requestId)?.receipt.steps?.[1].status,
-	).toBe("standby");
-	const applied = await watcher.waitFor(
-		(m) => m.event?.state.lastAppliedAction?.source === "fallback",
-	);
-	const cursor = applied.event?.seq as number;
-	watcher.socket.close();
-	controller.socket.send(
-		JSON.stringify({ protocolVersion: 2, type: "stop", requestId: "v2-stop" }),
-	);
-	await controller.waitFor((m) => m.event?.type === "interrupted");
-	const reconnect = await connect(`${wsBase}/watch`);
-	reconnect.socket.send(
-		JSON.stringify({ type: "subscribe", afterSeq: cursor }),
-	);
-	expect((await reconnect.waitFor((m) => m.type === "event")).event?.seq).toBe(
-		cursor + 1,
-	);
-	const rows = game.store.events(state.id, -1).events;
-	expect(rows.every((e, i) => e.seq === i)).toBe(true);
-	const publicText = JSON.stringify(rows);
-	for (const secret of [
-		token,
-		adminToken,
-		"Authorization",
-		"control_hash",
-		'"plans":',
-		"rngState",
-	])
-		expect(publicText).not.toContain(secret);
-	expect(
-		game.store
-			.request(state.id, plan.requestId)
-			?.receipt.steps?.map((s) => s.status),
-	).toEqual(["applied", "applied"]);
+		(await controller.waitFor((m) => m.type === "error")).error?.code,
+	).toBe("unsupported_protocol");
+	expect(game.store.get(created.id)).toMatchObject({
+		tick: 0,
+		status: "ready",
+	});
 });

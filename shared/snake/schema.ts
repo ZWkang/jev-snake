@@ -208,7 +208,7 @@ const responseConfigSchema = fixedConfigSchema
 	})
 	.strict();
 export const configSchema = z.union([fixedConfigSchema, responseConfigSchema]);
-export const createSchema = z
+export const legacyCreateSchema = z
 	.object({
 		requestId: z.string().min(1),
 		controlToken: z.string().min(32),
@@ -217,6 +217,14 @@ export const createSchema = z
 		config: configSchema,
 	})
 	.strict();
+// Creation is response-only; historical configuration parsing stays unchanged.
+export const newConfigSchema = responseConfigSchema.extend({
+	stepMode: z.literal("response").default("response"),
+	decisionMode: z.literal("single_step").default("single_step"),
+});
+export const createSchema = legacyCreateSchema.extend({
+	config: newConfigSchema,
+});
 export const forkSchema = createSchema
 	.omit({ config: true })
 	.extend({ sourceSeq: integer })

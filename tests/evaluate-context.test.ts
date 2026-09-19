@@ -40,7 +40,7 @@ test("offline evaluation never calls a provider and reports measured costs, base
 	expect(JSON.stringify(report)).not.toContain("eval-private-key");
 });
 
-test("explicit live evaluation sends twelve serial requests through the production contract and records errors without replacement", async () => {
+test("explicit live evaluation sends three response-only serial requests through the production contract and records errors without replacement", async () => {
 	let inFlight = 0,
 		maxInFlight = 0;
 	const bodies: unknown[] = [];
@@ -50,6 +50,8 @@ test("explicit live evaluation sends twelve serial requests through the producti
 			inFlight++;
 			maxInFlight = Math.max(maxInFlight, inFlight);
 			const body = JSON.parse(init?.body as string);
+			expect(body.questions.plan).toBeUndefined();
+			expect(body.state.timing.stepMode).toBe("response");
 			bodies.push(body);
 			await new Promise((resolve) => setTimeout(resolve, 1));
 			inFlight--;
@@ -83,9 +85,9 @@ test("explicit live evaluation sends twelve serial requests through the producti
 		env,
 		fetch: transport,
 	});
-	expect(transport).toHaveBeenCalledTimes(12);
+	expect(transport).toHaveBeenCalledTimes(3);
 	expect(maxInFlight).toBe(1);
-	expect(report.live.completedRequests).toBe(12);
+	expect(report.live.completedRequests).toBe(3);
 	expect(report.live.failedRequests).toBe(2);
 	expect(report.live.results[0].error).toContain("503");
 	expect(report.live.results[0].responseText).toBe(

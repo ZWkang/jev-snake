@@ -1,4 +1,4 @@
-import { planBody } from "../server/jev/client.js";
+import { planBody } from "../server/jev/legacy-context.js";
 import {
 	type DecisionContext,
 	type PlanChoice,

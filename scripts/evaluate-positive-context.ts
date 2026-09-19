@@ -141,6 +141,12 @@ export async function evaluatePositiveContext(
 	];
 	const cases = fixtures.map(({ name, state: fullState, source }) => {
 		const state = publicState(fullState);
+		state.config = {
+			...state.config,
+			stepMode: "response",
+			decisionMode: "single_step",
+			tickIntervalMs: null,
+		};
 		const progress = options.progressByFixture?.[name];
 		const v3 = measure(
 			() => decisionBodyV3(state, config.model, undefined, progress),
@@ -246,16 +252,11 @@ export async function evaluatePositiveContext(
 					return response;
 				};
 				try {
-					const output = await sendJevRequest(
-						config.apiKey,
-						input.request,
-						"direction",
-						{
-							provider: config.provider,
-							fetch: transport,
-							contextBuildMs: input.contextBuildMs.last,
-						},
-					);
+					const output = await sendJevRequest(config.apiKey, input.request, {
+						provider: config.provider,
+						fetch: transport,
+						contextBuildMs: input.contextBuildMs.last,
+					});
 					result.decision = output.decision;
 					if (
 						output.response !== null &&

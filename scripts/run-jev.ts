@@ -3,10 +3,13 @@ import "dotenv/config";
 import { parseArgs } from "node:util";
 import { jevConfig } from "../server/jev/config.js";
 import { gameClient } from "../server/jev/game-client.js";
-import { gameConfig } from "../server/jev/game-config.js";
+import {
+	gameConfig,
+	warnDeprecatedTickConfig,
+} from "../server/jev/game-config.js";
 import { runJevMatch } from "../server/jev/runner.js";
 import { configSchema } from "../shared/snake/schema.js";
-import type { PublicState } from "../shared/snake/types.js";
+import { isResponseMode, type PublicState } from "../shared/snake/types.js";
 
 const { values } = parseArgs({
 	options: {
@@ -86,20 +89,13 @@ if (forkMatch !== undefined) {
 		);
 	configSchema.parse(source.config);
 }
+// Forks inherit the saved response configuration, including map and timing.
+if (source) warnDeprecatedTickConfig(process.env);
+if (source && !isResponseMode(source.config))
+	throw new Error(
+		"mode_retired: Only response single-step matches can be forked; the original remains available for replay",
+	);
 const config = source ? source.config : gameConfig(process.env, values);
-const decisionMode = config.decisionMode ?? "single_step";
-const protocolVersion = decisionMode === "two_step_fallback" ? 2 : 1;
-if (protocolVersion === 2) {
-	const response = await fetch(`${root}/api/health`);
-	if (!response.ok) throw new Error(`Game health HTTP ${response.status}`);
-	const health = (await response.json()) as {
-		supportedProtocolVersions?: number[];
-	};
-	if (!health.supportedProtocolVersions?.includes(2))
-		throw new Error(
-			"Game server does not support two_step_fallback protocol v2",
-		);
-}
 const identity = {
 	requestId: randomUUID(),
 	controlToken,

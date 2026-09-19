@@ -65,7 +65,7 @@ export function createApp(
 				model: options.jevModel ?? JEV_PROVIDERS.typesafe.model,
 				provider: options.jevProvider ?? "typesafe",
 				protocolVersion: 1,
-				supportedProtocolVersions: [1, 2],
+				supportedProtocolVersions: [1],
 			},
 			service.fault ? 503 : 200,
 		),

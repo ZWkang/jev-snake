@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vitest";
 import { createState } from "../server/game/engine";
-import { decisionBody, planBody } from "../server/jev/client";
+import { decisionBody } from "../server/jev/client.js";
+import { planBody } from "../server/jev/legacy-context.js";
 import type {
 	DecisionRequest,
 	LegacyDecisionRequest,

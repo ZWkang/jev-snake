@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { decisionBody, planBody } from "../server/jev/client.js";
+import { decisionBody } from "../server/jev/client.js";
+import { planBody } from "../server/jev/legacy-context.js";
 import { actionSummarySchema } from "../shared/snake/context-schema.js";
 import {
 	decisionRequestSchema,

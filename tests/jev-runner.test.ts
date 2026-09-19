@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, expect, test } from "vitest";
 import { JEV_ENDPOINT } from "../server/jev/client.js";
-import { analyzeActions } from "../server/jev/context-v3.js";
 import { startServer } from "../server/start.js";
 import type {
 	DecisionContext,
@@ -20,28 +19,18 @@ afterEach(async () => {
 
 async function fixture(
 	mode:
-		| "failure"
-		| "fast"
-		| "late"
-		| "late-error"
-		| "rounded"
-		| "two-step"
-		| "two-error"
-		| "two-cancel"
-		| "two-signal"
-		| "bad-plan"
-		| "old-server"
 		| "response-fast"
 		| "response-slow"
 		| "response-reverse"
 		| "response-stale"
 		| "response-protocol"
 		| "response-error"
+		| "response-stop-error"
 		| "response-cancel"
 		| "response-loop"
 		| "response-no-progress"
 		| "response-progress-mismatch"
-		| "response-rounded" = "failure",
+		| "response-rounded" = "response-error",
 ) {
 	const dir = mkdtempSync(join(tmpdir(), "snake-jev-runner-"));
 	const adminToken = "runner-test-admin".repeat(4);
@@ -69,51 +58,29 @@ let callNumber = 0;
 let requestsInFlight = 0;
 let contextCount = 0;
 globalThis.fetch = async (input, init) => {
-  if (${JSON.stringify(mode)} === "old-server" && String(input).endsWith("/api/health")) return Response.json({protocolVersion:1});
   if (String(input) === ${JSON.stringify(JEV_ENDPOINT)}) {
     callNumber++;
     const body = JSON.parse(init.body);
     appendFileSync(${JSON.stringify(join(dir, "bodies.jsonl"))}, init.body + "\\n");
     const mode = ${JSON.stringify(mode)};
-    if (mode.startsWith("response-")) {
       requestsInFlight++;
       if (requestsInFlight !== 1) throw new Error("Concurrent model requests");
       if (!body.questions.direction || body.questions.plan) throw new Error("Response mode must request one direction");
       const before = (await (await originalFetch(${JSON.stringify(`${root}/api/matches`)})).json()).matches[0];
       if (before.tick !== body.state.timing.observedTick) throw new Error("Model request used an unconfirmed position");
       console.log(JSON.stringify({type:"test_transport_started",callNumber,observedTick:before.tick,inFlight:requestsInFlight}));
-      const delay = mode === "response-slow" ? [120,470,1770][(callNumber - 1) % 3] : mode === "response-cancel" ? 3000 : 10;
+      const delay = mode === "response-slow" ? [120,470,1770][(callNumber - 1) % 3] : mode === "response-cancel" ? 3000 : mode === "response-stop-error" ? 250 : 10;
       await new Promise((resolve, reject) => {
         if (init.signal.aborted) { reject(init.signal.reason); return; }
         const timer = setTimeout(resolve, delay);
-        init.signal.addEventListener("abort", () => { clearTimeout(timer); reject(init.signal.reason); }, {once:true});
+        if (mode !== "response-stop-error") init.signal.addEventListener("abort", () => { clearTimeout(timer); reject(init.signal.reason); }, {once:true});
       });
       const after = (await (await originalFetch(${JSON.stringify(`${root}/api/matches`)})).json()).matches[0];
       if (before.tick !== after.tick) throw new Error("Response snake moved while awaiting model");
       requestsInFlight--;
-      if (mode === "response-error") return new Response("response-test-upstream-error", {status:503});
+      if (mode === "response-error" || mode === "response-stop-error") return new Response("response-test-upstream-error", {status:503});
       const choice = mode === "response-reverse" && callNumber === 1 ? "left" : mode === "response-loop" && callNumber <= 12 ? ["right","down","left","up"][(callNumber - 1) % 4] : "right";
       return Response.json({model:"test-only-response-mode",answers:{direction:{type:"choice",choice,probabilities:Object.fromEntries(["up","right","down","left"].map(direction => [direction,direction === choice ? (mode === "response-rounded" ? 0.99 : 1) : 0])),confidence:1}}});
-    }
-    if (body.questions.plan) {
-      const mode = ${JSON.stringify(mode)};
-      const delay = callNumber === 2 ? (mode === "two-step" || mode === "two-error" ? 835 : 3000) : 10;
-      await new Promise((resolve, reject) => {
-        const timer = setTimeout(resolve, delay);
-        init.signal.addEventListener("abort", () => { clearTimeout(timer); reject(init.signal.reason); }, {once:true});
-      });
-      if (mode === "two-error" && callNumber === 2) return new Response("two-step-test-error", {status:503});
-      const choice = mode === "bad-plan" ? "invalid" : callNumber === 1 && ["two-step","two-error"].includes(mode) ? "right_down" : "right_right";
-      return Response.json({model:"test-only-plan-response",answers:{plan:{type:"choice",choice,probabilities:Object.fromEntries(Object.keys(body.questions.plan.criteria).map(c=>[c,c===choice?1:0])),confidence:1}}});
-    }
-    if (${JSON.stringify(mode)} === "failure")
-      return new Response("runner-test-upstream-unavailable", { status: 503 });
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(resolve, ${mode === "late-error" ? 2300 : mode === "late" ? 650 : 10});
-      if (${JSON.stringify(mode)} !== "late-error") init.signal.addEventListener("abort", () => { clearTimeout(timer); reject(init.signal.reason); }, { once: true });
-    });
-    if (${JSON.stringify(mode)} === "late-error") return new Response("upstream-after-match-end", { status: 503 });
-    return Response.json({model:"typesafe/jev-1.13",answers:{direction:{type:"choice",choice:${JSON.stringify(mode === "late" ? "up" : "right")},probabilities:{up:${mode === "late" ? 1 : 0},right:${mode === "late" ? 0 : mode === "rounded" ? 0.99 : 1},down:0,left:0},confidence:1}}});
   }
   if (!String(input).startsWith(${JSON.stringify(`${root}/`)}))
     throw new Error("Unexpected test network destination");
@@ -167,16 +134,10 @@ globalThis.fetch = async (input, init) => {
 					"18",
 					"--obstacles",
 					"0",
-					...(mode.startsWith("response-") ? [] : ["--tick-ms", "500"]),
 					"--seed",
 					// These transport scenarios deliberately answer right/down. Keep a
 					// reproducible right-facing opening with room for their test paths.
 					"runner-spawn-45",
-					...(["failure", "fast", "late", "late-error", "rounded"].includes(
-						mode,
-					)
-						? ["--decision-mode", "single_step"]
-						: []),
 					...args,
 				],
 				{
@@ -188,7 +149,7 @@ globalThis.fetch = async (input, init) => {
 						TYPESAFE_API_KEY: apiKey,
 						OPENROUTER_API_KEY: "",
 						GAME_ADMIN_TOKEN: adminToken,
-						SNAKE_STEP_MODE: "fixed",
+						SNAKE_STEP_MODE: "response",
 						SNAKE_TICK_MS: "50000",
 						...env,
 					},
@@ -202,23 +163,10 @@ globalThis.fetch = async (input, init) => {
 			let sentSignal = false;
 			child.stdout.on("data", (data) => {
 				output += data.toString();
-				// The 835ms scenario ends once its replacement plan is accepted.
-				// Letting it run to the wall also exercises unrelated later deadlines,
-				// where another plan may legitimately consume its own backup.
 				if (
 					!sentSignal &&
-					((mode === "two-step" &&
-						output
-							.split("\n")
-							.slice(0, -1)
-							.some(
-								(line) =>
-									line.startsWith('{"observedTick":2,"targetTick":3,') &&
-									line.includes('"status":"accepted"'),
-							)) ||
-						(mode === "two-signal" && output.includes('"observedTick":1')) ||
-						(mode === "response-cancel" &&
-							output.includes('"type":"test_transport_started"')))
+					(mode === "response-cancel" || mode === "response-stop-error") &&
+					output.includes('"type":"test_transport_started"')
 				) {
 					sentSignal = true;
 					child.kill("SIGINT");
@@ -280,242 +228,6 @@ test("the removed lookahead option is rejected before match creation", async () 
 	expect(result.code).not.toBe(0);
 	expect(f.game.store.list({}).matches).toHaveLength(0);
 	expect(result.output).toContain("Unknown option '--lookahead-ms'");
-});
-
-test("a fast model observes each actual position once and never queues future movements", async () => {
-	const f = await fixture("fast");
-	const result = await f.run(["--tick-ms", "300", "--width", "10"]);
-	expect(result.code).toBe(0);
-	const match = f.game.store.list({}).matches[0];
-	const events = f.game.store.events(match.id, -1).events;
-	expectProgressForwarded(f.decisionContexts(), f.transportBodies());
-	const actions = events.filter((e) => e.type === "action_accepted");
-	expect(actions.length).toBeGreaterThan(2);
-	expect(events.some((e) => e.type === "action_rejected")).toBe(false);
-	expect(new Set(actions.map((e) => e.tick)).size).toBe(actions.length);
-	for (const action of actions) {
-		const observed = events[Number(action.data.observedSeq)].state;
-		const request = action.state.lastDecision?.request;
-		expect(action.data.targetTick).toBe(observed.tick + 1);
-		expect(action.tick).toBe(observed.tick);
-		expect(request?.state.timing).toMatchObject({
-			stateIsProjected: false,
-			observedTick: observed.tick,
-			targetTick: observed.tick + 1,
-		});
-		expect(request?.state.contextVersion).toBe("action-facts-v4");
-		expect(request?.state.player).toMatchObject({
-			head: observed.snake[0],
-			length: observed.snake.length,
-		});
-		expect(request?.state.player).not.toHaveProperty("bodyHeadToTail");
-		expect(
-			request &&
-				"direction" in request.questions &&
-				request.questions.direction.criteria,
-		).toMatchObject(analyzeActions(observed));
-		expect(f.transportBodies()).toContainEqual(request);
-		expect(action.state.lastDecision?.requestBytes).toBe(
-			Buffer.byteLength(JSON.stringify(request), "utf8"),
-		);
-		expect(action.state.lastDecision?.contextBuildMs).toBeGreaterThanOrEqual(0);
-		const applied = events.find(
-			(e) =>
-				e.data.actionStatus === "applied" &&
-				e.data.requestId === action.data.requestId,
-		);
-		expect(applied?.tick).toBe(observed.tick + 1);
-	}
-});
-
-test("a late model result stays attached to its expired step and is never applied later", async () => {
-	const f = await fixture("late");
-	const result = await f.run(["--tick-ms", "300", "--width", "10"]);
-	expect(result.code).toBe(0);
-	expect(result.output).toContain('"type":"model_request_started"');
-	expect(result.output).toContain('"type":"model_request_cancelled"');
-	expect(result.output).toContain('"reason":"match_ended"');
-	const match = f.game.store.list({}).matches[0];
-	const events = f.game.store.events(match.id, -1).events;
-	expectProgressForwarded(f.decisionContexts(), f.transportBodies());
-	for (const body of f.transportBodies()) {
-		expect(body.state.progress.movesSinceApple).toBe(
-			body.state.timing.observedTick,
-		);
-		expect(body.state.progress.positionVisits).toBe(1);
-	}
-	expect(
-		f.transportBodies().some((body) => body.state.progress.movesSinceApple > 0),
-	).toBe(true);
-	const rejected = events.filter((e) => e.type === "action_rejected");
-	expect(rejected.length).toBeGreaterThan(1);
-	expect(events.some((e) => e.data.actionStatus === "applied")).toBe(false);
-	for (const action of rejected) {
-		expect(action.data.code).toBe("late_action");
-		const observed = events[Number(action.data.observedSeq)].state;
-		expect(action.data.targetTick).toBe(observed.tick + 1);
-		expect(action.state.direction).toBe("right");
-	}
-});
-
-test("upstream failure exits unsuccessfully and persists an interrupted match", async () => {
-	const f = await fixture();
-	const result = await f.run();
-	expect(result.code).not.toBe(0);
-	expect(result.output).toContain("HTTP 503");
-	expect(result.output).toContain("runner-test-upstream-unavailable");
-	const matches = f.game.store.list({}).matches;
-	expect(matches).toHaveLength(1);
-	expect(matches[0].status).toBe("interrupted");
-	expect(matches[0].endReason).toBe("model_error");
-	const events = f.game.store.events(matches[0].id, -1).events;
-	expect(events.at(-1)?.type).toBe("interrupted");
-	expect(events.every((event) => event.state.lastDecision === null)).toBe(true);
-});
-
-test("a genuine upstream error racing with gameover is exposed rather than treated as cancellation", async () => {
-	const f = await fixture("late-error");
-	const result = await f.run(["--tick-ms", "300", "--width", "10"]);
-	expect(f.game.store.list({}).matches[0].status).toBe("gameover");
-	expect(result.code).not.toBe(0);
-	expect(result.output).toContain("HTTP 503");
-	expect(result.output).toContain("upstream-after-match-end");
-	expect(result.output).toContain('"type":"model_request_failed"');
-	expect(result.output).not.toContain("runner-test-credential");
-});
-
-test("a 0.99 probability total is preserved and the runner keeps playing", async () => {
-	const f = await fixture("rounded");
-	const result = await f.run(["--tick-ms", "300", "--width", "10"]);
-	expect(result.code).toBe(0);
-	expect(result.output).toContain("probabilities_not_normalized");
-	const match = f.game.store.list({}).matches[0];
-	expect(match.status).toBe("gameover");
-	expect(match.endReason).toBe("wall");
-	const actions = f.game.store
-		.events(match.id, -1)
-		.events.filter((e) => e.type === "action_accepted");
-	expect(actions.length).toBeGreaterThan(2);
-	for (const event of actions) {
-		expect(event.state.lastDecision?.choice).toBe("right");
-		expect(event.state.lastDecision?.probabilities).toEqual({
-			up: 0,
-			right: 0.99,
-			down: 0,
-			left: 0,
-		});
-	}
-});
-
-test("default two-step runner uses stored backup during 835ms request, rejects stale plan, then observes the actual fallback position", async () => {
-	const f = await fixture("two-step");
-	const result = await f.run(["--width", "10"]);
-	expect(result.code).toBe(0);
-	expect(result.output).toContain("mode two_step_fallback");
-	const match = f.game.store.list({}).matches[0];
-	expect(match.config.decisionMode).toBe("two_step_fallback");
-	expect(match.config.tickIntervalMs).toBe(500);
-	expect(match).toMatchObject({
-		status: "interrupted",
-		endReason: "controller_stop",
-	});
-	const events = f.game.store.events(match.id, -1).events;
-	expectProgressForwarded(f.decisionContexts(), f.transportBodies());
-	const first = events.find((e) => e.type === "plan_accepted");
-	expect(first?.state.lastDecision?.request?.state.contextVersion).toBe(
-		"two-step-plan-v4",
-	);
-	expect(f.transportBodies()).toContainEqual(
-		first?.state.lastDecision?.request,
-	);
-	expect(first?.state.lastDecision?.requestBytes).toBe(
-		Buffer.byteLength(
-			JSON.stringify(first?.state.lastDecision?.request),
-			"utf8",
-		),
-	);
-	const backup = events.find(
-		(e) => e.tick === 2 && e.data.actionStatus === "applied",
-	);
-	expect(backup?.state.lastAppliedAction).toMatchObject({
-		source: "fallback",
-		stepIndex: 1,
-		requestId: first?.data.requestId,
-	});
-	const rejected = events.find((e) => e.type === "plan_rejected");
-	expect(rejected?.data.code).toBe("late_action");
-	const resumed = events.find(
-		(e) => e.type === "plan_accepted" && Number(e.data.observedTick) >= 2,
-	);
-	expect(resumed?.state.lastDecision?.request?.state.player.head).toEqual(
-		backup?.state.snake[0],
-	);
-	expect(resumed?.state.lastDecision?.request?.state).toHaveProperty(
-		"progress",
-		expect.objectContaining({ throughTick: 2, movesSinceApple: 2 }),
-	);
-	const starts = result.output
-		.split("\n")
-		.filter((l) => l.startsWith('{"type":"model_request_started"'))
-		.map((l) => JSON.parse(l).observedTick);
-	expect(starts).toEqual([0, 1, 2]);
-	expect(new Set(starts).size).toBe(starts.length);
-	const fallbacks = events.filter(
-		(e) =>
-			e.state.lastAppliedAction?.source === "fallback" &&
-			e.data.actionStatus === "applied",
-	);
-	expect(
-		fallbacks,
-		JSON.stringify({
-			fallbacks: fallbacks.map((event) => ({
-				tick: event.tick,
-				requestId: event.data.requestId,
-				observedTick: event.state.lastAppliedAction?.observedTick,
-			})),
-			output: result.output,
-		}),
-	).toHaveLength(1);
-});
-test.each(["two-error", "bad-plan"] as const)(
-	"%s exposes errors and interrupts without fallback hiding a failed call",
-	async (mode) => {
-		const f = await fixture(mode);
-		const result = await f.run(["--width", "10"]);
-		expect(result.code).not.toBe(0);
-		expect(result.output).toContain(
-			mode === "two-error" ? "HTTP 503" : "Invalid JEV",
-		);
-		expect(f.game.store.list({}).matches[0]).toMatchObject({
-			status: "interrupted",
-			endReason: "model_error",
-		});
-		expect(result.output).not.toContain("runner-test-credential");
-	},
-);
-test.each(["two-cancel", "two-signal"] as const)(
-	"%s cancels the pending model request and all unused steps",
-	async (mode) => {
-		const f = await fixture(mode);
-		const result = await f.run(["--width", "7"]);
-		expect(result.code).toBe(0);
-		expect(result.output).toContain('"type":"model_request_cancelled"');
-		const match = f.game.store.list({}).matches[0];
-		expect(match.status).toBe(
-			mode === "two-signal" ? "interrupted" : "gameover",
-		);
-		expect(f.game.store.get(match.id).plans).toEqual([]);
-	},
-);
-test("invalid decision mode and unsupported old server reject before creation", async () => {
-	const f = await fixture("old-server");
-	const invalid = await f.run(["--decision-mode", "invalid"]);
-	expect(invalid.code).not.toBe(0);
-	expect(invalid.output).toContain("decision-mode must be");
-	const unsupported = await f.run();
-	expect(unsupported.code).not.toBe(0);
-	expect(unsupported.output).toContain("does not support");
-	expect(f.game.store.list({}).matches).toHaveLength(0);
 });
 
 test.each(["response-fast", "response-slow"] as const)(
@@ -736,9 +448,7 @@ test("response mode config comes from CLI or environment, with conflicts rejecte
 	]) {
 		const result = await f.run(args);
 		expect(result.code).not.toBe(0);
-		expect(result.output).toMatch(
-			/step-mode must be|cannot be combined|cannot use/,
-		);
+		expect(result.output).toMatch(/Only response|retired|Only single_step/);
 		expect(f.game.store.list({}).matches).toHaveLength(0);
 	}
 	const result = await f.run(["--width", "7"], "runner-test-credential", {
@@ -787,4 +497,17 @@ test("response mode preserves rounded probabilities and keeps moving only on ret
 	expect(actions.length).toBeGreaterThan(2);
 	for (const action of actions)
 		expect(action.state.lastDecision?.probabilities.right).toBe(0.99);
+});
+
+test("a real upstream error after stop is reported as failure rather than successful cancellation", async () => {
+	const f = await fixture("response-stop-error");
+	const result = await f.run();
+	expect(result.code, result.output).toBe(1);
+	expect(result.output).toContain('"type":"model_request_failed"');
+	expect(result.output).toContain("HTTP 503");
+	expect(f.game.store.list().matches[0]).toMatchObject({
+		status: "interrupted",
+		tick: 0,
+		endReason: "controller_stop",
+	});
 });

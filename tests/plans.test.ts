@@ -1,352 +1,196 @@
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { Store } from "../server/db/store.js";
+import { gameConfig } from "../server/jev/game-config.js";
 import { MatchService } from "../server/matches/service.js";
-import { allControlSchema } from "../shared/snake/schema.js";
-import { type MatchState, publicState } from "../shared/snake/types.js";
-import { makePlan } from "./plan-fixture.js";
+import { createSchema, configSchema } from "../shared/snake/schema.js";
+import { decisionStatistics } from "../src/features/snake/replay.js";
+import { loadLegacy } from "./legacy-fixture.js";
 
-const disposers: (() => void)[] = [];
+const cleanup: (() => void)[] = [];
 afterEach(() => {
-	for (const close of disposers.splice(0).reverse()) close();
+	for (const close of cleanup.splice(0).reverse()) close();
 	vi.restoreAllMocks();
 });
-function fixture(configureReady?: (state: MatchState) => void) {
-	const dir = mkdtempSync(join(tmpdir(), "snake-plans-"));
-	const path = join(dir, "game.sqlite");
-	const store = new Store(path);
+function fixture(snapshot?: string, restart = false) {
+	const store = new Store(":memory:");
+	const legacy = snapshot ? loadLegacy(store, snapshot) : undefined;
 	let now = 0;
+	// A ready fixture is never scheduled; running snapshots intentionally exercise restart cancellation.
 	const service = new MatchService(store, () => now, false);
-	disposers.push(() => {
+	cleanup.push(() => {
 		service.close();
-		if (store.db.open) store.close();
-		rmSync(dir, { recursive: true, force: true });
+		store.close();
 	});
-	const creation = {
-		requestId: "create",
-		controlToken: "test-token".repeat(4),
-		agentName: "Test only",
-		config: {
-			width: 24,
-			height: 18,
-			obstacleCount: 0,
-			tickIntervalMs: 500,
-			seed: "plans",
-			decisionMode: "two_step_fallback",
-		},
-	};
-	const match = service.create(creation);
-	if (configureReady) {
-		const ready = store.get(match.id);
-		configureReady(ready);
-		store.commit(ready, []);
-	}
-	service.command(match.id, {
-		protocolVersion: 2,
-		requestId: "start",
-		type: "start",
-	});
+	if (restart) expect(legacy).toBeDefined();
 	return {
-		path,
 		store,
 		service,
-		match,
-		creation,
-		context: () => service.decisionContext(match.id),
-		read: () => store.get(match.id),
-		events: () => store.events(match.id, -1).events,
-		send: (command: unknown) => service.command(match.id, command),
-		time: (t: number) => {
-			now = t;
+		legacy,
+		time: (value: number) => {
+			now = value;
 		},
-		advance: (t: number) => {
-			now = t;
-			service.advance(match.id);
-		},
-		receipt: (id: string) => store.request(match.id, id)?.receipt,
 	};
 }
-test("protocol rejects malformed pairs, unknown versions, injected request secrets and mismatched modes", () => {
+const creation = {
+	requestId: "new-response",
+	controlToken: "response-only-test-control-token-00000",
+	agentName: "Response test",
+	config: { seed: "response-default", obstacleCount: 0 },
+};
+
+test("creation defaults to explicit response/single_step/null while historical parsing keeps fixed semantics", () => {
+	expect(createSchema.parse(creation).config).toMatchObject({
+		stepMode: "response",
+		decisionMode: "single_step",
+		tickIntervalMs: null,
+	});
+	expect(configSchema.parse(creation.config)).toMatchObject({
+		tickIntervalMs: 300,
+	});
 	const f = fixture();
-	const a = makePlan(f.context());
-	expect(allControlSchema.safeParse(a).success).toBe(true);
-	expect(
-		allControlSchema.safeParse({ ...a, directions: ["right"] }).success,
-	).toBe(false);
-	expect(allControlSchema.safeParse({ ...a, protocolVersion: 3 }).success).toBe(
-		false,
-	);
-	expect(
-		allControlSchema.safeParse({
-			...a,
-			decision: {
-				...a.decision,
-				request: {
-					...a.decision.request,
-					headers: { Authorization: "private" },
-				},
-			},
-		}).success,
-	).toBe(false);
-	const before = f.read();
+	const match = f.service.create(creation);
+	expect(match.recordVersion).toBe(3);
+	expect(f.service.create(creation)).toEqual(match);
 	expect(() =>
-		f.send({ protocolVersion: 1, type: "stop", requestId: "wrong" }),
-	).toThrow("decision mode");
-	expect(f.read()).toEqual(before);
-	expect(() =>
-		f.service.create({
-			...f.creation,
-			config: { ...f.creation.config, decisionMode: "single_step" },
-		}),
+		f.service.create({ ...creation, agentName: "different" }),
 	).toThrow("different content");
 });
-test("500ms: stored second step executes while next request is absent; late whole plan is rejected and backup is exhausted", () => {
+test.each([
+	{ stepMode: "fixed" },
+	{ decisionMode: "two_step_fallback" },
+	{ tickIntervalMs: 300 },
+	{ stepMode: "unknown" },
+])("retired creation configuration %j fails without writing", (config) => {
 	const f = fixture();
-	const a = makePlan(f.context());
-	const head = f.read().snake[0];
-	expect(f.send(a).steps?.map((s) => s.status)).toEqual(["queued", "standby"]);
-	expect(f.read().snake[0]).toEqual(head);
-	f.advance(500);
-	const b = makePlan(f.context(), "down_right", "B");
-	expect(f.read().lastAppliedAction).toMatchObject({
-		source: "primary",
-		requestId: "plan-A",
-		stepIndex: 0,
-	});
-	f.advance(1000);
-	expect(f.read().snake[0]).toEqual({ x: head.x + 1, y: head.y + 1 });
-	expect(f.read().lastAppliedAction).toMatchObject({
-		source: "fallback",
-		requestId: "plan-A",
-		stepIndex: 1,
-	});
-	f.time(1100);
-	expect(f.send(b).code).toBe("late_action");
-	expect(f.read().lastAppliedAction?.requestId).toBe("plan-A");
-	expect(f.receipt("B")?.steps?.map((s) => s.status)).toEqual([
-		"rejected",
-		"rejected",
-	]);
-	f.advance(1500);
-	expect(f.read().lastAppliedAction).toMatchObject({
-		source: "coast",
-		reason: "backup_exhausted",
-	});
-	expect(f.receipt("plan-A")?.steps?.map((s) => s.status)).toEqual([
-		"applied",
-		"applied",
-	]);
+	expect(() =>
+		f.service.create({
+			...creation,
+			config: { ...creation.config, ...config },
+		}),
+	).toThrow();
+	expect(f.store.list().matches).toHaveLength(0);
+});
+test("legacy tick environment is visible but cannot affect response speed or seed configuration", () => {
+	const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 	expect(
-		f.events().filter((e) => e.data.actionStatus === "applied"),
-	).toHaveLength(2);
-});
-test("fresh primary supersedes backup only at boundary and duplicate reads retain both outcomes", () => {
-	const f = fixture();
-	const a = makePlan(f.context());
-	f.send(a);
-	f.advance(500);
-	const b = makePlan(f.context(), "up_right", "B");
-	f.time(600);
-	f.send(b);
-	expect(f.receipt("plan-A")?.steps?.[1].status).toBe("standby");
-	expect(publicState(f.read()).scheduledActions).toHaveLength(3);
-	f.advance(1000);
-	expect(f.read().direction).toBe("up");
-	expect(f.send(a).steps?.map((s) => s.status)).toEqual([
-		"applied",
-		"superseded",
-	]);
-	expect(f.send(a).steps?.[1].replacementRequestId).toBe("B");
-	expect(() => f.send({ ...a, directions: ["right", "up"] })).toThrow(
-		"different content",
-	);
-	f.advance(1500);
-	expect(f.read().lastAppliedAction).toMatchObject({
-		source: "fallback",
-		requestId: "B",
+		gameConfig({ SNAKE_TICK_MS: "50000", SNAKE_SEED: "same" }),
+	).toMatchObject({
+		stepMode: "response",
+		decisionMode: "single_step",
+		tickIntervalMs: null,
+		seed: "same",
 	});
+	expect(warn).toHaveBeenCalledWith(expect.stringContaining("deprecated"));
+	warn.mockClear();
+	gameConfig({});
+	expect(warn).not.toHaveBeenCalled();
+	for (const values of [
+		{ "step-mode": "fixed" },
+		{ "decision-mode": "two_step_fallback" },
+		{ "tick-ms": "300" },
+	])
+		expect(() => gameConfig({}, values)).toThrow();
 });
-test.each([500, 650])(
-	"first response at %dms cannot salvage its second step",
-	(time) => {
-		const f = fixture();
-		const a = makePlan(f.context());
-		f.time(time);
-		expect(f.send(a).code).toBe("late_action");
-		f.advance(1000);
-		expect(f.read().lastAppliedAction).toMatchObject({
-			source: "coast",
-			reason: "no_plan",
-		});
-		expect(f.read().plans).toEqual([]);
-	},
-);
-test("primary invalidation by reward expiry preserves the previous backup", () => {
-	const f = fixture((s) => {
-		s.star = { point: { x: 0, y: 0 }, expiresAt: 1000 };
-	});
-	f.send(makePlan(f.context()));
-	f.advance(500);
-	f.send(makePlan(f.context(), "up_right", "B"));
-	f.advance(1000);
-	expect(f.read().lastAppliedAction).toMatchObject({
-		source: "fallback",
-		requestId: "plan-A",
-	});
-	expect(f.receipt("B")?.steps?.map((s) => s.status)).toEqual([
-		"cancelled",
-		"cancelled",
-	]);
-	expect(f.receipt("plan-A")?.steps?.[1].status).toBe("applied");
-});
-test("eating and randomly spawning food does not invalidate an eligible backup", () => {
-	const f = fixture((s) => {
-		s.apple = { x: s.snake[0].x + 1, y: s.snake[0].y };
-	});
-	f.send(makePlan(f.context()));
-	f.advance(500);
-	expect(f.read().score).toBe(10);
-	f.advance(1000);
-	expect(f.read().lastAppliedAction?.source).toBe("fallback");
-});
-test("cancelled first step never enables backup even when coasting has the same direction", () => {
-	const f = fixture((s) => {
-		s.star = { point: { x: 0, y: 0 }, expiresAt: 500 };
-	});
-	f.send(makePlan(f.context()));
-	f.advance(1000);
-	expect(f.read().direction).toBe("right");
-	expect(f.receipt("plan-A")?.steps?.map((s) => s.status)).toEqual([
-		"cancelled",
-		"cancelled",
-	]);
-	expect(
-		f.events().some((e) => e.state.lastAppliedAction?.source === "fallback"),
-	).toBe(false);
-});
-test("invalid observations, pair mismatch, reverse and duplicate primary leave slots unclaimed", () => {
-	const f = fixture();
-	const a = makePlan(f.context());
-	expect(
-		f.send({ ...a, requestId: "choice", directions: ["right", "up"] }).code,
-	).toBe("invalid_plan");
-	expect(f.send({ ...a, requestId: "obs", observedSeq: 999 }).code).toBe(
-		"invalid_observation",
-	);
-	expect(f.send({ ...a, requestId: "future", targetTick: 3 }).code).toBe(
-		"invalid_target_tick",
-	);
-	expect(
-		f.send({ ...a, requestId: "hash", expectedStateHash: "0".repeat(64) }).code,
-	).toBe("stale_state");
-	expect(f.send(makePlan(f.context(), "right_left", "reverse")).code).toBe(
-		"invalid_direction",
-	);
-	expect(f.read().plans).toEqual([]);
-	expect(f.send(a).status).toBe("accepted");
-	expect(f.send({ ...a, requestId: "conflict" }).code).toBe(
-		"tick_action_conflict",
-	);
-});
-test("backup can really collide; terminal receipt and subsequent arrival keep actual timestamps", () => {
-	const f = fixture((s) => {
-		s.obstacles = [{ x: s.snake[0].x + 1, y: s.snake[0].y + 1 }];
-	});
-	f.send(makePlan(f.context()));
-	f.advance(500);
-	const late = makePlan(f.context(), "up_up", "late");
-	f.advance(1000);
-	expect(f.read()).toMatchObject({
-		status: "gameover",
-		endReason: "obstacle",
-		tick: 2,
-		lastAppliedAction: { source: "fallback" },
-	});
-	f.time(1200);
-	expect(f.send(late).code).toBe("not_running");
-	expect(f.events().at(-1)?.data.receivedGameTimeMs).toBe(1200);
-	expect(f.events().at(-1)?.gameTimeMs).toBe(1000);
-	expect(f.receipt("plan-A")?.steps?.[1].status).toBe("applied");
-});
-test("catchup consumes exactly one backup and stops using it for later ticks", () => {
-	const f = fixture();
-	f.send(makePlan(f.context()));
-	f.advance(2000);
-	expect(f.read().tick).toBe(4);
-	expect(
-		f
-			.events()
-			.filter((e) => e.data.actionSource)
-			.map((e) => e.state.lastAppliedAction?.source),
-	).toEqual(["primary", "fallback", "coast", "coast"]);
-});
-test.each(["accept", "replace"])(
-	"%s transaction failure does not leak partial plans, receipts or success broadcasts",
-	(phase) => {
-		const f = fixture();
-		const a = makePlan(f.context());
-		if (phase === "replace") {
-			f.send(a);
-			f.advance(500);
-			f.send(makePlan(f.context(), "up_right", "B"));
-		}
-		const before = f.read();
-		const listener = vi.fn();
-		f.service.subscribe(listener);
-		f.store.db.exec(
-			"CREATE TRIGGER fail_plan BEFORE INSERT ON match_events BEGIN SELECT RAISE(ABORT, 'plan write failed'); END",
-		);
-		vi.spyOn(console, "error").mockImplementation(() => {});
-		expect(() => (phase === "accept" ? f.send(a) : f.advance(1000))).toThrow(
-			"plan write failed",
-		);
-		expect(f.read()).toEqual(before);
+test.each(["single_step", "two_step_fallback"])(
+	"old %s ready matches remain readable, idempotent and stoppable but cannot start or fork",
+	(mode) => {
+		const f = fixture(`${mode}-ready`);
+		const old = f.legacy!;
+		expect(f.service.create(old.creation).id).toBe(old.id);
+		const before = f.store.get(old.id);
+		expect(() =>
+			f.service.fork(old.id, {
+				requestId: "fork-retired",
+				controlToken: creation.controlToken,
+				agentName: "Fork",
+				sourceSeq: 0,
+			}),
+		).toThrow("Only response single-step matches can be forked");
+		expect(f.store.get(old.id)).toEqual(before);
+		expect(f.store.list().matches).toHaveLength(1);
 		expect(
-			listener.mock.calls.filter(([id]) => id === f.match.id),
-		).toHaveLength(0);
-		if (phase === "accept") expect(f.receipt("plan-A")).toBeUndefined();
-		else expect(f.receipt("plan-A")?.steps?.[1].status).toBe("standby");
+			f.service.command(old.id, {
+				protocolVersion: 1,
+				requestId: "start-retired",
+				type: "start",
+			}),
+		).toMatchObject({ status: "rejected", code: "mode_retired" });
+		f.time(10000);
+		f.service.advance(old.id);
+		expect(f.store.get(old.id)).toMatchObject({
+			status: "ready",
+			tick: 0,
+			config: before.config,
+		});
+		expect(
+			f.service.command(old.id, {
+				protocolVersion: 1,
+				requestId: "stop-retired",
+				type: "stop",
+			}),
+		).toMatchObject({ status: "applied" });
+		expect(f.store.get(old.id).status).toBe("interrupted");
 	},
 );
-test("v2 SQLite reread, restart cancellation, stop, old records and unknown version boundaries", () => {
-	const f = fixture();
-	const a = makePlan(f.context());
-	f.send(a);
-	f.advance(500);
-	const reader = new Store(f.path);
-	expect(reader.get(f.match.id)).toEqual(f.read());
-	reader.close();
-	f.service.close();
-	const restart = new MatchService(f.store, () => 0, false);
-	disposers.push(() => restart.close());
-	expect(f.read()).toMatchObject({
-		status: "interrupted",
-		endReason: "server_restart",
-		tick: 1,
-		plans: [],
+test.each(["single_step", "two_step_fallback"])(
+	"old %s running history survives restart and never schedules a move",
+	(mode) => {
+		const f = fixture(`${mode}-running`, true);
+		const old = f.legacy!;
+		const events = f.store.events(old.id, -1).events;
+		const prefix = old.tables.match_events.map((r) => JSON.parse(r.event_json));
+		expect(events.slice(0, prefix.length)).toEqual(prefix);
+		expect(f.store.get(old.id)).toMatchObject({
+			status: "interrupted",
+			endReason: "server_restart",
+			tick: 1,
+			snake: old.state.snake,
+			config: old.state.config,
+		});
+		f.time(50000);
+		f.service.advance(old.id);
+		expect(f.store.get(old.id).tick).toBe(1);
+		const command = old.commands[1];
+		const receipt = f.service.command(old.id, command);
+		expect(receipt.status).toBe(
+			mode === "two_step_fallback" ? "accepted" : "applied",
+		);
+		if (mode === "two_step_fallback") {
+			expect(receipt.steps?.map((s) => s.status)).toEqual([
+				"applied",
+				"cancelled",
+			]);
+			expect(events.some((e) => e.type === "plan_step_cancelled")).toBe(true);
+		}
+		if (mode === "two_step_fallback")
+			expect(() =>
+				f.service.command(old.id, { ...command, requestId: "fresh-retired" }),
+			).toThrow("protocol v1");
+		else
+			expect(
+				f.service.command(old.id, { ...command, requestId: "fresh-retired" }),
+			).toMatchObject({ status: "rejected", code: "mode_retired" });
+	},
+);
+test("new v2 commands are rejected while captured plan, fallback and coast history stays readable", () => {
+	const f = fixture("two_step_fallback-moved");
+	const old = f.legacy!;
+	const events = old.tables.match_events.map((r) => JSON.parse(r.event_json));
+	expect(decisionStatistics(events)).toMatchObject({
+		requests: 1,
+		primary: 1,
+		fallback: 1,
+		coast: 1,
 	});
-	expect(restart.command(f.match.id, a).steps?.map((s) => s.status)).toEqual([
-		"applied",
-		"cancelled",
-	]);
-	const g = fixture();
-	g.send(makePlan(g.context()));
-	g.send({ protocolVersion: 2, type: "stop", requestId: "stop" });
-	expect(g.receipt("plan-A")?.steps?.map((s) => s.status)).toEqual([
-		"cancelled",
-		"cancelled",
-	]);
-	const old = g.service.create({
-		...g.creation,
-		requestId: "old",
-		config: { ...g.creation.config, decisionMode: undefined },
-	});
-	expect(old.recordVersion).toBe(1);
-	expect(g.store.get(old.id).recordVersion).toBe(1);
-	const corrupt = g.read();
-	corrupt.rulesVersion = 1;
-	g.store.commit(corrupt, []);
-	expect(() => g.read()).toThrow("Unsupported");
+	const current = f.service.create(creation);
+	for (const command of [
+		old.commands[1],
+		{ protocolVersion: 2, type: "start", requestId: "v2-start" },
+		{ protocolVersion: 2, type: "stop", requestId: "v2-stop" },
+	])
+		expect(() => f.service.command(current.id, command)).toThrow("protocol v1");
+	expect(f.store.get(current.id)).toMatchObject({ status: "ready", tick: 0 });
+	expect(f.store.events(old.id, -1).events.slice(0, events.length)).toEqual(
+		events,
+	);
 });

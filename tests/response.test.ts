@@ -16,6 +16,7 @@ import type {
 	Receipt,
 } from "../shared/snake/types.js";
 import { publicState } from "../shared/snake/types.js";
+import { loadLegacy } from "./legacy-fixture.js";
 
 const disposers: (() => void | Promise<void>)[] = [];
 afterEach(async () => {
@@ -338,56 +339,24 @@ test("rejected responses preserve receipt time after stop and do not invent reac
 	expect(f.read()).toMatchObject({ tick: 0, gameTimeMs: 500 });
 });
 
-test.each([
-	{
-		decisionMode: undefined,
-		version: 1,
-		createHash:
-			"84726af7aae341ab50126472a335f7ecf5a9fb5731d31d53dcf41d3de8915156",
-		stateDigest:
-			"d1048ef1c6112baa924fbfc6096de18eeba8d0ae069c8c40045937a6764edee6",
-	},
-	{
-		decisionMode: "two_step_fallback",
-		version: 2,
-		createHash:
-			"fc80a645d8a0addbc792994c66afd1b8837400adf144f9cfb0f6502dcb519e34",
-		stateDigest:
-			"06c82f16925351bf7015e4981d38261dbfe5430418b7330579c7a0e0fedcb70b",
-	},
-])(
-	"legacy v$version creation and state digests remain unchanged alongside response records",
-	(legacy) => {
+test.each(["single_step", "two_step_fallback"])(
+	"captured legacy %s hashes remain unchanged beside response records",
+	(mode) => {
 		const f = fixture();
-		const input = {
-			requestId: `legacy-${legacy.decisionMode ?? "single"}`,
-			controlToken: "legacy-token".repeat(3),
-			agentName: "Legacy fixture",
-			config: {
-				decisionMode: legacy.decisionMode,
-				width: 24,
-				height: 18,
-				obstacleCount: 0,
-				tickIntervalMs: 500,
-				seed: "response-legacy",
-			},
-		};
-		const created = f.service.create(input);
-		expect(created.recordVersion).toBe(legacy.version);
-		expect(f.store.byCreation(input.requestId)?.create_hash).toBe(
-			legacy.createHash,
-		);
-		expect(stateHash(f.store.get(created.id))).toBe(legacy.stateDigest);
+		const old = loadLegacy(f.store, `${mode}-ready`);
 		const original = f.store.db
 			.prepare("SELECT state_json FROM matches WHERE id=?")
-			.get(created.id);
-		expect(f.service.create(input)).toEqual(created);
-		expect(f.store.events(created.id, -1).events[0].state).toEqual(created);
+			.get(old.id);
+		expect(f.store.byCreation(old.creation.requestId)?.create_hash).toBe(
+			old.tables.matches[0].create_hash,
+		);
+		expect(f.service.create(old.creation)).toEqual(publicState(old.state));
+		expect(stateHash(f.store.get(old.id))).toBe(stateHash(old.state));
 		expect(f.store.list().matches).toHaveLength(2);
 		expect(
 			f.store.db
 				.prepare("SELECT state_json FROM matches WHERE id=?")
-				.get(created.id),
+				.get(old.id),
 		).toEqual(original);
 	},
 );

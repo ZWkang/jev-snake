@@ -2,13 +2,13 @@ import { randomUUID } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import WebSocket from "ws";
 import {
-	planDirections,
+	isResponseMode,
 	type DecisionContext,
 	type MatchEvent,
 	type PublicState,
 	type Receipt,
 } from "../../shared/snake/types.js";
-import { askJev, askJevPlan } from "./client.js";
+import { askJev } from "./client.js";
 import type { jevConfig } from "./config.js";
 import { gameClient } from "./game-client.js";
 
@@ -29,9 +29,9 @@ export async function runJevMatch(
 	const log = options.log ?? console.log;
 	const reportError = options.error ?? console.error;
 	let latest = options.state;
-	const stepMode = latest.config.stepMode ?? "fixed";
-	const decisionMode = latest.config.decisionMode ?? "single_step";
-	const protocolVersion = decisionMode === "two_step_fallback" ? 2 : 1;
+	if (!isResponseMode(latest.config))
+		throw new Error("Only response single-step matches can run");
+	const protocolVersion = 1;
 	const request = gameClient(root);
 	const socket = new WebSocket(
 		`${root.replace(/^http/, "ws")}/ws/matches/${latest.id}/control`,
@@ -41,7 +41,6 @@ export async function runJevMatch(
 		string,
 		{ resolve: (r: Receipt) => void; reject: (error: Error) => void }
 	>();
-	const changes = new Set<() => void>();
 	let inference: AbortController | null = null;
 	let activeRequest: {
 		observedTick: number;
@@ -52,7 +51,6 @@ export async function runJevMatch(
 	function observe(state: PublicState) {
 		if (state.seq < latest.seq) return;
 		latest = state;
-		for (const notify of changes) notify();
 		if (latest.status !== "running" && latest.status !== "ready")
 			inference?.abort(new DOMException("match_ended", "AbortError"));
 	}
@@ -61,7 +59,6 @@ export async function runJevMatch(
 		for (const waiter of pending.values()) waiter.reject(error);
 		pending.clear();
 		inference?.abort(error);
-		for (const notify of changes) notify();
 	}
 	socket.on("message", (raw) => {
 		const message = JSON.parse(raw.toString()) as {
@@ -127,32 +124,12 @@ export async function runJevMatch(
 			);
 		});
 	}
-	function movedAfter(tick: number) {
-		return new Promise<void>((resolve, reject) => {
-			const check = () => {
-				if (connectionError) {
-					changes.delete(check);
-					reject(connectionError);
-				} else if (
-					latest.tick > tick ||
-					latest.status !== "running" ||
-					stopping
-				) {
-					changes.delete(check);
-					resolve();
-				}
-			};
-			changes.add(check);
-			check();
-		});
-	}
 	let stopping = false;
 	let stopTask: Promise<void> | undefined;
 	function stop(reason: string): Promise<void> {
 		if (stopTask) return stopTask;
 		stopping = true;
 		inference?.abort(new DOMException(reason, "AbortError"));
-		for (const notify of changes) notify();
 		stopTask = (async () => {
 			if (
 				socket.readyState === WebSocket.OPEN &&
@@ -171,21 +148,9 @@ export async function runJevMatch(
 	};
 	options.signal?.addEventListener("abort", onAbort, { once: true });
 	log(
-		"JEV match " +
-			latest.id +
-			" | " +
-			(latest.config.stepMode === "response"
-				? "one move per response"
-				: `${1000 / latest.config.tickIntervalMs} cells/s`) +
-			" | step mode " +
-			stepMode +
-			" | seed " +
-			latest.config.seed +
-			" | provider " +
-			jev.provider +
-			" | mode " +
-			decisionMode,
+		`JEV match ${latest.id} | one move per response | seed ${latest.config.seed} | provider ${jev.provider} | mode single_step`,
 	);
+
 	try {
 		await opening;
 		if (stopping) {
@@ -251,28 +216,22 @@ export async function runJevMatch(
 					repeatAfterMoves: context.progress.repeatAfterMoves,
 				}),
 			);
-			const decision = await (protocolVersion === 2 ? askJevPlan : askJev)(
-				jev.apiKey,
-				context.state,
-				{
-					signal: inference.signal,
-					provider: jev.provider,
-					model: jev.model,
-					progress: context.progress,
-					timing: {
-						elapsedGameTimeMs: context.elapsedGameTimeMs,
-						deadlineInMs: context.deadlineInMs,
-					},
+			const decision = await askJev(jev.apiKey, context.state, {
+				signal: inference.signal,
+				provider: jev.provider,
+				model: jev.model,
+				progress: context.progress,
+				timing: {
+					elapsedGameTimeMs: context.elapsedGameTimeMs,
+					deadlineInMs: context.deadlineInMs,
 				},
-			);
+			});
 			const receipt = await command({
-				type: decision.kind === "plan" ? "plan" : "action",
+				type: "action",
 				observedSeq: context.observedSeq,
 				targetTick: context.targetTick,
 				expectedStateHash: context.expectedStateHash,
-				...(decision.kind === "plan"
-					? { directions: planDirections(decision.choice) }
-					: { direction: decision.choice }),
+				direction: decision.choice,
 				decision,
 			});
 			log(
@@ -292,19 +251,16 @@ export async function runJevMatch(
 			);
 			inference = null;
 			activeRequest = null;
-			if (stepMode === "response") {
-				if (
-					receipt.status === "applied" ||
-					(receipt.status === "rejected" &&
-						(receipt.code === "stale_state" ||
-							receipt.code === "invalid_direction"))
-				)
-					continue;
-				throw new Error(
-					`Response action ${receipt.status}: ${receipt.code ?? "expected immediate applied confirmation"}`,
-				);
-			}
-			await movedAfter(context.state.tick);
+			if (
+				receipt.status === "applied" ||
+				(receipt.status === "rejected" &&
+					(receipt.code === "stale_state" ||
+						receipt.code === "invalid_direction"))
+			)
+				continue;
+			throw new Error(
+				`Response action ${receipt.status}: ${receipt.code ?? "expected immediate applied confirmation"}`,
+			);
 		}
 	} catch (error) {
 		const expectedCancellation =

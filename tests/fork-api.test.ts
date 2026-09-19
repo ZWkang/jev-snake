@@ -6,11 +6,13 @@ import { join, resolve } from "node:path";
 import { afterEach, expect, test } from "vitest";
 import { JEV_ENDPOINT } from "../server/jev/client.js";
 import { startServer } from "../server/start.js";
-import type {
-	DecisionRequestV3,
-	Direction,
-	PublicState,
+import {
+	publicState,
+	type DecisionRequestV3,
+	type Direction,
+	type PublicState,
 } from "../shared/snake/types.js";
+import { loadLegacy } from "./legacy-fixture.js";
 
 const disposers: (() => void | Promise<void>)[] = [];
 afterEach(async () => {
@@ -35,28 +37,30 @@ async function fixture(twoStep = false) {
 	if (!address || typeof address === "string")
 		throw new Error("No server address");
 	const root = `http://127.0.0.1:${address.port}`;
-	const source = game.service.create({
-		requestId: "source-create",
-		controlToken: sourceToken,
-		agentName: "Historical source",
-		config: {
-			width: 7,
-			height: 5,
-			obstacleCount: 0,
-			seed: "runner-test",
-			...(twoStep
-				? {
-						stepMode: "fixed",
-						decisionMode: "two_step_fallback",
-						tickIntervalMs: 500,
-					}
-				: {
-						stepMode: "response",
-						decisionMode: "single_step",
-						tickIntervalMs: null,
-					}),
-		},
-	});
+	const source = twoStep
+		? publicState(loadLegacy(game.store, "two_step_fallback-ready").state)
+		: game.service.create({
+				requestId: "source-create",
+				controlToken: sourceToken,
+				agentName: "Historical source",
+				config: {
+					width: 7,
+					height: 5,
+					obstacleCount: 0,
+					seed: "runner-test",
+					...(twoStep
+						? {
+								stepMode: "fixed",
+								decisionMode: "two_step_fallback",
+								tickIntervalMs: 500,
+							}
+						: {
+								stepMode: "response",
+								decisionMode: "single_step",
+								tickIntervalMs: null,
+							}),
+				},
+			});
 	if (!twoStep) {
 		game.service.command(source.id, {
 			protocolVersion: 1,
@@ -427,16 +431,14 @@ test.each(["missing-source", "unsupported-fork", "missing-provenance"])(
 	},
 );
 
-test("two-step fork checks protocol-v2 support before creating a fork", async () => {
+test("old two-step fork is rejected before creation or model invocation", async () => {
 	const f = await fixture(true);
 	const result = await f.run(
 		["--fork-match", f.source.id, "--fork-seq", String(f.target.seq)],
 		"old-health",
 	);
 	expect(result.code).not.toBe(0);
-	expect(result.output).toContain(
-		"does not support two_step_fallback protocol v2",
-	);
+	expect(result.output).toContain("mode_retired");
 	expect(f.game.store.list().matches).toHaveLength(1);
 	f.assertSourceUnchanged();
 });

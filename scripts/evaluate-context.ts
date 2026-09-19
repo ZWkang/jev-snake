@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import {
 	decisionBodyV3 as decisionBody,
-	planBodyV3 as planBody,
 	sendJevRequest,
 } from "../server/jev/client.js";
 import { jevConfig } from "../server/jev/config.js";
+import { planBodyV3 as planBody } from "../server/jev/legacy-context.js";
 import {
 	decisionRequestSchema,
 	planRequestSchema,
@@ -244,69 +244,59 @@ export async function evaluateContext(options: EvaluationOptions = {}) {
 	const live: LiveResult[] = [];
 	if (options.live) {
 		// Deliberately serial: same fixtures, no game submission, retries, or substitution.
-		for (const entry of cases)
-			for (const version of ["v2", "v3"] as const) {
-				const request = entry[version].request;
-				const result: LiveResult = {
-					fixture: entry.fixture,
-					mode: entry.mode,
-					version,
-					startedAt: new Date().toISOString(),
-					finishedAt: "",
+		for (const entry of responseCosts) {
+			const version = "v3" as const;
+			const request = entry.request;
+			const result: LiveResult = {
+				fixture: entry.fixture,
+				mode: "single",
+				version,
+				startedAt: new Date().toISOString(),
+				finishedAt: "",
+				provider: config.provider,
+				model: config.model,
+				request,
+				requestBytes: bytes(request),
+				status: "error",
+				responseText: null,
+				httpStatus: null,
+			};
+			const transport: typeof fetch = async (input, init) => {
+				const response = await (options.fetch ?? fetch)(input, init);
+				result.httpStatus = response.status;
+				result.responseText = (await response.clone().text()).replaceAll(
+					config.apiKey,
+					"[redacted]",
+				);
+				return response;
+			};
+			try {
+				const output = await sendJevRequest(config.apiKey, request, {
 					provider: config.provider,
-					model: config.model,
+					fetch: transport,
+				});
+				result.decision = output.decision;
+				// Compare both context versions against the same deterministic v3 evidence.
+				result.selectedEvidence = selectedEvidence(
 					request,
-					requestBytes: bytes(request),
-					status: "error",
-					responseText: null,
-					httpStatus: null,
-				};
-				const transport: typeof fetch = async (input, init) => {
-					const response = await (options.fetch ?? fetch)(input, init);
-					result.httpStatus = response.status;
-					result.responseText = (await response.clone().text()).replaceAll(
-						config.apiKey,
-						"[redacted]",
-					);
-					return response;
-				};
-				try {
-					const output =
-						entry.mode === "single"
-							? await sendJevRequest(
-									config.apiKey,
-									request as DecisionRequest,
-									"direction",
-									{ provider: config.provider, fetch: transport },
-								)
-							: await sendJevRequest(
-									config.apiKey,
-									request as PlanRequest,
-									"plan",
-									{ provider: config.provider, fetch: transport },
-								);
-					result.decision = output.decision;
-					// Compare both context versions against the same deterministic v3 evidence.
-					result.selectedEvidence = selectedEvidence(
-						entry.v3.request,
-						output.decision,
-						entry.fixture,
-					);
-					result.status = "ok";
-				} catch (error) {
-					result.error = (
-						error instanceof Error ? error.message : String(error)
-					).replaceAll(config.apiKey, "[redacted]");
-				}
-				result.finishedAt = new Date().toISOString();
-				live.push(result);
-				await options.onLiveResult?.(result);
+					output.decision,
+					entry.fixture,
+				);
+				result.status = "ok";
+			} catch (error) {
+				result.error = (
+					error instanceof Error ? error.message : String(error)
+				).replaceAll(config.apiKey, "[redacted]");
 			}
+			result.finishedAt = new Date().toISOString();
+			live.push(result);
+			await options.onLiveResult?.(result);
+		}
 	}
 	return {
 		reportVersion: 1,
 		createdAt: new Date().toISOString(),
-		mode: options.live ? "live_fixture_comparison" : "offline",
+		mode: options.live ? "live_response_single_step" : "offline",
 		provider: config.provider,
 		model: config.model,
 		sampleCount: samples,
@@ -319,11 +309,11 @@ export async function evaluateContext(options: EvaluationOptions = {}) {
 		deadlineComparison: {
 			fixedDeadlineMs: 500,
 			worstV3BuildP95Ms: Math.max(...cases.map((c) => c.v3.contextBuildMs.p95)),
-			note: "Context building consumes part of the deadline; provider latency and network costs are separate and can still make a request late.",
+			note: "Offline historical fixed-mode comparison only; current response mode has no movement deadline.",
 		},
 		live: {
 			enabled: !!options.live,
-			plannedRequests: options.live ? 12 : 0,
+			plannedRequests: options.live ? responseCosts.length : 0,
 			completedRequests: live.length,
 			failedRequests: live.filter((r) => r.status === "error").length,
 			results: live,

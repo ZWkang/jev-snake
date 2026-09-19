@@ -19,7 +19,8 @@ const config: GameConfig = {
 	width: 24,
 	height: 18,
 	obstacleCount: 0,
-	tickIntervalMs: 125,
+	stepMode: "response",
+	tickIntervalMs: null,
 	seed: "test-seed",
 };
 const cleanup: (() => void)[] = [];
@@ -64,8 +65,8 @@ function fixture(extra: Partial<GameConfig> = {}) {
 		},
 	};
 }
-test("actual decision request survives acceptance, late rejection and SQLite reread", () => {
-	const f = fixture({ tickIntervalMs: 300 });
+test("actual decision request survives application, stale rejection and SQLite reread", () => {
+	const f = fixture();
 	f.start();
 	const plan = f.service.decisionContext(f.match.id);
 	const request = decisionBody(plan.state);
@@ -86,11 +87,11 @@ test("actual decision request survives acceptance, late rejection and SQLite rer
 			request,
 		},
 	};
-	expect(f.service.command(f.match.id, command).status).toBe("accepted");
+	expect(f.service.command(f.match.id, command).status).toBe("applied");
 	f.advance(300);
 	expect(
 		f.service.command(f.match.id, { ...command, requestId: "late-input" }).code,
-	).toBe("late_action");
+	).toBe("stale_state");
 	const saved = new Store(join(f.dir, "game.sqlite"));
 	cleanup.push(() => saved.close());
 	const actions = saved
@@ -283,131 +284,7 @@ describe("engine", () => {
 		).toThrow("Obstacle count");
 	});
 });
-describe("clock, planned actions and persistence", () => {
-	test("ready does not move, clock advances without inputs and speed is configurable", () => {
-		const f = fixture();
-		f.advance(500);
-		expect(f.store.get(f.match.id).tick).toBe(0);
-		f.start();
-		f.advance(1000);
-		expect(f.store.get(f.match.id).tick).toBe(4);
-		const slow = fixture({ tickIntervalMs: 500 });
-		slow.start();
-		slow.advance(1000);
-		expect(slow.store.get(slow.match.id).tick).toBe(2);
-	});
-	test("acceptance is not movement; duplicate after application is not late", () => {
-		const f = fixture();
-		f.start();
-		const plan = f.service.decisionContext(f.match.id);
-		const command = {
-			protocolVersion: 1,
-			requestId: "turn",
-			type: "action",
-			observedSeq: plan.observedSeq,
-			targetTick: plan.targetTick,
-			expectedStateHash: plan.expectedStateHash,
-			direction: "up",
-		};
-		f.time(100);
-		expect(f.service.command(f.match.id, command).status).toBe("accepted");
-		expect(f.store.get(f.match.id).direction).toBe("right");
-		expect(f.store.get(f.match.id).tick).toBe(0);
-		f.advance(125);
-		expect(f.store.get(f.match.id).direction).toBe("up");
-		expect(f.service.command(f.match.id, command).status).toBe("applied");
-		expect(() =>
-			f.service.command(f.match.id, { ...command, direction: "down" }),
-		).toThrow("different content");
-	});
-	test.each([125, 150])(
-		"an action received at %sms cannot be moved to the next tick",
-		(time) => {
-			const f = fixture();
-			f.start();
-			const p = f.service.decisionContext(f.match.id);
-			f.time(time);
-			expect(
-				f.service.command(f.match.id, {
-					protocolVersion: 1,
-					requestId: "late",
-					type: "action",
-					observedSeq: p.observedSeq,
-					targetTick: p.targetTick,
-					expectedStateHash: p.expectedStateHash,
-					direction: "up",
-				}).code,
-			).toBe("late_action");
-			expect(f.store.get(f.match.id).direction).toBe("right");
-		},
-	);
-	test("only the next movement can be reserved, and an old observation cannot be retargeted", () => {
-		const f = fixture({ tickIntervalMs: 300 });
-		f.start();
-		const current = f.service.decisionContext(f.match.id);
-		expect(current.state).toEqual(publicState(f.store.get(f.match.id)));
-		expect(current.targetTick).toBe(current.state.tick + 1);
-		const action = {
-			protocolVersion: 1,
-			requestId: "future",
-			type: "action",
-			observedSeq: current.observedSeq,
-			targetTick: current.targetTick + 4,
-			expectedStateHash: current.expectedStateHash,
-			direction: "up",
-		};
-		expect(f.service.command(f.match.id, action).code).toBe(
-			"invalid_target_tick",
-		);
-		expect(f.store.get(f.match.id).pending).toHaveLength(0);
-		expect(
-			f.service.command(f.match.id, {
-				...action,
-				requestId: "current",
-				targetTick: current.targetTick,
-			}).status,
-		).toBe("accepted");
-		expect(() => f.service.decisionContext(f.match.id)).toThrow(
-			"already has a decision",
-		);
-		expect(f.store.get(f.match.id).pending).toHaveLength(1);
-		f.advance(300);
-		const next = f.service.decisionContext(f.match.id);
-		expect(next.state.tick).toBe(1);
-		expect(next.targetTick).toBe(2);
-		expect(
-			f.service.command(f.match.id, {
-				...action,
-				requestId: "retarget-old",
-				targetTick: next.targetTick,
-				expectedStateHash: next.expectedStateHash,
-			}).code,
-		).toBe("stale_state");
-		expect(f.store.get(f.match.id).pending).toHaveLength(0);
-	});
-	test("a decision is cancelled if its actual observed state changes before the movement", () => {
-		const f = fixture({ tickIntervalMs: 300 });
-		const initial = f.store.get(f.match.id);
-		initial.star = { point: { x: 0, y: 0 }, expiresAt: 300 };
-		f.store.commit(initial, [], []);
-		f.start();
-		const context = f.service.decisionContext(f.match.id);
-		expect(context.state.star).not.toBeNull();
-		f.service.command(f.match.id, {
-			protocolVersion: 1,
-			requestId: "expiring-state",
-			type: "action",
-			observedSeq: context.observedSeq,
-			targetTick: context.targetTick,
-			expectedStateHash: context.expectedStateHash,
-			direction: "up",
-		});
-		f.advance(300);
-		expect(
-			f.store.request(f.match.id, "expiring-state")?.receipt,
-		).toMatchObject({ status: "cancelled", code: "stale_state" });
-		expect(f.store.get(f.match.id).direction).toBe("right");
-	});
+describe("response persistence", () => {
 	test("rejects an invalid expected state and direct reversal without occupying a slot", () => {
 		const f = fixture();
 		f.start();
@@ -442,7 +319,17 @@ describe("clock, planned actions and persistence", () => {
 			"CREATE TRIGGER fail_insert BEFORE INSERT ON match_events BEGIN SELECT RAISE(ABORT, 'write failed'); END",
 		);
 		vi.spyOn(console, "error").mockImplementation(() => {});
-		expect(() => f.advance(125)).toThrow("write failed");
+		expect(() =>
+			f.service.command(f.match.id, {
+				protocolVersion: 1,
+				requestId: "move-fails",
+				type: "action",
+				observedSeq: before.seq,
+				targetTick: before.tick + 1,
+				expectedStateHash: stateHash(before),
+				direction: "right",
+			}),
+		).toThrow("write failed");
 		expect(f.store.get(f.match.id)).toEqual(before);
 		expect(
 			listener.mock.calls.filter(([id]) => id === f.match.id),
@@ -465,8 +352,8 @@ describe("clock, planned actions and persistence", () => {
 		expect(store.get(f.match.id)).toMatchObject({
 			status: "interrupted",
 			endReason: "server_restart",
-			tick: 2,
-			gameTimeMs: 250,
+			tick: 0,
+			gameTimeMs: 0,
 		});
 		expect(store.events(f.match.id, -1).events.at(-1)?.state.snake).toEqual(
 			before.snake,

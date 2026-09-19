@@ -8,7 +8,6 @@ import {
 	type MatchState,
 	vectors,
 } from "../shared/snake/types.js";
-import { makePlan } from "./plan-fixture.js";
 
 const disposers: (() => void)[] = [];
 afterEach(() => {
@@ -331,61 +330,6 @@ test("invalid sequence, incomplete history and terminal targets reject without c
 	expect(() => f.fork(2)).toThrow("incomplete");
 	expect(f.store.list().matches).toHaveLength(1);
 });
-
-test.each(["single_step", "two_step_fallback"] as const)(
-	"fixed %s fork keeps its schedule and clears queued control from the old controller",
-	(decisionMode) => {
-		const f = fixture({ stepMode: "fixed", tickIntervalMs: 500, decisionMode });
-		f.start();
-		if (decisionMode === "two_step_fallback") {
-			f.service.command(
-				f.source.id,
-				makePlan(f.service.decisionContext(f.source.id)),
-			);
-		} else {
-			f.service.command(
-				f.source.id,
-				action(f.service.decisionContext(f.source.id), "right"),
-			);
-		}
-		f.time(500);
-		f.service.advance(f.source.id);
-		if (decisionMode === "single_step") {
-			f.service.command(
-				f.source.id,
-				action(f.service.decisionContext(f.source.id), "down"),
-			);
-		}
-		const checkpoint = f.store.get(f.source.id);
-		const fork = f.fork();
-		expect(fork).toMatchObject({
-			config: checkpoint.config,
-			recordVersion: checkpoint.recordVersion,
-			rulesVersion: checkpoint.rulesVersion,
-			tick: 1,
-			gameTimeMs: 500,
-		});
-		expect(f.store.get(fork.id).pending).toEqual([]);
-		if (decisionMode === "two_step_fallback") {
-			expect(f.store.get(fork.id).plans).toEqual([]);
-			expect(fork.scheduledActions).toEqual([]);
-		}
-		f.time(100000);
-		f.start(fork.id);
-		expect(f.service.decisionContext(fork.id).deadlineInMs).toBe(500);
-		f.time(100499);
-		f.service.advance(fork.id);
-		expect(f.store.get(fork.id).tick).toBe(1);
-		f.time(100500);
-		f.service.advance(fork.id);
-		expect(f.store.get(fork.id)).toMatchObject({
-			tick: 2,
-			gameTimeMs: 1000,
-			direction: "right",
-		});
-		expect(f.store.get(f.source.id)).toEqual(checkpoint);
-	},
-);
 
 test("a fork can be forked again with complete movement history", () => {
 	const f = fixture();

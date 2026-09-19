@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import { move } from "../server/game/engine.js";
 import {
 	askJev,
-	buildDecisionContext,
+	buildDecisionContextV4 as buildDecisionContext,
 	decisionBodyV3,
 } from "../server/jev/client.js";
 import { buildPlanContext, planBodyV3 } from "../server/jev/legacy-context.js";

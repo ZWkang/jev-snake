@@ -236,8 +236,12 @@ test("a model choice is not replaced even when its option carries a fatal certif
 	expect(Object.keys(body.questions.direction.criteria)).toEqual([
 		...directions,
 	]);
-	expect(body.questions.direction.criteria.right.danger).toBe("proven_fatal");
-	expect(body.questions.direction.criteria.left.danger).toBeNull();
+	expect(body.questions.direction.criteria.right.survival.status).toBe(
+		"proven_fatal",
+	);
+	expect(body.questions.direction.criteria.left.survival.status).toBe(
+		"not_proven_fatal",
+	);
 	expect(decision.choice).toBe("right");
 	expect(decision.request).toEqual(body);
 	expect(fetch).toHaveBeenCalledTimes(1);

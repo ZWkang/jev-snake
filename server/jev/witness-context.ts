@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import type { PositiveEvidence } from "../../shared/snake/positive-evidence.js";
 import {
 	directions,
 	type Direction,
@@ -36,75 +37,83 @@ export function witnessDirections(record: WitnessRecord): Direction[] {
 			]
 		: evidence.witness.directions;
 }
+export function archiveOpportunity(
+	state: PublicState,
+	evidence: PositiveEvidence,
+	archive: WitnessArchive,
+	basis: WitnessRecord["basis"] = "observed",
+): OpportunitySummary {
+	const base: OpportunitySummary = {
+		status: evidence.status,
+		witnessId: null,
+		moves: null,
+		appleTarget: null,
+		endEvent: "none",
+		cycle: null,
+		releasePassages: [],
+		scope: "none",
+		postEat: null,
+	};
+	if (!("witness" in evidence)) return base;
+	const record: WitnessRecord = {
+		basis,
+		origin: witnessOrigin(state),
+		evidence,
+	};
+	const id = createHash("sha256").update(JSON.stringify(record)).digest("hex");
+	archive.records[id] = record;
+	const cycle = evidence.status === "non_growth_cycle";
+	return {
+		...base,
+		witnessId: id,
+		moves: witnessDirections(record).length,
+		appleTarget: cycle ? null : state.apple,
+		endEvent:
+			evidence.status === "non_growth_cycle"
+				? "cycle_completed"
+				: evidence.terminal === "board_complete"
+					? "board_complete"
+					: "apple_eaten",
+		cycle: cycle
+			? {
+					prefixMoves: evidence.witness.prefixDirections.length,
+					period: evidence.witness.cycleDirections.length,
+				}
+			: null,
+		releasePassages: evidence.witness.releasePassages,
+		scope: cycle ? "no_growth_cycle" : "observed_apple_only",
+		postEat: cycle
+			? null
+			: evidence.terminal === "board_complete"
+				? {
+						terminal: "board_complete",
+						bodyLength: evidence.witness.end.snake.length,
+						staticReachableCells: null,
+						relativeToBody: null,
+						legalNextMoves: null,
+						tailConnection: null,
+					}
+				: {
+						terminal: "none",
+						...staticSpace({ ...state, ...evidence.witness.end }),
+					},
+	} satisfies OpportunitySummary;
+}
 export function opportunityFacts(
 	state: PublicState,
 	archive: WitnessArchive,
 	basis: WitnessRecord["basis"] = "observed",
 ): Record<Direction, OpportunitySummary> {
 	return Object.fromEntries(
-		directions.map((direction) => {
-			const evidence = analyzePositiveEvidence(state, direction);
-			const base: OpportunitySummary = {
-				status: evidence.status,
-				witnessId: null,
-				moves: null,
-				appleTarget: null,
-				endEvent: "none",
-				cycle: null,
-				releasePassages: [],
-				scope: "none",
-				postEat: null,
-			};
-			if (!("witness" in evidence)) return [direction, base];
-			const record: WitnessRecord = {
+		directions.map((direction) => [
+			direction,
+			archiveOpportunity(
+				state,
+				analyzePositiveEvidence(state, direction),
+				archive,
 				basis,
-				origin: witnessOrigin(state),
-				evidence,
-			};
-			const id = createHash("sha256")
-				.update(JSON.stringify(record))
-				.digest("hex");
-			archive.records[id] = record;
-			const cycle = evidence.status === "non_growth_cycle";
-			return [
-				direction,
-				{
-					...base,
-					witnessId: id,
-					moves: witnessDirections(record).length,
-					appleTarget: cycle ? null : state.apple,
-					endEvent:
-						evidence.status === "non_growth_cycle"
-							? "cycle_completed"
-							: evidence.terminal === "board_complete"
-								? "board_complete"
-								: "apple_eaten",
-					cycle: cycle
-						? {
-								prefixMoves: evidence.witness.prefixDirections.length,
-								period: evidence.witness.cycleDirections.length,
-							}
-						: null,
-					releasePassages: evidence.witness.releasePassages,
-					scope: cycle ? "no_growth_cycle" : "observed_apple_only",
-					postEat: cycle
-						? null
-						: evidence.terminal === "board_complete"
-							? {
-									terminal: "board_complete",
-									bodyLength: evidence.witness.end.snake.length,
-									staticReachableCells: null,
-									relativeToBody: null,
-									legalNextMoves: null,
-									tailConnection: null,
-								}
-							: {
-									terminal: "none",
-									...staticSpace({ ...state, ...evidence.witness.end }),
-								},
-				} satisfies OpportunitySummary,
-			];
-		}),
+			),
+		]),
 	) as Record<Direction, OpportunitySummary>;
 }
 

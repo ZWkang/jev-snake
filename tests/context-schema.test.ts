@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { decisionBody } from "../server/jev/client.js";
+import { decisionBodyV4 as decisionBody } from "../server/jev/client.js";
 import { planBody } from "../server/jev/legacy-context.js";
 import {
 	allControlSchema,

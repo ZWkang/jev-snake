@@ -1,0 +1,191 @@
+{
+	"source": {
+		"matchId": "2424060a-0fa8-4f33-9cb9-4024372b612a",
+		"seq": 380,
+		"code": "invalid_direction"
+	},
+	"state": {
+		"id": "2424060a-0fa8-4f33-9cb9-4024372b612a",
+		"agentName": "JEV 小棋盘验证 8×6 · v4续跑",
+		"model": "typesafe/jev-1.13",
+		"config": {
+			"layoutVersion": 2,
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 8,
+			"height": 6,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "jev-small-check-8x6-20260920"
+		},
+		"recordVersion": 3,
+		"rulesVersion": 3,
+		"status": "running",
+		"createdAt": "2026-09-19T18:40:35.448Z",
+		"startedAt": "2026-09-19T18:40:35.533Z",
+		"endedAt": null,
+		"seq": 380,
+		"tick": 186,
+		"gameTimeMs": 70612.90891600007,
+		"score": 320,
+		"applesEaten": 26,
+		"snake": [
+			{
+				"x": 6,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 1
+			},
+			{
+				"x": 4,
+				"y": 1
+			},
+			{
+				"x": 3,
+				"y": 1
+			},
+			{
+				"x": 2,
+				"y": 1
+			},
+			{
+				"x": 1,
+				"y": 1
+			},
+			{
+				"x": 0,
+				"y": 1
+			},
+			{
+				"x": 0,
+				"y": 0
+			},
+			{
+				"x": 1,
+				"y": 0
+			},
+			{
+				"x": 2,
+				"y": 0
+			},
+			{
+				"x": 3,
+				"y": 0
+			},
+			{
+				"x": 4,
+				"y": 0
+			},
+			{
+				"x": 5,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 0
+			},
+			{
+				"x": 7,
+				"y": 0
+			},
+			{
+				"x": 7,
+				"y": 1
+			},
+			{
+				"x": 7,
+				"y": 2
+			},
+			{
+				"x": 6,
+				"y": 2
+			},
+			{
+				"x": 6,
+				"y": 3
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 5
+			},
+			{
+				"x": 3,
+				"y": 5
+			},
+			{
+				"x": 2,
+				"y": 5
+			},
+			{
+				"x": 1,
+				"y": 5
+			},
+			{
+				"x": 0,
+				"y": 5
+			},
+			{
+				"x": 0,
+				"y": 4
+			},
+			{
+				"x": 0,
+				"y": 3
+			},
+			{
+				"x": 1,
+				"y": 3
+			}
+		],
+		"direction": "right",
+		"obstacles": [
+			{
+				"x": 4,
+				"y": 3
+			}
+		],
+		"apple": {
+			"x": 2,
+			"y": 3
+		},
+		"star": {
+			"point": {
+				"x": 3,
+				"y": 3
+			},
+			"expiresAt": 76072.95912500008
+		},
+		"endReason": null,
+		"lastDecision": null,
+		"lastStepDurationMs": 315.91512499999953,
+		"forkedFrom": {
+			"matchId": "4f549994-1f96-402f-9925-6f683576ad67",
+			"seq": 311,
+			"tick": 154,
+			"gameTimeMs": 57265.04129100009
+		},
+		"lastAppliedAction": {
+			"source": "primary",
+			"stepIndex": 0,
+			"direction": "right",
+			"tick": 186,
+			"targetTick": 186,
+			"requestId": "e96380ba-ce1d-46c7-a8c9-1d9935904d57",
+			"observedTick": 185
+		}
+	}
+}

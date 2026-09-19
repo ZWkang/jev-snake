@@ -1,8 +1,10 @@
+import type { DecisionRequestV5 } from "./outcome-context.js";
 import type {
 	DecisionRequestV4,
 	PlanRequestV4,
 	WitnessArchive,
 } from "./witness-context.js";
+export type { DecisionRequestV5 } from "./outcome-context.js";
 export type { DecisionRequestV4, PlanRequestV4 } from "./witness-context.js";
 export const directions = ["up", "right", "down", "left"] as const;
 export type Direction = (typeof directions)[number];
@@ -270,7 +272,8 @@ export type PlanRequestV3 = {
 export type DecisionRequest =
 	| LegacyDecisionRequest
 	| DecisionRequestV3
-	| DecisionRequestV4;
+	| DecisionRequestV4
+	| DecisionRequestV5;
 export type PlanRequest = LegacyPlanRequest | PlanRequestV3 | PlanRequestV4;
 type BoardConfig = {
 	// Missing means the original fixed-spawn generator, including its RNG order.

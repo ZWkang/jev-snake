@@ -60,6 +60,7 @@ export function LiveMatch(props: { matchId: string }) {
 		let reconnect: ReturnType<typeof setTimeout> | undefined;
 		let cursor = -1;
 		let fatal = false;
+		let finished = false;
 		setError("");
 		setPhase("loading");
 		setState(undefined);
@@ -67,7 +68,7 @@ export function LiveMatch(props: { matchId: string }) {
 		setElapsedSample(undefined);
 		setElapsedGameTimeMs(0);
 		function open() {
-			if (disposed || fatal) return;
+			if (disposed || fatal || finished) return;
 			socket = new WebSocket(
 				(location.protocol === "https:" ? "wss://" : "ws://") +
 					location.host +
@@ -105,6 +106,7 @@ export function LiveMatch(props: { matchId: string }) {
 					if (event.seq !== cursor + 1)
 						throw new Error("事件序列缺失，请重新同步");
 					cursor = event.seq;
+					finished = ["gameover", "won"].includes(event.state.status);
 					setState(event.state);
 					sampleElapsed(
 						event.state.status === "running"
@@ -114,6 +116,7 @@ export function LiveMatch(props: { matchId: string }) {
 					setRecent((events) => [...events, event].slice(-8));
 					setPhase("live");
 					setError("");
+					if (finished) socket?.close();
 				} catch (e) {
 					fatal = true;
 					setError(e instanceof Error ? e.message : String(e));
@@ -122,10 +125,10 @@ export function LiveMatch(props: { matchId: string }) {
 				}
 			};
 			socket.onerror = () => {
-				if (!disposed) setPhase("reconnecting");
+				if (!disposed && !finished) setPhase("reconnecting");
 			};
 			socket.onclose = () => {
-				if (disposed || fatal) return;
+				if (disposed || fatal || finished) return;
 				setPhase("reconnecting");
 				reconnect = setTimeout(open, 1000);
 			};
@@ -146,7 +149,9 @@ export function LiveMatch(props: { matchId: string }) {
 				);
 				if (disposed) return;
 				const last = page.events.at(-1);
-				setState(last?.state ?? current);
+				const latest = last?.state ?? current;
+				finished = ["gameover", "won"].includes(latest.status);
+				setState(latest);
 				const displayedElapsed =
 					last && last.state.status !== "running"
 						? last.gameTimeMs
@@ -158,7 +163,8 @@ export function LiveMatch(props: { matchId: string }) {
 				setElapsedGameTimeMs(displayedElapsed);
 				cursor = last?.seq ?? current.seq;
 				setRecent(page.events.slice(-8));
-				open();
+				if (finished) setPhase("live");
+				else open();
 			} catch (e) {
 				if (!disposed) {
 					setError(e instanceof Error ? e.message : String(e));
@@ -206,7 +212,7 @@ export function LiveMatch(props: { matchId: string }) {
 							</span>
 
 							<Link to="/matches/$matchId/replay" params={{ matchId: s().id }}>
-								{isActiveMatch(s().status) ? "回看已记录片段 ↗" : "查看回放 ↗"}
+								{isActiveMatch(s().status) ? "回看已记录片段" : "查看回放"}
 							</Link>
 						</div>
 						<div class="game-layout">

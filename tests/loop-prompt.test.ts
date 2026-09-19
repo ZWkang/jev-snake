@@ -53,10 +53,12 @@ test("the real 24-move loop reaches a legal apple with exits while recording the
 	const request = decisionBody(state, undefined, undefined, progress);
 	expect(request.state.progress).toEqual(progress);
 	expect(request.questions.direction.criteria.up).toMatchObject({
-		eatsApple: true,
 		appleRoute: {
-			status: "eaten_now",
-			postEat: { legalNextMoves: 2, tailConnection: "connected" },
+			status: "verified_route",
+			moves: 1,
+			postApple: {
+				postEat: { legalNextMoves: 2, tailConnection: "connected" },
+			},
 		},
 	});
 	expect(request.questions.direction.instructions).toContain(
@@ -140,8 +142,8 @@ test("a no-static-path loop exposes actual action history without prescribing an
 	});
 	for (const d of ["up", "right"] as const)
 		expect(input.questions.direction.criteria[d]).toMatchObject({
-			danger: null,
-			appleRoute: { status: "no_static_path" },
+			survival: { status: "not_proven_fatal" },
+			appleRoute: { status: "verified_route" },
 		});
 	expect(input.questions.direction.instructions).toContain(
 		"not which direction to choose",
@@ -150,7 +152,7 @@ test("a no-static-path loop exposes actual action history without prescribing an
 		/prefer an UNTRIED|prefer fewer|among danger=null options/,
 	);
 	expect(input.state.rules.factsSemantics).toContain(
-		"no_static_path does not prove",
+		"not_proven_fatal means unresolved",
 	);
 	expect(decisionRequestSchema.parse(input)).toEqual(input);
 });

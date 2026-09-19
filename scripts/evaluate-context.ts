@@ -120,7 +120,7 @@ function selectedEvidence(
 		decision.kind !== "plan"
 	) {
 		const facts = request.questions.direction.criteria[decision.choice];
-		if (typeof facts === "string" || !("appleRoute" in facts))
+		if (typeof facts === "string" || !("immediateCollision" in facts))
 			throw new Error("Expected v3 action facts");
 		const danger =
 			facts.immediateCollision !== null ||

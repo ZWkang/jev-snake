@@ -92,6 +92,7 @@ export const reasonName = (reason: string | null) =>
 				wall: "撞到边界",
 				obstacle: "撞到障碍",
 				self: "撞到身体",
+				no_legal_moves: "已无可走方向",
 				board_complete: "完成棋盘",
 				server_restart: "服务重启",
 				server_shutdown: "服务关闭",
@@ -164,6 +165,8 @@ export function eventName(event: MatchEvent) {
 			gameover: reasonName(event.state.endReason),
 			won: "完成棋盘",
 			interrupted: reasonName(event.state.endReason),
+			resumed: "服务恢复，继续本局",
+			trapped: "已无可走方向，本局结束",
 		}[event.type] ?? event.type;
 	const source = (event.data.actionSource as { source?: string } | undefined)
 		?.source;

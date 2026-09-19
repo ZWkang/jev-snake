@@ -52,7 +52,7 @@ export function HomePage() {
 					</p>
 					<div class="home-actions">
 						<Link to="/watch" class="snake-button yellow">
-							进入连续观战 ↗
+							进入连续观战
 						</Link>
 						<Link to="/matches" class="snake-button">
 							翻看历史对局
@@ -81,7 +81,7 @@ export function HomePage() {
 				<section class="latest-matches">
 					<div class="section-heading">
 						<h2>刚刚发生过的故事</h2>
-						<Link to="/matches">全部历史 ↗</Link>
+						<Link to="/matches">全部历史</Link>
 					</div>
 					<div class="recent-grid">
 						<For each={list()?.matches}>
@@ -102,7 +102,7 @@ export function HomePage() {
 									</strong>
 									<span>
 										{m.tick} 步 · {matchSpeed(m)}{" "}
-										<b>{isActiveMatch(m.status) ? "单局观战 ↗" : "回放 ↗"}</b>
+										<b>{isActiveMatch(m.status) ? "单局观战" : "回放"}</b>
 									</span>
 								</Link>
 							)}

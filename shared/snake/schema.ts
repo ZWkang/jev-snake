@@ -7,6 +7,7 @@ import {
 	decisionRequestV4Schema,
 	planRequestV4Schema,
 } from "./context-v4-schema.js";
+import { decisionRequestV5Schema } from "./context-v5-schema.js";
 import { decisionModes, directions, planChoices, stepModes } from "./types.js";
 import { witnessArchiveSchema } from "./witness-schema.js";
 
@@ -166,11 +167,13 @@ function contextVersion(value: unknown): unknown {
 // Select the shape before parsing. A malformed v3 request never reaches a legacy parser.
 export const decisionRequestSchema = z.unknown().transform((value, context) => {
 	const result = (
-		contextVersion(value) === "action-facts-v4"
-			? decisionRequestV4Schema
-			: contextVersion(value) === "action-facts-v3"
-				? decisionRequestV3Schema
-				: legacyDecisionRequestSchema
+		contextVersion(value) === "action-outcomes-v5"
+			? decisionRequestV5Schema
+			: contextVersion(value) === "action-facts-v4"
+				? decisionRequestV4Schema
+				: contextVersion(value) === "action-facts-v3"
+					? decisionRequestV3Schema
+					: legacyDecisionRequestSchema
 	).safeParse(value);
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) context.addIssue({ ...issue });

@@ -1,0 +1,2311 @@
+{
+	"version": "outcome-input-regressions-v1",
+	"cases": [
+		{
+			"id": "fatal_apple_2e220",
+			"source": {
+				"kind": "historical_request",
+				"matchId": "2e220db6-762b-4675-bc50-9c742426a73a",
+				"observedSeq": 968,
+				"requestSeq": 969,
+				"tick": 480,
+				"description": "Original recorded provider request, including its actual movement history and witnessContinuity. Observation omits lastDecision and lastAppliedAction; neither is consumed by v5.",
+				"requestSha256": "48258aa2a9caab7d931663ebf3746519c07e1970506aa515d60ffd1f672d8b3e"
+			},
+			"observation": {
+				"id": "2e220db6-762b-4675-bc50-9c742426a73a",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 2,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 24,
+					"height": 18,
+					"obstacleCount": 12,
+					"tickIntervalMs": null,
+					"seed": "f1b571f6-efe3-40f3-869b-1aad7d5183a1"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-19T18:10:26.947Z",
+				"startedAt": "2026-09-19T18:10:26.983Z",
+				"endedAt": null,
+				"seq": 968,
+				"tick": 480,
+				"gameTimeMs": 184526.942125,
+				"score": 340,
+				"applesEaten": 31,
+				"snake": [
+					{
+						"x": 0,
+						"y": 16
+					},
+					{
+						"x": 1,
+						"y": 16
+					},
+					{
+						"x": 1,
+						"y": 15
+					},
+					{
+						"x": 1,
+						"y": 14
+					},
+					{
+						"x": 1,
+						"y": 13
+					},
+					{
+						"x": 1,
+						"y": 12
+					},
+					{
+						"x": 1,
+						"y": 11
+					},
+					{
+						"x": 1,
+						"y": 10
+					},
+					{
+						"x": 1,
+						"y": 9
+					},
+					{
+						"x": 1,
+						"y": 8
+					},
+					{
+						"x": 1,
+						"y": 7
+					},
+					{
+						"x": 1,
+						"y": 6
+					},
+					{
+						"x": 1,
+						"y": 5
+					},
+					{
+						"x": 1,
+						"y": 4
+					},
+					{
+						"x": 1,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 2
+					},
+					{
+						"x": 1,
+						"y": 2
+					},
+					{
+						"x": 2,
+						"y": 2
+					},
+					{
+						"x": 3,
+						"y": 2
+					},
+					{
+						"x": 4,
+						"y": 2
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 5,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 4
+					},
+					{
+						"x": 8,
+						"y": 4
+					},
+					{
+						"x": 9,
+						"y": 4
+					},
+					{
+						"x": 10,
+						"y": 4
+					},
+					{
+						"x": 11,
+						"y": 4
+					},
+					{
+						"x": 12,
+						"y": 4
+					},
+					{
+						"x": 12,
+						"y": 3
+					},
+					{
+						"x": 12,
+						"y": 2
+					},
+					{
+						"x": 11,
+						"y": 2
+					},
+					{
+						"x": 10,
+						"y": 2
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 19,
+						"y": 3
+					},
+					{
+						"x": 18,
+						"y": 10
+					},
+					{
+						"x": 22,
+						"y": 1
+					},
+					{
+						"x": 15,
+						"y": 4
+					},
+					{
+						"x": 8,
+						"y": 11
+					},
+					{
+						"x": 9,
+						"y": 10
+					},
+					{
+						"x": 8,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 10
+					},
+					{
+						"x": 11,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 12
+					},
+					{
+						"x": 10,
+						"y": 6
+					},
+					{
+						"x": 19,
+						"y": 1
+					}
+				],
+				"apple": {
+					"x": 0,
+					"y": 5
+				},
+				"star": {
+					"point": {
+						"x": 13,
+						"y": 13
+					},
+					"expiresAt": 186303.31237500004
+				},
+				"endReason": null,
+				"lastStepDurationMs": 349.3202919999603
+			},
+			"timing": {
+				"elapsedGameTimeMs": 184536.49300000002,
+				"deadlineInMs": null
+			},
+			"progress": {
+				"historyVersion": "progress-v1",
+				"historyStartTick": 0,
+				"throughTick": 480,
+				"lastAppleTick": 479,
+				"movesSinceApple": 1,
+				"positionVisits": 1,
+				"previousVisitTick": null,
+				"repeatAfterMoves": null,
+				"actions": {
+					"up": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"right": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"down": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"left": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					}
+				}
+			},
+			"recordedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "action-facts-v4",
+					"rules": {
+						"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown. opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it."
+					},
+					"board": {
+						"width": 24,
+						"height": 18,
+						"obstacleCount": 12
+					},
+					"player": {
+						"head": {
+							"x": 0,
+							"y": 16
+						},
+						"direction": "left",
+						"length": 35,
+						"score": 340
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 5
+						},
+						"star": {
+							"point": {
+								"x": 13,
+								"y": 13
+							},
+							"expiresAt": 186303.31237500004
+						}
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"observedTick": 480,
+						"targetTick": 481,
+						"gameTimeMs": 184536.49300000002,
+						"stepMode": "response",
+						"deadlineInMs": null,
+						"tickIntervalMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 480,
+						"lastAppleTick": 479,
+						"movesSinceApple": 1,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"witnessContinuity": [
+						{
+							"witnessId": "8668bf68e7384f185ac6dd5482b7fe63806cdbdfc27cf0bca3d07701e3e14382",
+							"originTick": 479,
+							"stateCompatibleAfterMoves": 1,
+							"opportunityStatus": "apple_route_found",
+							"appleTarget": {
+								"x": 0,
+								"y": 5
+							},
+							"scope": "observed_apple_only",
+							"endEvent": "apple_eaten",
+							"remainingMoves": 11,
+							"nextDirection": "up"
+						}
+					]
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions. state.progress records committed movement, not a forecast. It counts visits to this full body, heading and food configuration since the last apple. actions counts actual departures and how often each was followed by returning here without an apple; rejected or merely proposed actions do not count. A historical return describes what happened, not which direction to choose or whether an alternative is safe.",
+						"criteria": {
+							"up": {
+								"immediateCollision": null,
+								"danger": "proven_fatal",
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "unknown_after_apple",
+									"steps": 11
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 12,
+									"bodyLength": 35,
+									"relativeToBody": "less",
+									"legalNextMoves": 1,
+									"tailConnection": "disconnected"
+								},
+								"appleRoute": {
+									"status": "path_found",
+									"distance": 11,
+									"verified": true,
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 36,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"starRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"remainingMs": 1766.819375000021,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "f62dfb0c6b7b8c854ee9219fd456c5dc747a8c3493008b574371bb5a6e71595e",
+									"moves": 11,
+									"appleTarget": {
+										"x": 0,
+										"y": 5
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 36,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"immediateCollision": "reverse",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								},
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 3
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 374,
+									"bodyLength": 35,
+									"relativeToBody": "greater",
+									"legalNextMoves": 1,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "path_found",
+									"distance": 18,
+									"verified": true,
+									"remainingMs": 1766.819375000021,
+									"nominalArrivalMs": null,
+									"timingStatus": "unknown"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "1b4c393060832894691f8852ccae49883a2ec08bab203a324e8e3ebe40a0c2cc",
+									"moves": 23,
+									"appleTarget": {
+										"x": 0,
+										"y": 5
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [
+										{
+											"point": {
+												"x": 2,
+												"y": 2
+											},
+											"originalBodyIndex": 18,
+											"earliestReleaseStep": 17,
+											"enteredAtStep": 18
+										},
+										{
+											"point": {
+												"x": 1,
+												"y": 2
+											},
+											"originalBodyIndex": 17,
+											"earliestReleaseStep": 18,
+											"enteredAtStep": 19
+										},
+										{
+											"point": {
+												"x": 0,
+												"y": 2
+											},
+											"originalBodyIndex": 16,
+											"earliestReleaseStep": 19,
+											"enteredAtStep": 20
+										},
+										{
+											"point": {
+												"x": 0,
+												"y": 3
+											},
+											"originalBodyIndex": 15,
+											"earliestReleaseStep": 20,
+											"enteredAtStep": 21
+										}
+									],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"staticReachableCells": 11,
+										"bodyLength": 36,
+										"relativeToBody": "less",
+										"legalNextMoves": 2,
+										"tailConnection": "connected",
+										"terminal": "none"
+									}
+								},
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"immediateCollision": "wall",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								},
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"historicalDecision": {
+				"choice": "up",
+				"probabilities": {
+					"up": 0.79,
+					"right": 0.02,
+					"down": 0.17,
+					"left": 0.02
+				},
+				"model": "typesafe/jev-1.13-20260917",
+				"inputTokens": 3247
+			}
+		},
+		{
+			"id": "fatal_apple_7x5",
+			"source": {
+				"kind": "historical_request",
+				"matchId": "f4961093-c36b-4ba1-bde2-d3b4e2ac6175",
+				"observedSeq": 253,
+				"requestSeq": 254,
+				"tick": 126,
+				"description": "Original recorded provider request, including its actual movement history and witnessContinuity. Observation omits lastDecision and lastAppliedAction; neither is consumed by v5.",
+				"requestSha256": "fec015b3f518d7f378e2b153f1d6095a2052d8a54ee49325ef38fdc59d4f08cd"
+			},
+			"observation": {
+				"id": "f4961093-c36b-4ba1-bde2-d3b4e2ac6175",
+				"agentName": "JEV 小棋盘验证 7×5 · 当前v4",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 2,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 7,
+					"height": 5,
+					"obstacleCount": 0,
+					"tickIntervalMs": null,
+					"seed": "jev-small-check-7x5-20260920"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-19T18:36:54.077Z",
+				"startedAt": "2026-09-19T18:36:54.100Z",
+				"endedAt": null,
+				"seq": 253,
+				"tick": 126,
+				"gameTimeMs": 47802.45004200004,
+				"score": 270,
+				"applesEaten": 18,
+				"snake": [
+					{
+						"x": 1,
+						"y": 1
+					},
+					{
+						"x": 1,
+						"y": 0
+					},
+					{
+						"x": 2,
+						"y": 0
+					},
+					{
+						"x": 3,
+						"y": 0
+					},
+					{
+						"x": 4,
+						"y": 0
+					},
+					{
+						"x": 5,
+						"y": 0
+					},
+					{
+						"x": 5,
+						"y": 1
+					},
+					{
+						"x": 5,
+						"y": 2
+					},
+					{
+						"x": 5,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 2
+					},
+					{
+						"x": 4,
+						"y": 1
+					},
+					{
+						"x": 3,
+						"y": 1
+					},
+					{
+						"x": 3,
+						"y": 2
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 3,
+						"y": 4
+					},
+					{
+						"x": 2,
+						"y": 4
+					},
+					{
+						"x": 2,
+						"y": 3
+					},
+					{
+						"x": 1,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 2
+					},
+					{
+						"x": 1,
+						"y": 2
+					}
+				],
+				"direction": "down",
+				"obstacles": [],
+				"apple": {
+					"x": 0,
+					"y": 1
+				},
+				"star": null,
+				"endReason": null,
+				"lastStepDurationMs": 450.6390000000829
+			},
+			"timing": {
+				"elapsedGameTimeMs": 47809.11508300004,
+				"deadlineInMs": null
+			},
+			"progress": {
+				"historyVersion": "progress-v1",
+				"historyStartTick": 0,
+				"throughTick": 126,
+				"lastAppleTick": 117,
+				"movesSinceApple": 9,
+				"positionVisits": 1,
+				"previousVisitTick": null,
+				"repeatAfterMoves": null,
+				"actions": {
+					"up": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"right": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"down": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"left": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					}
+				}
+			},
+			"recordedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "action-facts-v4",
+					"rules": {
+						"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown. opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it."
+					},
+					"board": {
+						"width": 7,
+						"height": 5,
+						"obstacleCount": 0
+					},
+					"player": {
+						"head": {
+							"x": 1,
+							"y": 1
+						},
+						"direction": "down",
+						"length": 22,
+						"score": 270
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 1
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"observedTick": 126,
+						"targetTick": 127,
+						"gameTimeMs": 47809.11508300004,
+						"stepMode": "response",
+						"deadlineInMs": null,
+						"tickIntervalMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 126,
+						"lastAppleTick": 117,
+						"movesSinceApple": 9,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"witnessContinuity": [
+						{
+							"witnessId": "9cc9f59324769560208f0f36741ada84317d793222ec8ba59164e0adb6e89f1e",
+							"originTick": 125,
+							"stateCompatibleAfterMoves": 1,
+							"opportunityStatus": "apple_route_found",
+							"appleTarget": {
+								"x": 0,
+								"y": 1
+							},
+							"scope": "observed_apple_only",
+							"endEvent": "apple_eaten",
+							"remainingMoves": 1,
+							"nextDirection": "left"
+						}
+					]
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions. state.progress records committed movement, not a forecast. It counts visits to this full body, heading and food configuration since the last apple. actions counts actual departures and how often each was followed by returning here without an apple; rejected or merely proposed actions do not count. A historical return describes what happened, not which direction to choose or whether an alternative is safe.",
+						"criteria": {
+							"up": {
+								"immediateCollision": "reverse",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								},
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 3
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 3,
+									"bodyLength": 22,
+									"relativeToBody": "less",
+									"legalNextMoves": 1,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "71603725ec5de8cbd9dc497bb201c67e822ad6d95197a5cac4220408a449cd1d",
+									"moves": 5,
+									"appleTarget": {
+										"x": 0,
+										"y": 1
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [
+										{
+											"point": {
+												"x": 1,
+												"y": 2
+											},
+											"originalBodyIndex": 21,
+											"earliestReleaseStep": 1,
+											"enteredAtStep": 3
+										},
+										{
+											"point": {
+												"x": 0,
+												"y": 2
+											},
+											"originalBodyIndex": 20,
+											"earliestReleaseStep": 2,
+											"enteredAtStep": 4
+										}
+									],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 23,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 3,
+									"bodyLength": 22,
+									"relativeToBody": "less",
+									"legalNextMoves": 2,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "9b680f279bed4cfab93d96de069ed782ef1c7e039e4d50653fe9867973186123",
+									"moves": 3,
+									"appleTarget": {
+										"x": 0,
+										"y": 1
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [
+										{
+											"point": {
+												"x": 1,
+												"y": 2
+											},
+											"originalBodyIndex": 21,
+											"earliestReleaseStep": 1,
+											"enteredAtStep": 1
+										},
+										{
+											"point": {
+												"x": 0,
+												"y": 2
+											},
+											"originalBodyIndex": 20,
+											"earliestReleaseStep": 2,
+											"enteredAtStep": 2
+										}
+									],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 23,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"immediateCollision": null,
+								"danger": "proven_fatal",
+								"eatsApple": true,
+								"forcedPath": {
+									"outcome": "unknown_after_apple",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 2,
+									"bodyLength": 23,
+									"relativeToBody": "less",
+									"legalNextMoves": 1,
+									"tailConnection": "disconnected"
+								},
+								"appleRoute": {
+									"status": "eaten_now",
+									"distance": 1,
+									"verified": true,
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 23,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"starRoute": {
+									"status": "unknown_after_growth",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "unknown"
+								},
+								"opportunity": {
+									"status": "apple_eaten_now",
+									"witnessId": "4743ef51522a46b73f5198ce0350d099a879f5db202e7c4cd486d04f730bd421",
+									"moves": 1,
+									"appleTarget": {
+										"x": 0,
+										"y": 1
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"staticReachableCells": 2,
+										"bodyLength": 23,
+										"relativeToBody": "less",
+										"legalNextMoves": 1,
+										"tailConnection": "disconnected",
+										"terminal": "none"
+									}
+								},
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"historicalDecision": {
+				"choice": "left",
+				"probabilities": {
+					"up": 0,
+					"right": 0.01,
+					"down": 0.02,
+					"left": 0.97
+				},
+				"model": "typesafe/jev-1.13-20260917",
+				"inputTokens": 3346
+			}
+		},
+		{
+			"id": "release_trap_529dd",
+			"source": {
+				"kind": "reconstructed_v4",
+				"description": "Recorded 529dd tick649 geometry with baseState metadata; v4 request freshly constructed and frozen for this regression fixture. This is NOT the historical provider request.",
+				"requestSha256": "53d45b1476545cd0a28fca85c33e7b875245bb1090d21070e617aa657b5d1652"
+			},
+			"observation": {
+				"id": "529dd24d-28ef-40cd-9757-eefce748e5c1",
+				"agentName": "Test",
+				"model": null,
+				"config": {
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 12,
+					"height": 9,
+					"obstacleCount": 4,
+					"tickIntervalMs": null,
+					"seed": "f13e0941-f9f8-4c47-b522-4459c6fc025f"
+				},
+				"recordVersion": 1,
+				"rulesVersion": 1,
+				"status": "running",
+				"createdAt": "now",
+				"startedAt": null,
+				"endedAt": null,
+				"seq": 1301,
+				"tick": 649,
+				"gameTimeMs": 0,
+				"score": 0,
+				"applesEaten": 0,
+				"snake": [
+					{
+						"x": 10,
+						"y": 2
+					},
+					{
+						"x": 9,
+						"y": 2
+					},
+					{
+						"x": 9,
+						"y": 1
+					},
+					{
+						"x": 8,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 5,
+						"y": 1
+					},
+					{
+						"x": 5,
+						"y": 0
+					},
+					{
+						"x": 4,
+						"y": 0
+					},
+					{
+						"x": 3,
+						"y": 0
+					},
+					{
+						"x": 2,
+						"y": 0
+					},
+					{
+						"x": 1,
+						"y": 0
+					},
+					{
+						"x": 1,
+						"y": 1
+					},
+					{
+						"x": 2,
+						"y": 1
+					},
+					{
+						"x": 2,
+						"y": 2
+					},
+					{
+						"x": 2,
+						"y": 3
+					},
+					{
+						"x": 2,
+						"y": 4
+					},
+					{
+						"x": 2,
+						"y": 5
+					},
+					{
+						"x": 3,
+						"y": 5
+					},
+					{
+						"x": 3,
+						"y": 4
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 3,
+						"y": 2
+					},
+					{
+						"x": 4,
+						"y": 2
+					},
+					{
+						"x": 5,
+						"y": 2
+					},
+					{
+						"x": 6,
+						"y": 2
+					},
+					{
+						"x": 7,
+						"y": 2
+					},
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 8,
+						"y": 3
+					},
+					{
+						"x": 8,
+						"y": 4
+					},
+					{
+						"x": 7,
+						"y": 4
+					},
+					{
+						"x": 6,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 5
+					},
+					{
+						"x": 6,
+						"y": 5
+					},
+					{
+						"x": 7,
+						"y": 5
+					},
+					{
+						"x": 8,
+						"y": 5
+					},
+					{
+						"x": 9,
+						"y": 5
+					},
+					{
+						"x": 10,
+						"y": 5
+					},
+					{
+						"x": 10,
+						"y": 6
+					},
+					{
+						"x": 11,
+						"y": 6
+					},
+					{
+						"x": 11,
+						"y": 7
+					},
+					{
+						"x": 11,
+						"y": 8
+					},
+					{
+						"x": 10,
+						"y": 8
+					},
+					{
+						"x": 9,
+						"y": 8
+					},
+					{
+						"x": 8,
+						"y": 8
+					},
+					{
+						"x": 7,
+						"y": 8
+					},
+					{
+						"x": 6,
+						"y": 8
+					},
+					{
+						"x": 5,
+						"y": 8
+					},
+					{
+						"x": 4,
+						"y": 8
+					},
+					{
+						"x": 3,
+						"y": 8
+					}
+				],
+				"direction": "right",
+				"obstacles": [
+					{
+						"x": 9,
+						"y": 7
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 7
+					},
+					{
+						"x": 9,
+						"y": 6
+					}
+				],
+				"apple": {
+					"x": 4,
+					"y": 7
+				},
+				"star": null,
+				"endReason": null
+			},
+			"timing": {
+				"elapsedGameTimeMs": 0,
+				"deadlineInMs": null
+			},
+			"progress": null,
+			"recordedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "action-facts-v4",
+					"rules": {
+						"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown. opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it."
+					},
+					"board": {
+						"width": 12,
+						"height": 9,
+						"obstacleCount": 4
+					},
+					"player": {
+						"head": {
+							"x": 10,
+							"y": 2
+						},
+						"direction": "right",
+						"length": 50,
+						"score": 0
+					},
+					"food": {
+						"apple": {
+							"x": 4,
+							"y": 7
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"observedTick": 649,
+						"targetTick": 650,
+						"gameTimeMs": 0,
+						"stepMode": "response",
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"witnessContinuity": []
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1.",
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 16,
+									"bodyLength": 50,
+									"relativeToBody": "less",
+									"legalNextMoves": 2,
+									"tailConnection": "disconnected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "4aa8b70dc4e6083c93d33a86e0634664cb5e83192e5dbd2197f3cfe4c26f2f56",
+									"moves": 21,
+									"appleTarget": {
+										"x": 4,
+										"y": 7
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [
+										{
+											"point": {
+												"x": 11,
+												"y": 6
+											},
+											"originalBodyIndex": 39,
+											"earliestReleaseStep": 11,
+											"enteredAtStep": 11
+										},
+										{
+											"point": {
+												"x": 11,
+												"y": 7
+											},
+											"originalBodyIndex": 40,
+											"earliestReleaseStep": 10,
+											"enteredAtStep": 12
+										},
+										{
+											"point": {
+												"x": 11,
+												"y": 8
+											},
+											"originalBodyIndex": 41,
+											"earliestReleaseStep": 9,
+											"enteredAtStep": 13
+										},
+										{
+											"point": {
+												"x": 10,
+												"y": 8
+											},
+											"originalBodyIndex": 42,
+											"earliestReleaseStep": 8,
+											"enteredAtStep": 14
+										},
+										{
+											"point": {
+												"x": 9,
+												"y": 8
+											},
+											"originalBodyIndex": 43,
+											"earliestReleaseStep": 7,
+											"enteredAtStep": 15
+										},
+										{
+											"point": {
+												"x": 8,
+												"y": 8
+											},
+											"originalBodyIndex": 44,
+											"earliestReleaseStep": 6,
+											"enteredAtStep": 16
+										},
+										{
+											"point": {
+												"x": 7,
+												"y": 8
+											},
+											"originalBodyIndex": 45,
+											"earliestReleaseStep": 5,
+											"enteredAtStep": 17
+										},
+										{
+											"point": {
+												"x": 6,
+												"y": 8
+											},
+											"originalBodyIndex": 46,
+											"earliestReleaseStep": 4,
+											"enteredAtStep": 18
+										}
+									],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 47,
+										"bodyLength": 51,
+										"relativeToBody": "less",
+										"legalNextMoves": 3,
+										"tailConnection": "connected"
+									}
+								}
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1.",
+								"immediateCollision": null,
+								"danger": "proven_fatal",
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 16,
+									"bodyLength": 50,
+									"relativeToBody": "less",
+									"legalNextMoves": 2,
+									"tailConnection": "disconnected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "exhausted",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1.",
+								"immediateCollision": null,
+								"danger": "proven_fatal",
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 16,
+									"bodyLength": 50,
+									"relativeToBody": "less",
+									"legalNextMoves": 3,
+									"tailConnection": "disconnected"
+								},
+								"appleRoute": {
+									"status": "no_static_path",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "exhausted",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1.",
+								"immediateCollision": "reverse",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							}
+						}
+					}
+				}
+			},
+			"historicalDecision": null
+		},
+		{
+			"id": "opening",
+			"source": {
+				"kind": "synthetic_control",
+				"description": "Synthetic opening control from tests/context-fixture.ts; frozen v4 baseline, not a historical provider request.",
+				"requestSha256": "96dc9261b40d598ca254d077cde336a501479be331ea96fdb6309e07ca52626a"
+			},
+			"observation": {
+				"id": "context",
+				"agentName": "Test",
+				"model": null,
+				"config": {
+					"width": 24,
+					"height": 18,
+					"obstacleCount": 0,
+					"tickIntervalMs": null,
+					"seed": "context",
+					"stepMode": "response",
+					"decisionMode": "single_step"
+				},
+				"recordVersion": 1,
+				"rulesVersion": 1,
+				"status": "running",
+				"createdAt": "now",
+				"startedAt": null,
+				"endedAt": null,
+				"seq": -1,
+				"tick": 0,
+				"gameTimeMs": 0,
+				"score": 0,
+				"applesEaten": 0,
+				"snake": [
+					{
+						"x": 7,
+						"y": 9
+					},
+					{
+						"x": 6,
+						"y": 9
+					},
+					{
+						"x": 5,
+						"y": 9
+					},
+					{
+						"x": 4,
+						"y": 9
+					}
+				],
+				"direction": "right",
+				"obstacles": [],
+				"apple": {
+					"x": 23,
+					"y": 17
+				},
+				"star": null,
+				"endReason": null
+			},
+			"timing": {
+				"elapsedGameTimeMs": 0,
+				"deadlineInMs": null
+			},
+			"progress": null,
+			"recordedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "action-facts-v4",
+					"rules": {
+						"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown. opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it."
+					},
+					"board": {
+						"width": 24,
+						"height": 18,
+						"obstacleCount": 0
+					},
+					"player": {
+						"head": {
+							"x": 7,
+							"y": 9
+						},
+						"direction": "right",
+						"length": 4,
+						"score": 0
+					},
+					"food": {
+						"apple": {
+							"x": 23,
+							"y": 17
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"observedTick": 0,
+						"targetTick": 1,
+						"gameTimeMs": 0,
+						"stepMode": "response",
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"witnessContinuity": []
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1.",
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 429,
+									"bodyLength": 4,
+									"relativeToBody": "greater",
+									"legalNextMoves": 3,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "path_found",
+									"distance": 26,
+									"verified": true,
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "404cc8b119d51736bd696b33e5258b0543b4b11a53764dd1a372a59aa876916d",
+									"moves": 26,
+									"appleTarget": {
+										"x": 23,
+										"y": 17
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								}
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1.",
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 429,
+									"bodyLength": 4,
+									"relativeToBody": "greater",
+									"legalNextMoves": 3,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "path_found",
+									"distance": 24,
+									"verified": true,
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "fd6e2d2245a646bfef38f8746e7dfee77ec85201a461102e6e3bad828576e74c",
+									"moves": 24,
+									"appleTarget": {
+										"x": 23,
+										"y": 17
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								}
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1.",
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": false,
+								"forcedPath": {
+									"outcome": "branch",
+									"steps": 1
+								},
+								"terminal": "none",
+								"space": {
+									"staticReachableCells": 429,
+									"bodyLength": 4,
+									"relativeToBody": "greater",
+									"legalNextMoves": 3,
+									"tailConnection": "connected"
+								},
+								"appleRoute": {
+									"status": "path_found",
+									"distance": 24,
+									"verified": true,
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								},
+								"starRoute": {
+									"status": "absent",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_route_found",
+									"witnessId": "27e6d85f1f61960dbaeb4999ddc2d05a7381c39f3975fe9569009e555879f3a1",
+									"moves": 24,
+									"appleTarget": {
+										"x": 23,
+										"y": 17
+									},
+									"endEvent": "apple_eaten",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"terminal": "none",
+										"staticReachableCells": 428,
+										"bodyLength": 5,
+										"relativeToBody": "greater",
+										"legalNextMoves": 1,
+										"tailConnection": "connected"
+									}
+								}
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1.",
+								"immediateCollision": "reverse",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							}
+						}
+					}
+				}
+			},
+			"historicalDecision": null
+		},
+		{
+			"id": "near_complete",
+			"source": {
+				"kind": "synthetic_control",
+				"description": "Synthetic final-apple control from tests/context-fixture.ts; frozen v4 baseline, not a historical provider request.",
+				"requestSha256": "893adedf7b3b8af4ababed39311aa51aa793e3da3e7617529211f8c2322b378d"
+			},
+			"observation": {
+				"id": "context",
+				"agentName": "Test",
+				"model": null,
+				"config": {
+					"width": 7,
+					"height": 1,
+					"obstacleCount": 0,
+					"tickIntervalMs": null,
+					"seed": "context",
+					"stepMode": "response",
+					"decisionMode": "single_step"
+				},
+				"recordVersion": 1,
+				"rulesVersion": 1,
+				"status": "running",
+				"createdAt": "now",
+				"startedAt": null,
+				"endedAt": null,
+				"seq": -1,
+				"tick": 0,
+				"gameTimeMs": 0,
+				"score": 0,
+				"applesEaten": 0,
+				"snake": [
+					{
+						"x": 5,
+						"y": 0
+					},
+					{
+						"x": 4,
+						"y": 0
+					},
+					{
+						"x": 3,
+						"y": 0
+					},
+					{
+						"x": 2,
+						"y": 0
+					},
+					{
+						"x": 1,
+						"y": 0
+					},
+					{
+						"x": 0,
+						"y": 0
+					}
+				],
+				"direction": "right",
+				"obstacles": [],
+				"apple": {
+					"x": 6,
+					"y": 0
+				},
+				"star": null,
+				"endReason": null
+			},
+			"timing": {
+				"elapsedGameTimeMs": 0,
+				"deadlineInMs": null
+			},
+			"progress": null,
+			"recordedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "action-facts-v4",
+					"rules": {
+						"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown. opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it."
+					},
+					"board": {
+						"width": 7,
+						"height": 1,
+						"obstacleCount": 0
+					},
+					"player": {
+						"head": {
+							"x": 5,
+							"y": 0
+						},
+						"direction": "right",
+						"length": 6,
+						"score": 0
+					},
+					"food": {
+						"apple": {
+							"x": 6,
+							"y": 0
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"observedTick": 0,
+						"targetTick": 1,
+						"gameTimeMs": 0,
+						"stepMode": "response",
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"witnessContinuity": []
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1.",
+								"immediateCollision": "wall",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1.",
+								"immediateCollision": null,
+								"danger": null,
+								"eatsApple": true,
+								"forcedPath": {
+									"outcome": "board_complete",
+									"steps": 1
+								},
+								"terminal": "board_complete",
+								"space": null,
+								"appleRoute": {
+									"status": "eaten_now",
+									"distance": 1,
+									"verified": true,
+									"postEat": {
+										"terminal": "board_complete",
+										"bodyLength": 7,
+										"staticReachableCells": null,
+										"relativeToBody": null,
+										"legalNextMoves": null,
+										"tailConnection": null
+									}
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "apple_eaten_now",
+									"witnessId": "90d6e4d33bde1953a24ef9f3577eb8b7ca2d3b71014d6ff2ff99536c689cfcad",
+									"moves": 1,
+									"appleTarget": {
+										"x": 6,
+										"y": 0
+									},
+									"endEvent": "board_complete",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "observed_apple_only",
+									"postEat": {
+										"terminal": "board_complete",
+										"bodyLength": 7,
+										"staticReachableCells": null,
+										"relativeToBody": null,
+										"legalNextMoves": null,
+										"tailConnection": null
+									}
+								}
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1.",
+								"immediateCollision": "wall",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1.",
+								"immediateCollision": "reverse",
+								"danger": "immediate_collision",
+								"eatsApple": false,
+								"forcedPath": null,
+								"terminal": "none",
+								"space": null,
+								"appleRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"postEat": null
+								},
+								"starRoute": {
+									"status": "not_applicable",
+									"distance": null,
+									"verified": null,
+									"remainingMs": null,
+									"nominalArrivalMs": null,
+									"timingStatus": "not_applicable"
+								},
+								"opportunity": {
+									"status": "initial_collision",
+									"witnessId": null,
+									"moves": null,
+									"appleTarget": null,
+									"endEvent": "none",
+									"cycle": null,
+									"releasePassages": [],
+									"scope": "none",
+									"postEat": null
+								}
+							}
+						}
+					}
+				}
+			},
+			"historicalDecision": null
+		}
+	]
+}

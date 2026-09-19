@@ -256,7 +256,7 @@ test.each(["response-fast", "response-slow"] as const)(
 				action.state.lastDecision?.request,
 			);
 			expect(action.state.lastDecision?.request?.state.contextVersion).toBe(
-				"action-facts-v4",
+				"action-outcomes-v5",
 			);
 			expect(action.state.lastDecision?.contextBuildMs).toBeGreaterThanOrEqual(
 				0,
@@ -300,7 +300,7 @@ test.each(["response-fast", "response-slow"] as const)(
 	},
 );
 
-test.each(["response-stale", "response-reverse"] as const)(
+test.each(["response-stale"] as const)(
 	"%s rereads and asks again at the same tick after rejection",
 	async (mode) => {
 		const f = await fixture(mode);
@@ -328,7 +328,7 @@ test.each(["response-stale", "response-reverse"] as const)(
 		expect(rejection).toMatchObject({
 			tick: 0,
 			data: {
-				code: mode === "response-stale" ? "stale_state" : "invalid_direction",
+				code: "stale_state",
 			},
 		});
 		const accepted = events.find((e) => e.type === "action_accepted");
@@ -343,6 +343,25 @@ test.each(["response-stale", "response-reverse"] as const)(
 		expect(starts.slice(0, 2)).toEqual([0, 0]);
 	},
 );
+
+test("a reverse model answer fails once without re-requesting the unchanged position", async () => {
+	const f = await fixture("response-reverse");
+	const result = await f.run(["--step-mode", "response", "--width", "7"]);
+	expect(result.code).not.toBe(0);
+	expect(result.output).toContain(
+		"Response action rejected: invalid_direction",
+	);
+	expect(f.transportBodies()).toHaveLength(1);
+	const match = f.game.store.list().matches[0];
+	expect(match).toMatchObject({
+		status: "interrupted",
+		tick: 0,
+		endReason: "model_error",
+	});
+	const events = f.game.store.events(match.id, -1).events;
+	expect(events.filter((e) => e.type === "action_rejected")).toHaveLength(1);
+	expect(events.some((e) => e.type === "action_accepted")).toBe(false);
+});
 
 test("response command protocol failures stop explicitly instead of looping", async () => {
 	const f = await fixture("response-protocol");

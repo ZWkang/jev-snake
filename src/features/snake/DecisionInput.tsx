@@ -1,6 +1,7 @@
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import type { MatchEvent, PublicState } from "../../../shared/snake/types";
 import { Select } from "../../components/ui/select";
+import { ActionOutcomes } from "./ActionOutcomes";
 import { choiceName, directionName, reasonName, stepStatusName } from "./api";
 import { presentDecisionContext } from "./contextPresentation";
 import { OpportunityEvidence } from "./OpportunityEvidence";
@@ -196,6 +197,14 @@ export function DecisionInput(props: {
 					</Show>
 					<p class="decision-input-note">{presentation().semantics}</p>
 					<p class="decision-input-note">{presentation().probabilityNote}</p>
+					<Show when={supportedRequest()}>
+						{(input) => (
+							<ActionOutcomes
+								request={input()}
+								archive={decision()?.evidence}
+							/>
+						)}
+					</Show>
 					<Show when={supportedRequest()}>
 						{(input) => (
 							<OpportunityEvidence

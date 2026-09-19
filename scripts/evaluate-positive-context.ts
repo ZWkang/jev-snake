@@ -4,7 +4,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import {
-	buildDecisionContext,
+	buildDecisionContextV4 as buildDecisionContext,
 	decisionBodyV3,
 	sendJevRequest,
 } from "../server/jev/client.js";

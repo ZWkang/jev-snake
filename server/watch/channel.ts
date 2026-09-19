@@ -1,5 +1,9 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import type { GameConfig, PublicState } from "../../shared/snake/types.js";
+import {
+	isResponseMode,
+	type GameConfig,
+	type PublicState,
+} from "../../shared/snake/types.js";
 import {
 	watchCommandSchema,
 	type WatchCommandResult,
@@ -51,9 +55,8 @@ export class WatchChannel {
 			const { snapshot } = this.store.read();
 			if (
 				this.closing ||
-				!snapshot.enabled ||
 				snapshot.currentMatchId !== id ||
-				snapshot.phase !== "starting"
+				!["starting", "running", "draining"].includes(snapshot.phase)
 			)
 				throw new GameError(
 					"channel_stopped",
@@ -70,7 +73,7 @@ export class WatchChannel {
 			const record = this.store.read();
 			record.snapshot = {
 				...record.snapshot,
-				phase: "running",
+				phase: record.snapshot.enabled ? "running" : "draining",
 				revision: record.snapshot.revision + 1,
 				serverTime: this.now(),
 			};
@@ -90,15 +93,51 @@ export class WatchChannel {
 	activate(root: string) {
 		this.root = root;
 		this.recovering = true;
+		let recovery:
+			| { state: PublicState; controlToken: string; generation: number }
+			| undefined;
 		try {
 			const record = this.store.read(),
 				s = record.snapshot;
 			if (s.currentMatchId) {
 				const current = this.service.store.get(s.currentMatchId);
-				if (current.status === "ready" || current.status === "running")
+				if (!this.store.owned(current.id))
+					throw new Error("Channel recovery cannot take over an unowned match");
+				if (
+					s.phase !== "fault" &&
+					isResponseMode(current.config) &&
+					(current.status === "ready" ||
+						(current.status === "interrupted" &&
+							["server_restart", "server_shutdown"].includes(
+								current.endReason ?? "",
+							)))
+				) {
+					if (!this.settings.jev.apiKey)
+						throw new Error(
+							`Set ${this.settings.jev.keyEnv} before resuming continuous watch`,
+						);
+					const controlToken = randomBytes(32).toString("hex");
+					record.generation++;
+					record.config = current.config;
+					record.snapshot = {
+						...s,
+						revision: s.revision + 1,
+						phase: s.enabled ? "starting" : "draining",
+						nextStartAt: null,
+						serverTime: this.now(),
+					};
+					const state = this.service.resume(current.id, controlToken, () =>
+						this.store.write(record),
+					);
+					recovery = { state, controlToken, generation: record.generation };
+				} else if (current.status === "ready" || current.status === "running") {
 					this.stopMatch(current, "server_restart");
+				}
 			}
-			if (s.currentMatchId || (s.enabled && s.phase !== "fault")) {
+			if (
+				!recovery &&
+				(s.currentMatchId || (s.enabled && s.phase !== "fault"))
+			) {
 				record.generation++;
 				record.snapshot = {
 					...s,
@@ -117,6 +156,10 @@ export class WatchChannel {
 			}
 		} finally {
 			this.recovering = false;
+		}
+		if (recovery) {
+			this.runRound(recovery.state, recovery.controlToken, recovery.generation);
+			return;
 		}
 		this.publish();
 		this.schedule();
@@ -314,6 +357,13 @@ export class WatchChannel {
 				);
 			},
 		);
+		this.runRound(state, controlToken, generation);
+	}
+	private runRound(
+		state: PublicState,
+		controlToken: string,
+		generation: number,
+	) {
 		this.controlToken = controlToken;
 		this.controller = new AbortController();
 		this.task = Promise.resolve()

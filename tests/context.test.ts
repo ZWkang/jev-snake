@@ -124,9 +124,13 @@ test("filling the board is distinguished from an unknown food respawn", () => {
 test("both request modes transmit the body-corridor facts through the strict control schema", () => {
 	const state = deadEndReplay();
 	const single = decisionBody(publicState(state));
-	expect(single.state.contextVersion).toBe("action-facts-v4");
+	expect(single.state.contextVersion).toBe("action-outcomes-v5");
 	expect(single.questions.direction.criteria.left).toMatchObject({
-		forcedPath: { outcome: "forced_collision", steps: 7 },
+		survival: {
+			status: "proven_fatal",
+			collisionWithinMoves: 7,
+			proof: "forced_path",
+		},
 	});
 	const action = {
 		protocolVersion: 1,
@@ -150,9 +154,12 @@ test("both request modes transmit the body-corridor facts through the strict con
 	expect(plan.state.contextVersion).toBe("two-step-plan-v4");
 	expect(planRequestSchema.parse(plan)).toEqual(plan);
 	for (const direction of directions) {
-		const { meaning: _meaning, ...fact } =
-			single.questions.direction.criteria[direction];
-		expect(plan.state.firstActions[direction]).toEqual(fact);
+		expect(plan.state.firstActions[direction].immediateCollision).toEqual(
+			single.questions.direction.criteria[direction].survival.collision,
+		);
+		expect(plan.state.firstActions[direction].space).toEqual(
+			single.questions.direction.criteria[direction].space,
+		);
 	}
 	expect(plan.questions.plan.criteria.right_up).toMatchObject({
 		secondStatus: "known",

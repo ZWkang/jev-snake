@@ -175,6 +175,22 @@ export class Store {
 			})
 			.immediate();
 	}
+	resume(
+		s: MatchState,
+		events: MatchEvent[],
+		controlHash: string,
+		resumedInTransaction: () => void,
+	) {
+		this.db
+			.transaction(() => {
+				this.db
+					.prepare("UPDATE matches SET control_hash=? WHERE id=?")
+					.run(controlHash, s.id);
+				this.commit(s, events);
+				resumedInTransaction();
+			})
+			.immediate();
+	}
 	events(id: string, afterSeq: number, limit = 200) {
 		const state = this.get(id);
 		const rows = this.db

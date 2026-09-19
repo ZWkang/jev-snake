@@ -1,6 +1,15 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { newConfigSchema } from "../../shared/snake/schema.js";
 import type { ResponseGameConfig } from "../../shared/snake/types.js";
+
+export const randomBoardSizes = [
+	{ width: 8, height: 6 },
+	{ width: 10, height: 8 },
+	{ width: 12, height: 9 },
+	{ width: 16, height: 12 },
+	{ width: 20, height: 15 },
+	{ width: 24, height: 18 },
+] as const;
 
 export function gameConfig(
 	env: Record<string, string | undefined>,
@@ -21,15 +30,29 @@ export function gameConfig(
 			"Only single_step decision-mode is supported; two_step_fallback is retired",
 		);
 	warnDeprecatedTickConfig(env);
+	const seed = values.seed ?? env.SNAKE_SEED ?? randomUUID();
+	// Separate from the engine RNG: a seed reproduces both size and layout.
+	const sample =
+		createHash("sha256")
+			.update(`snake-board-size-v1:${seed}`)
+			.digest()
+			.readUInt32BE(0) / 0x100000000;
+	const size = randomBoardSizes[Math.floor(sample * randomBoardSizes.length)];
+	const width = Number(values.width ?? env.SNAKE_WIDTH ?? size.width);
+	const height = Number(values.height ?? env.SNAKE_HEIGHT ?? size.height);
 	return newConfigSchema.parse({
 		layoutVersion: 2,
 		stepMode,
 		decisionMode,
-		width: Number(values.width ?? env.SNAKE_WIDTH ?? 24),
-		height: Number(values.height ?? env.SNAKE_HEIGHT ?? 18),
-		obstacleCount: Number(values.obstacles ?? env.SNAKE_OBSTACLES ?? 12),
+		width,
+		height,
+		obstacleCount: Number(
+			values.obstacles ??
+				env.SNAKE_OBSTACLES ??
+				Math.floor((width * height) / 36),
+		),
 		tickIntervalMs: null,
-		seed: values.seed ?? env.SNAKE_SEED ?? randomUUID(),
+		seed,
 	});
 }
 

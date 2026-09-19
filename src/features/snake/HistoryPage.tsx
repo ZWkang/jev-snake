@@ -196,7 +196,7 @@ export function HistoryPage() {
 												params={{ matchId: m.id }}
 												class="replay-link"
 											>
-												{isActiveMatch(m.status) ? "观战 ↗" : "回放 ↗"}
+												{isActiveMatch(m.status) ? "观战" : "回放"}
 											</Link>
 										</td>
 									</tr>

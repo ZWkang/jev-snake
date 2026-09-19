@@ -69,11 +69,14 @@ function replay(state: PublicState, route: Direction[]) {
 	return { end, releasePassages };
 }
 
-function appleEvidence(
+export function appleEvidence(
 	state: PublicState,
 	route: Direction[],
 	source: "direct" | "static_candidate" | "dynamic_search",
-): PositiveEvidence {
+): Extract<
+	PositiveEvidence,
+	{ status: "apple_eaten_now" | "apple_route_found" }
+> {
 	const checked = replay(state, route);
 	if (!state.apple || checked.end.apple !== null)
 		throw new Error("An apple witness must consume the observed apple");

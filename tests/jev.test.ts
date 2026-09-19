@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import { createState, move } from "../server/game/engine.js";
 import {
 	askJev,
-	decisionBody,
+	decisionBodyV4,
 	JEV_ENDPOINT,
 	JEV_MODEL,
 } from "../server/jev/client.js";
@@ -65,13 +65,14 @@ test("uses the real Decisions contract and preserves probabilities", async () =>
 	expect(body.state).not.toHaveProperty("actionFacts");
 	expect(body.state.player).not.toHaveProperty("bodyHeadToTail");
 	expect(body.state.board).not.toHaveProperty("obstacles");
-	expect(body.state.contextVersion).toBe("action-facts-v4");
-	expect(body.questions.direction.criteria.left.immediateCollision).toBe(
+	expect(body.state.contextVersion).toBe("action-outcomes-v5");
+	expect(body.questions.direction.criteria.left.survival.collision).toBe(
 		"reverse",
 	);
-	expect(body.questions.direction.criteria.up).toMatchObject(
-		analyzeActions(state).up,
+	expect(body.questions.direction.criteria.up.space).toEqual(
+		analyzeActions(state).up.space,
 	);
+	expect(body.questions.direction.criteria.up).toHaveProperty("summary");
 	expect(body.state.timing).toMatchObject({
 		stateIsProjected: false,
 		observedTick: state.tick,
@@ -317,10 +318,10 @@ test("response API failures and explicit cancellation retain their original erro
 	await expect(pending).rejects.toBe(cancelled);
 });
 
-test("v3 request facts come from the observed corridor and share one first-action summary", () => {
+test("historical v4 request facts come from the observed corridor and share one first-action summary", () => {
 	const observed = publicState(deadEndReplay());
 	const before = structuredClone(observed);
-	const single = decisionBody(observed);
+	const single = decisionBodyV4(observed);
 	expect(Object.keys(single.questions.direction.criteria)).toEqual(directions);
 	expect(single.questions.direction.criteria.left.forcedPath).toEqual({
 		outcome: "forced_collision",

@@ -48,7 +48,7 @@ export function LivePage(props: { matchId: string }) {
 					<h1>看它，走出下一步。</h1>
 				</div>
 				<Link to="/watch" class="back-link">
-					进入连续观战 ↗
+					进入连续观战
 				</Link>
 			</div>
 			<Show when={error()}>

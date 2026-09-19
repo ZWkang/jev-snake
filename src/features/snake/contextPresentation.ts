@@ -8,6 +8,7 @@ import type {
 	PlanRequestV3,
 	DecisionRequestV4,
 	PlanRequestV4,
+	DecisionRequestV5,
 } from "../../../shared/snake/types";
 
 function storedVersion(request: unknown): unknown {
@@ -27,13 +28,15 @@ function isV3Context(
 	| DecisionRequestV3
 	| PlanRequestV3
 	| DecisionRequestV4
-	| PlanRequestV4 {
+	| PlanRequestV4
+	| DecisionRequestV5 {
 	const version = storedVersion(request);
 	return (
 		version === "action-facts-v3" ||
 		version === "two-step-plan-v3" ||
 		version === "action-facts-v4" ||
-		version === "two-step-plan-v4"
+		version === "two-step-plan-v4" ||
+		version === "action-outcomes-v5"
 	);
 }
 
@@ -66,6 +69,9 @@ export function presentDecisionContext(
 		semantics =
 			"程序计算碰撞、逃生空间和候选食物路径，JEV 选择方向。静态连通性与单条已验证路线不保证存活，未知也不代表安全。请求使用动作摘要，不含完整蛇身和障碍坐标；棋盘来自保存的观察记录。";
 		const progress = request.state.progress;
+		if (version === "action-outcomes-v5")
+			semantics =
+				"程序计算每个方向的即时结果、所有续路的死亡证明、具体进食路线及其增长后结果，合并为完整后果，由 JEV 选择方向。这些事实不保证存活。未证明必死不等于安全；一条路线的结论不扩展到同方向的所有路线。模型输入不含旧见证下一方向或重复的静态食物路线；实际历史与四方向选择完整保留，JEV仍自主决定。完整路线仅在后台存档。";
 		if (version === "action-facts-v4" || version === "two-step-plan-v4")
 			semantics +=
 				" 正向证据包含到当前苹果的真实路线、无增长循环和身体格释放时序；存在路线不代表长期安全。当前几何与先前见证相容不证明走过相同路线，也不代表模型承诺跟随。完整路线单独存档，不属于发送给模型的原始 JSON。";

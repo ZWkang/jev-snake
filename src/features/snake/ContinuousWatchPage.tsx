@@ -17,7 +17,7 @@ export function ContinuousWatchPage(props: { admin?: boolean }) {
 					<h1>下一局，接着看。</h1>
 				</div>
 				<Link to="/matches" class="back-link">
-					历史对局 ↗
+					历史对局
 				</Link>
 			</div>
 			<Show when={props.admin}>

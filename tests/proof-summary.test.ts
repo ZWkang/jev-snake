@@ -3,7 +3,7 @@ import {
 	continuationDeathProof,
 	type ContinuationDeathProof,
 } from "../server/jev/branch-death.js";
-import { decisionBody } from "../server/jev/client.js";
+import { decisionBodyV4 as decisionBody } from "../server/jev/client.js";
 import { advanceGeometry } from "../server/jev/context-v3.js";
 import {
 	summarizeContinuationProof,

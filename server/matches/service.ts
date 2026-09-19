@@ -9,6 +9,7 @@ import {
 } from "../../shared/snake/schema.js";
 import {
 	type DecisionContext,
+	directions,
 	isResponseMode,
 	type MatchEvent,
 	type MatchState,
@@ -19,7 +20,13 @@ import {
 } from "../../shared/snake/types.js";
 import type { RequestWrite, Store } from "../db/store.js";
 import { GameError } from "../errors.js";
-import { createState, expireStar, move, stateHash } from "../game/engine.js";
+import {
+	createState,
+	expireStar,
+	inspectMove,
+	move,
+	stateHash,
+} from "../game/engine.js";
 import { ProgressHistory } from "../jev/progress.js";
 import { restoreMatchAt } from "./restore.js";
 
@@ -260,6 +267,49 @@ export class MatchService {
 				401,
 			);
 	}
+	// Internal channel recovery only; never exposed as an unauthenticated route.
+	resume(id: string, controlToken: string, resumedInTransaction: () => void) {
+		this.assertHealthy();
+		const s = this.store.get(id);
+		if (!isResponseMode(s.config))
+			throw new GameError(
+				"mode_retired",
+				"Only response matches can resume",
+				409,
+			);
+		if (
+			s.status !== "ready" &&
+			!(
+				s.status === "interrupted" &&
+				["server_restart", "server_shutdown"].includes(s.endReason ?? "")
+			)
+		)
+			throw new GameError(
+				"not_resumable",
+				"Match was not interrupted by a server restart",
+				409,
+			);
+		if (controlToken.length < 32)
+			throw new GameError(
+				"invalid_credential",
+				"Recovery requires a new control credential",
+			);
+		const reason = s.endReason;
+		s.status = "ready";
+		s.endReason = null;
+		s.endedAt = null;
+		const events: MatchEvent[] = [];
+		this.event(s, events, "resumed", { reason, fromTick: s.tick });
+		try {
+			this.store.resume(s, events, digest(controlToken), resumedInTransaction);
+		} catch (error) {
+			this.fail(error);
+			throw error;
+		}
+		this.progress.delete(id);
+		this.publish(id);
+		return publicState(s);
+	}
 	elapsed(id: string) {
 		const anchor = this.anchors.get(id);
 		if (anchor === undefined) return this.store.get(id).gameTimeMs;
@@ -354,6 +404,29 @@ export class MatchService {
 		this.assertHealthy();
 		this.advance(id);
 		const s = this.store.get(id);
+		if (s.status === "running") {
+			const blockedDirections = Object.fromEntries(
+				directions.map((direction) => [
+					direction,
+					inspectMove(s, direction).immediateCollision,
+				]),
+			);
+			if (
+				directions.every((direction) => blockedDirections[direction] !== null)
+			) {
+				s.gameTimeMs = Math.max(s.gameTimeMs, this.elapsed(id));
+				s.status = "gameover";
+				s.endReason = "no_legal_moves";
+				s.endedAt = new Date().toISOString();
+				const events: MatchEvent[] = [];
+				this.event(s, events, "trapped", {
+					reason: s.endReason,
+					blockedDirections,
+				});
+				this.commit(s, events);
+				this.schedule(id);
+			}
+		}
 		if (s.status !== "running")
 			throw new GameError("not_running", "Match is not running", 409);
 		const targetTick = s.tick + 1;
@@ -416,7 +489,7 @@ export class MatchService {
 				if (s.status !== "ready")
 					throw new GameError("not_ready", "Only a ready match can start", 409);
 				s.status = "running";
-				s.startedAt = new Date().toISOString();
+				s.startedAt ??= new Date().toISOString();
 				const e = this.event(s, events, "started", {});
 				receipt = {
 					requestId: command.requestId,

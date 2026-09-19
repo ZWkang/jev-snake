@@ -11,7 +11,6 @@ import { MatchService } from "../server/matches/service.js";
 import { WatchChannel } from "../server/watch/channel.js";
 import { WatchStore } from "../server/watch/store.js";
 import { publicState, type PublicState } from "../shared/snake/types.js";
-import type { WatchSnapshot } from "../shared/snake/watch.js";
 
 const cleanup: (() => void | Promise<void>)[] = [];
 afterEach(async () => {
@@ -29,7 +28,17 @@ const config = () =>
 	);
 function finishMoves(service: MatchService, store: Store, id: string) {
 	while (store.get(id).status === "running") {
-		const c = service.decisionContext(id);
+		let c;
+		try {
+			c = service.decisionContext(id);
+		} catch (error) {
+			expect(error).toMatchObject({ code: "not_running" });
+			expect(store.get(id)).toMatchObject({
+				status: "gameover",
+				endReason: "no_legal_moves",
+			});
+			return;
+		}
 		expect(
 			service.command(id, {
 				protocolVersion: 1,
@@ -327,23 +336,43 @@ test.each([
 		store.close();
 		const f = fixture(path);
 		expect(f.store.get(manual.id).status).toBe("ready");
-		if (id)
+		if (id) {
 			expect(f.store.get(id)).toMatchObject({
-				status: "interrupted",
-				endReason: "server_restart",
+				status: "ready",
+				endReason: null,
 			});
-		const expected: WatchSnapshot["phase"] =
-			phase === "fault"
-				? "fault"
-				: ["stopped", "draining"].includes(phase)
-					? "stopped"
-					: "countdown";
-		expect(f.channel.snapshot().phase).toBe(expected);
-		if (expected === "countdown")
-			expect(f.channel.snapshot().nextStartAt).toBe(Date.now() + 5000);
-		if (expected === "fault")
-			expect(f.channel.snapshot().error?.message).toBe("preserved error");
-		expect(f.jobs).toHaveLength(0);
+			expect(f.channel.snapshot()).toMatchObject({
+				currentMatchId: id,
+				phase: phase === "draining" ? "draining" : "starting",
+			});
+			await vi.advanceTimersByTimeAsync(0);
+			expect(f.jobs).toHaveLength(1);
+			expect(f.jobs[0].options.state.id).toBe(id);
+			expect(f.store.list().matches).toHaveLength(2);
+			expect(() => f.service.authorize(id, "x".repeat(32))).toThrow();
+			f.service.authorize(id, f.jobs[0].options.controlToken);
+			f.start();
+			expect(f.channel.snapshot().phase).toBe(
+				phase === "draining" ? "draining" : "running",
+			);
+			await f.finish();
+			expect(f.channel.snapshot().phase).toBe(
+				phase === "draining" ? "stopped" : "countdown",
+			);
+		} else {
+			const expected =
+				phase === "fault"
+					? "fault"
+					: phase === "stopped"
+						? "stopped"
+						: "countdown";
+			expect(f.channel.snapshot().phase).toBe(expected);
+			if (expected === "countdown")
+				expect(f.channel.snapshot().nextStartAt).toBe(Date.now() + 5000);
+			if (expected === "fault")
+				expect(f.channel.snapshot().error?.message).toBe("preserved error");
+			expect(f.jobs).toHaveLength(0);
+		}
 	},
 );
 

@@ -253,9 +253,7 @@ export async function runJevMatch(
 			activeRequest = null;
 			if (
 				receipt.status === "applied" ||
-				(receipt.status === "rejected" &&
-					(receipt.code === "stale_state" ||
-						receipt.code === "invalid_direction"))
+				(receipt.status === "rejected" && receipt.code === "stale_state")
 			)
 				continue;
 			throw new Error(

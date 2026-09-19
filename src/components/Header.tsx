@@ -33,9 +33,7 @@ export default function Header() {
 					历史对局
 				</Link>
 			</nav>
-			<span class="visitor-label">
-				游客只读<span aria-hidden="true"> ↗</span>
-			</span>
+			<span class="visitor-label">游客只读</span>
 		</header>
 	);
 }

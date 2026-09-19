@@ -1,0 +1,165 @@
+import { createSignal, onMount, Show } from "solid-js";
+import type {
+	OwnerSession,
+	WatchCommand,
+	WatchCommandResult,
+	WatchSnapshot,
+} from "../../../shared/snake/watch";
+
+export function OwnerControl(props: {
+	state: WatchSnapshot | undefined;
+	onUpdate: (s: WatchSnapshot) => void;
+}) {
+	const [session, setSession] = createSignal<OwnerSession>({
+		authenticated: false,
+		expiresAt: null,
+	});
+	const [password, setPassword] = createSignal(""),
+		[pending, setPending] = createSignal(false),
+		[error, setError] = createSignal("");
+	let unconfirmed: WatchCommand | null = null;
+	async function request<T>(
+		path: string,
+		method = "GET",
+		body?: unknown,
+	): Promise<T> {
+		const response = await fetch(`/api/watch-admin/${path}`, {
+			method,
+			credentials: "same-origin",
+			headers: body ? { "Content-Type": "application/json" } : {},
+			...(body ? { body: JSON.stringify(body) } : {}),
+		});
+		const result = await response.json();
+		if (!response.ok) {
+			if (response.status === 401)
+				setSession({ authenticated: false, expiresAt: null });
+			throw new Error(
+				result.error?.message ?? `管理请求失败（${response.status}）`,
+			);
+		}
+		return result;
+	}
+	async function action(work: () => Promise<unknown>) {
+		setPending(true);
+		setError("");
+		try {
+			await work();
+		} catch (e) {
+			setError(e instanceof Error ? e.message : String(e));
+		} finally {
+			setPending(false);
+		}
+	}
+	onMount(
+		() =>
+			void action(async () =>
+				setSession(await request<OwnerSession>("session")),
+			),
+	);
+	async function login() {
+		const value = password();
+		setPassword("");
+		await action(async () =>
+			setSession(
+				await request<OwnerSession>("session", "POST", { password: value }),
+			),
+		);
+	}
+	async function command(enabled: boolean) {
+		if (!unconfirmed || unconfirmed.enabled !== enabled)
+			unconfirmed = { requestId: crypto.randomUUID(), enabled };
+		const input = unconfirmed;
+		await action(async () => {
+			const result = await request<WatchCommandResult>(
+				"commands",
+				"POST",
+				input,
+			);
+			unconfirmed = null;
+			props.onUpdate(result.state);
+		});
+	}
+	return (
+		<section class="watch-owner" aria-label="管理员控制">
+			<div class="section-heading">
+				<h2>管理员控制</h2>
+				<span class="outlined-tag lavender">
+					{session().authenticated ? "已解锁" : "口令解锁"}
+				</span>
+			</div>
+			<Show
+				when={session().authenticated}
+				fallback={
+					<form
+						class="owner-login"
+						onSubmit={(e) => {
+							e.preventDefault();
+							void login();
+						}}
+					>
+						<label for="watch-password">管理员口令</label>
+						<input
+							id="watch-password"
+							type="password"
+							autocomplete="current-password"
+							value={password()}
+							onInput={(e) => setPassword(e.currentTarget.value)}
+							disabled={pending()}
+						/>
+						<button
+							class="snake-button small"
+							type="submit"
+							disabled={pending() || !password()}
+						>
+							解锁控制
+						</button>
+					</form>
+				}
+			>
+				<p>停止连续开局后，本局会继续进行，结束后不再开启下一局。</p>
+				<div class="owner-actions">
+					<button
+						class="snake-button yellow small"
+						type="button"
+						disabled={
+							pending() ||
+							!props.state ||
+							(props.state.enabled && props.state.phase !== "fault")
+						}
+						onClick={() => void command(true)}
+					>
+						{props.state?.phase === "fault" ? "恢复连续观战" : "开启连续观战"}
+					</button>
+					<button
+						class="snake-button small"
+						type="button"
+						disabled={pending() || !props.state?.enabled}
+						onClick={() => void command(false)}
+					>
+						停止连续开局
+					</button>
+					<button
+						class="text-button"
+						type="button"
+						disabled={pending()}
+						onClick={() =>
+							void action(async () =>
+								setSession(await request<OwnerSession>("session", "DELETE")),
+							)
+						}
+					>
+						注销管理
+					</button>
+				</div>
+			</Show>
+			<Show when={pending()}>
+				<p role="status">正在确认管理请求…</p>
+			</Show>
+			<Show when={error()}>
+				<p class="decision-input-error" role="alert">
+					{error()}
+				</p>
+			</Show>
+		</section>
+	);
+}

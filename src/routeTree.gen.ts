@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DemoStoreRouteImport } from './routes/demo.store'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as MatchesIndexRouteImport } from './routes/matches.index'
+import { Route as WatchIndexRouteImport } from './routes/watch.index'
+import { Route as WatchMatchIdRouteImport } from './routes/watch.$matchId'
+import { Route as MatchesMatchIdReplayRouteImport } from './routes/matches.$matchId.replay'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +38,46 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MatchesIndexRoute = MatchesIndexRouteImport.update({
+  id: '/matches/',
+  path: '/matches/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchIndexRoute = WatchIndexRouteImport.update({
+  id: '/watch/',
+  path: '/watch/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchMatchIdRoute = WatchMatchIdRouteImport.update({
+  id: '/watch/$matchId',
+  path: '/watch/$matchId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesMatchIdReplayRoute = MatchesMatchIdReplayRouteImport.update({
+  id: '/matches/$matchId/replay',
+  path: '/matches/$matchId/replay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/watch/$matchId': typeof WatchMatchIdRoute
+  '/matches/': typeof MatchesIndexRoute
+  '/watch/': typeof WatchIndexRoute
+  '/matches/$matchId/replay': typeof MatchesMatchIdReplayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/watch/$matchId': typeof WatchMatchIdRoute
+  '/matches': typeof MatchesIndexRoute
+  '/watch': typeof WatchIndexRoute
+  '/matches/$matchId/replay': typeof MatchesMatchIdReplayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +85,42 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/watch/$matchId': typeof WatchMatchIdRoute
+  '/matches/': typeof MatchesIndexRoute
+  '/watch/': typeof WatchIndexRoute
+  '/matches/$matchId/replay': typeof MatchesMatchIdReplayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/demo/store' | '/demo/tanstack-query'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/demo/store'
+    | '/demo/tanstack-query'
+    | '/watch/$matchId'
+    | '/matches/'
+    | '/watch/'
+    | '/matches/$matchId/replay'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/demo/store' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/about' | '/demo/store' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/about'
+    | '/demo/store'
+    | '/demo/tanstack-query'
+    | '/watch/$matchId'
+    | '/matches'
+    | '/watch'
+    | '/matches/$matchId/replay'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/demo/store'
+    | '/demo/tanstack-query'
+    | '/watch/$matchId'
+    | '/matches/'
+    | '/watch/'
+    | '/matches/$matchId/replay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +128,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  WatchMatchIdRoute: typeof WatchMatchIdRoute
+  MatchesIndexRoute: typeof MatchesIndexRoute
+  WatchIndexRoute: typeof WatchIndexRoute
+  MatchesMatchIdReplayRoute: typeof MatchesMatchIdReplayRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -99,6 +164,34 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/matches/': {
+      id: '/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof MatchesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch/': {
+      id: '/watch/'
+      path: '/watch'
+      fullPath: '/watch/'
+      preLoaderRoute: typeof WatchIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch/$matchId': {
+      id: '/watch/$matchId'
+      path: '/watch/$matchId'
+      fullPath: '/watch/$matchId'
+      preLoaderRoute: typeof WatchMatchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches/$matchId/replay': {
+      id: '/matches/$matchId/replay'
+      path: '/matches/$matchId/replay'
+      fullPath: '/matches/$matchId/replay'
+      preLoaderRoute: typeof MatchesMatchIdReplayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,7 +200,20 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  WatchMatchIdRoute: WatchMatchIdRoute,
+  MatchesIndexRoute: MatchesIndexRoute,
+  WatchIndexRoute: WatchIndexRoute,
+  MatchesMatchIdReplayRoute: MatchesMatchIdReplayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/solid-start'
+declare module '@tanstack/solid-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

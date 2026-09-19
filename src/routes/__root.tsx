@@ -1,36 +1,50 @@
 import {
+	createRootRouteWithContext,
 	HeadContent,
 	Outlet,
 	Scripts,
-	createRootRouteWithContext,
 } from "@tanstack/solid-router";
 import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
 import "@fontsource/inter/400.css";
 
-import { Suspense } from "solid-js";
+import { Show, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import Header from "../components/Header";
+import "../features/snake/snake.css";
 import styleCss from "../styles.css?url";
 
 export const Route = createRootRouteWithContext()({
 	head: () => ({
 		links: [{ rel: "stylesheet", href: styleCss }],
+		meta: [
+			{ charSet: "utf-8" },
+			{ name: "viewport", content: "width=device-width, initial-scale=1" },
+			{ title: "SNAKE · JEV 贪吃蛇观战" },
+			{
+				name: "description",
+				content: "看 JEV 实时做出方向选择，浏览真实对局与历史回放。",
+			},
+		],
 	}),
 	shellComponent: RootComponent,
 });
 
 function RootComponent() {
 	return (
-		<html>
+		<html lang="zh-CN">
 			<head>
 				<HydrationScript />
 				<HeadContent />
 			</head>
 			<body>
 				<Suspense>
-					<Header />
-					<Outlet />
-					<TanStackRouterDevtools />
+					<div class="snake-app">
+						<Header />
+						<Outlet />
+					</div>
+					<Show when={import.meta.env.VITE_ROUTER_DEVTOOLS === "true"}>
+						<TanStackRouterDevtools />
+					</Show>
 				</Suspense>
 				<Scripts />
 			</body>

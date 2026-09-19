@@ -133,7 +133,7 @@ export function decisionBodyV3(
 	};
 }
 export const positiveSemantics =
-	"opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. witnessContinuity describes matching actual geometry, not a model commitment or an instruction to follow it.";
+	"opportunity is an existence witness, not a recommendation or survival probability. Its moves include the candidate. Apple witnesses stop at the known apple; the respawn is unknown. A cycle restores the ordered body and heading without growth and does not prove that the apple is unreachable. Release passages were replayed against the moving body. opportunity.postEat belongs to that exact witness endpoint and describes geometry before unknown food respawns. witnessContinuity describes current geometry compatible with a previous witness at the stated step; it does not assert that those prior moves were taken, a model commitment, or an instruction to follow it.";
 const positiveObjective =
 	"Choose the next direction to work toward completing the board. Decide your strategy using the current action consequences, verified opportunities, their assumptions and the recorded movement history. The evidence describes what is known and what remains unresolved. Choose one of the four directions.";
 
@@ -171,7 +171,7 @@ export function buildDecisionContext(
 					factsSemantics:
 						base.state.rules.factsSemantics + " " + positiveSemantics,
 				},
-				witnessContinuity: witnessContinuity(state),
+				witnessContinuity: witnessContinuity(state, evidence),
 			},
 			questions: {
 				direction: {

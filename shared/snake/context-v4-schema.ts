@@ -27,7 +27,7 @@ function checkState(
 	s: {
 		timing: { observedTick: number };
 		progress?: { throughTick: number };
-		witnessContinuity: { originTick: number; matchedMoves: number }[];
+		witnessContinuity: z.infer<typeof witnessContinuitySchema>;
 	},
 	c: z.RefinementCtx,
 ) {
@@ -38,11 +38,17 @@ function checkState(
 			message: "Progress must match the observed tick",
 		});
 	for (const w of s.witnessContinuity)
-		if (w.originTick + w.matchedMoves !== s.timing.observedTick)
+		if (
+			w.originTick +
+				("stateCompatibleAfterMoves" in w
+					? w.stateCompatibleAfterMoves
+					: w.matchedMoves) !==
+			s.timing.observedTick
+		)
 			c.addIssue({
 				code: "custom",
 				path: ["witnessContinuity"],
-				message: "Witness prefix must align with the actual observed tick",
+				message: "Witness geometry must align with the actual observed tick",
 			});
 }
 const state = z

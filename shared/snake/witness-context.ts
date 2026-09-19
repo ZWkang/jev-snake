@@ -10,6 +10,7 @@ import type {
 	PairSummary,
 	PlanRequestV3,
 	Point,
+	PostEatFacts,
 } from "./types.js";
 
 export type WitnessOrigin = PositiveGeometry & {
@@ -38,14 +39,31 @@ export type OpportunitySummary = {
 	cycle: { prefixMoves: number; period: number } | null;
 	releasePassages: ReleasePassage[];
 	scope: "observed_apple_only" | "no_growth_cycle" | "none";
+	// Computed from this witness's growth endpoint, not another static route.
+	postEat?: PostEatFacts | null; // Older stored v4 bodies predate this field.
 };
 export type WitnessContinuity = {
 	witnessId: string;
 	originTick: number;
-	matchedMoves: number;
+	// Different executed routes may converge here: this asserts equal geometry
+	// after N moves, never that the actual actions followed the witness prefix.
+	stateCompatibleAfterMoves: number;
 	remainingMoves: number;
 	nextDirection: Direction;
+	opportunityStatus: WitnessRecord["evidence"]["status"];
+	appleTarget: Point | null;
+	scope: "observed_apple_only" | "no_growth_cycle";
+	endEvent: "apple_eaten" | "board_complete" | "cycle_completed";
 };
+export type StoredWitnessContinuity =
+	| WitnessContinuity
+	| {
+			witnessId: string;
+			originTick: number;
+			matchedMoves: number;
+			remainingMoves: number;
+			nextDirection: Direction;
+	  };
 export type ActionSummaryV4 = ActionSummary & {
 	opportunity: OpportunitySummary;
 };
@@ -63,7 +81,7 @@ export type DecisionRequestV4 = Omit<
 > & {
 	state: Omit<DecisionRequestV3["state"], "contextVersion"> & {
 		contextVersion: "action-facts-v4";
-		witnessContinuity: WitnessContinuity[];
+		witnessContinuity: StoredWitnessContinuity[];
 	};
 	questions: {
 		direction: Omit<DecisionRequestV3["questions"]["direction"], "criteria"> & {
@@ -75,7 +93,7 @@ export type PlanRequestV4 = Omit<PlanRequestV3, "state" | "questions"> & {
 	state: Omit<PlanRequestV3["state"], "contextVersion" | "firstActions"> & {
 		contextVersion: "two-step-plan-v4";
 		firstActions: Record<Direction, ActionSummaryV4>;
-		witnessContinuity: WitnessContinuity[];
+		witnessContinuity: StoredWitnessContinuity[];
 	};
 	questions: {
 		plan: Omit<PlanRequestV3["questions"]["plan"], "criteria"> & {

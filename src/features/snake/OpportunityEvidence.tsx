@@ -83,6 +83,15 @@ export function OpportunityEvidence(props: {
 								<summary>
 									{row.label} · {opportunityDescription(row.fact)}
 								</summary>
+								<Show when={row.fact.postEat}>
+									{(end) => (
+										<p>
+											{end().terminal === "board_complete"
+												? "该路线终点已填满棋盘。"
+												: `该路线吃苹果后：${end().legalNextMoves} 个即时可走方向、${end().staticReachableCells} 个静态可达格；蛇尾${end().tailConnection === "connected" ? "静态相连" : "静态不连通"}。这些是增长端点事实，不保证长期生存。`}
+										</p>
+									)}
+								</Show>
 								<For each={row.fact.releasePassages}>
 									{(passage) => (
 										<p>
@@ -123,23 +132,24 @@ export function OpportunityEvidence(props: {
 							</details>
 						)}
 					</For>
-					<h3>先前见证与实际移动</h3>
+					<h3>先前见证与当前局面</h3>
 					<Show
 						when={request().state.witnessContinuity.length}
 						fallback={
-							<p class="muted">
-								没有尚未结束且与当前实际前缀一致的上一轮见证。
-							</p>
+							<p class="muted">没有尚未结束且与当前局面相容的先前见证。</p>
 						}
 					>
 						<For each={request().state.witnessContinuity}>
 							{(continuity) => (
 								<p>
 									第 {continuity.originTick} 步的见证{" "}
-									{continuity.witnessId.slice(0, 12)}：实际前缀吻合{" "}
-									{continuity.matchedMoves} 步，尚余 {continuity.remainingMoves}{" "}
-									步；该见证下一方向为{directionName(continuity.nextDirection)}
-									。这不是模型承诺或推荐动作。
+									{continuity.witnessId.slice(0, 12)}：当前几何相容于见证的第{" "}
+									{"stateCompatibleAfterMoves" in continuity
+										? continuity.stateCompatibleAfterMoves
+										: continuity.matchedMoves}{" "}
+									步，尚余 {continuity.remainingMoves} 步；该见证下一方向为
+									{directionName(continuity.nextDirection)}
+									。这不证明此前走过相同路线，也不是模型承诺或推荐动作。
 								</p>
 							)}
 						</For>

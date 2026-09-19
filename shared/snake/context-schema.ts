@@ -441,3 +441,5 @@ export const planRequestV3Schema = z
 			}
 		}
 	});
+
+export { postEat as postEatFactsSchema };

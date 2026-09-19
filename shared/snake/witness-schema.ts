@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { postEatFactsSchema } from "./context-schema.js";
 import { directions } from "./types.js";
 
 const integer = z.number().int().nonnegative();
@@ -105,6 +106,7 @@ export const opportunitySchema = z
 			.nullable(),
 		releasePassages: z.array(passage),
 		scope: z.enum(["observed_apple_only", "no_growth_cycle", "none"]),
+		postEat: postEatFactsSchema.nullable().optional(),
 	})
 	.strict()
 	.superRefine((v, c) => {
@@ -127,7 +129,8 @@ export const opportunitySchema = z
 					v.endEvent === "none" &&
 					v.cycle === null &&
 					v.appleTarget === null &&
-					!v.releasePassages.length,
+					!v.releasePassages.length &&
+					(v.postEat === null || v.postEat === undefined),
 				"No route means no invented route facts",
 			);
 		else if (v.status === "non_growth_cycle")
@@ -136,7 +139,8 @@ export const opportunitySchema = z
 					v.endEvent === "cycle_completed" &&
 					v.cycle !== null &&
 					v.moves === v.cycle.prefixMoves + v.cycle.period &&
-					v.appleTarget === null,
+					v.appleTarget === null &&
+					(v.postEat === null || v.postEat === undefined),
 				"Cycle scope and move counts must match",
 			);
 		else
@@ -144,7 +148,11 @@ export const opportunitySchema = z
 				v.scope === "observed_apple_only" &&
 					v.appleTarget !== null &&
 					v.cycle === null &&
-					(v.endEvent === "apple_eaten" || v.endEvent === "board_complete"),
+					(v.endEvent === "apple_eaten" || v.endEvent === "board_complete") &&
+					(v.postEat === undefined ||
+						(v.postEat !== null &&
+							(v.endEvent === "board_complete") ===
+								(v.postEat.terminal === "board_complete"))),
 				"Apple route requires its known target and growth boundary",
 			);
 		if (v.status === "apple_eaten_now")
@@ -155,14 +163,33 @@ export const opportunitySchema = z
 				"Release passage must occur on the witness",
 			);
 	});
+const currentWitnessContinuity = z
+	.object({
+		witnessId: z.string().min(1),
+		originTick: integer,
+		stateCompatibleAfterMoves: positive,
+		opportunityStatus: z.enum([
+			"apple_eaten_now",
+			"apple_route_found",
+			"non_growth_cycle",
+		]),
+		appleTarget: point.nullable(),
+		scope: z.enum(["observed_apple_only", "no_growth_cycle"]),
+		endEvent: z.enum(["apple_eaten", "board_complete", "cycle_completed"]),
+		remainingMoves: positive,
+		nextDirection: z.enum(directions),
+	})
+	.strict();
+const legacyWitnessContinuity = z
+	.object({
+		witnessId: z.string().min(1),
+		originTick: integer,
+		matchedMoves: positive,
+		remainingMoves: positive,
+		nextDirection: z.enum(directions),
+	})
+	.strict();
+// Keep early v4 records verbatim; their old field also compared only endpoints.
 export const witnessContinuitySchema = z.array(
-	z
-		.object({
-			witnessId: z.string().min(1),
-			originTick: integer,
-			matchedMoves: positive,
-			remainingMoves: positive,
-			nextDirection: z.enum(directions),
-		})
-		.strict(),
+	z.union([currentWitnessContinuity, legacyWitnessContinuity]),
 );

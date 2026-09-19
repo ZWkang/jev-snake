@@ -68,7 +68,7 @@ export function presentDecisionContext(
 		const progress = request.state.progress;
 		if (version === "action-facts-v4" || version === "two-step-plan-v4")
 			semantics +=
-				" 正向证据包含到当前苹果的真实路线、无增长循环和身体格释放时序；存在路线不代表长期安全。先前见证与实际前缀一致也不代表模型承诺跟随。完整路线单独存档，不属于发送给模型的原始 JSON。";
+				" 正向证据包含到当前苹果的真实路线、无增长循环和身体格释放时序；存在路线不代表长期安全。当前几何与先前见证相容不证明走过相同路线，也不代表模型承诺跟随。完整路线单独存档，不属于发送给模型的原始 JSON。";
 		if (progress?.historyVersion === "progress-v1") {
 			semantics += ` 历史记录覆盖第 ${progress.historyStartTick} 至 ${progress.throughTick} 步，已连续 ${progress.movesSinceApple} 步未吃苹果；当前完整局面在本次苹果周期出现 ${progress.positionVisits} 次。`;
 			if (progress.repeatAfterMoves !== null)

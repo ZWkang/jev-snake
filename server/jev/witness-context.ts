@@ -12,7 +12,7 @@ import type {
 	WitnessRecord,
 } from "../../shared/snake/witness-context.js";
 import { inspectMove } from "../game/engine.js";
-import { advanceGeometry } from "./context-v3.js";
+import { advanceGeometry, staticSpace } from "./context-v3.js";
 import { analyzePositiveEvidence } from "./positive-evidence.js";
 
 export function witnessOrigin(state: PublicState): WitnessOrigin {
@@ -53,6 +53,7 @@ export function opportunityFacts(
 				cycle: null,
 				releasePassages: [],
 				scope: "none",
+				postEat: null,
 			};
 			if (!("witness" in evidence)) return [direction, base];
 			const record: WitnessRecord = {
@@ -72,11 +73,12 @@ export function opportunityFacts(
 					witnessId: id,
 					moves: witnessDirections(record).length,
 					appleTarget: cycle ? null : state.apple,
-					endEvent: cycle
-						? "cycle_completed"
-						: evidence.terminal === "board_complete"
-							? "board_complete"
-							: "apple_eaten",
+					endEvent:
+						evidence.status === "non_growth_cycle"
+							? "cycle_completed"
+							: evidence.terminal === "board_complete"
+								? "board_complete"
+								: "apple_eaten",
 					cycle: cycle
 						? {
 								prefixMoves: evidence.witness.prefixDirections.length,
@@ -85,24 +87,48 @@ export function opportunityFacts(
 						: null,
 					releasePassages: evidence.witness.releasePassages,
 					scope: cycle ? "no_growth_cycle" : "observed_apple_only",
+					postEat: cycle
+						? null
+						: evidence.terminal === "board_complete"
+							? {
+									terminal: "board_complete",
+									bodyLength: evidence.witness.end.snake.length,
+									staticReachableCells: null,
+									relativeToBody: null,
+									legalNextMoves: null,
+									tailConnection: null,
+								}
+							: {
+									terminal: "none",
+									...staticSpace({ ...state, ...evidence.witness.end }),
+								},
 				} satisfies OpportunitySummary,
 			];
 		}),
 	) as Record<Direction, OpportunitySummary>;
 }
 
-// Counterfactual continuity only: a matching prefix is not a model commitment.
-// Use stored prior evidence and actual geometry, including coast/backup moves.
-export function witnessContinuity(state: PublicState): WitnessContinuity[] {
+// Counterfactual state compatibility only: different actual routes can converge
+// on the same ordered-body geometry. Retain the source records for audit, never
+// infer a model commitment or a history of actions from a matching endpoint.
+export function witnessContinuity(
+	state: PublicState,
+	targetArchive?: WitnessArchive,
+): WitnessContinuity[] {
 	const archive = state.lastDecision?.evidence;
 	if (!archive) return [];
 	const result: WitnessContinuity[] = [];
+	const remainingWitnesses = new Set<string>();
 	for (const [witnessId, record] of Object.entries(archive.records)) {
 		if (record.basis !== "observed") continue;
 		const origin = record.origin;
-		const matchedMoves = state.tick - origin.tick;
+		const stateCompatibleAfterMoves = state.tick - origin.tick;
 		const route = witnessDirections(record);
-		if (matchedMoves <= 0 || matchedMoves >= route.length) continue;
+		if (
+			stateCompatibleAfterMoves <= 0 ||
+			stateCompatibleAfterMoves >= route.length
+		)
+			continue;
 		if (
 			origin.width !== state.config.width ||
 			origin.height !== state.config.height ||
@@ -117,7 +143,7 @@ export function witnessContinuity(state: PublicState): WitnessContinuity[] {
 			apple: origin.apple,
 			star: null,
 		};
-		for (const direction of route.slice(0, matchedMoves)) {
+		for (const direction of route.slice(0, stateCompatibleAfterMoves)) {
 			if (inspectMove(projected, direction).immediateCollision)
 				throw new Error(
 					`Stored witness ${witnessId} contains an invalid prefix`,
@@ -130,13 +156,37 @@ export function witnessContinuity(state: PublicState): WitnessContinuity[] {
 			JSON.stringify(projected.apple) !== JSON.stringify(state.apple)
 		)
 			continue;
-		result.push({
+		const cycle = record.evidence.status === "non_growth_cycle";
+		const continuity: WitnessContinuity = {
 			witnessId,
 			originTick: origin.tick,
-			matchedMoves,
-			remainingMoves: route.length - matchedMoves,
-			nextDirection: route[matchedMoves],
-		});
+			stateCompatibleAfterMoves,
+			remainingMoves: route.length - stateCompatibleAfterMoves,
+			nextDirection: route[stateCompatibleAfterMoves],
+			opportunityStatus: record.evidence.status,
+			appleTarget: cycle ? null : structuredClone(origin.apple),
+			scope: cycle ? "no_growth_cycle" : "observed_apple_only",
+			endEvent:
+				record.evidence.status === "non_growth_cycle"
+					? "cycle_completed"
+					: record.evidence.terminal === "board_complete"
+						? "board_complete"
+						: "apple_eaten",
+		};
+		// Identical remaining routes and endpoint semantics are duplicate facts,
+		// irrespective of discovery time. This does not rank candidate actions.
+		const signature = JSON.stringify([
+			route.slice(stateCompatibleAfterMoves),
+			continuity.opportunityStatus,
+			continuity.appleTarget,
+			continuity.scope,
+			continuity.endEvent,
+		]);
+		if (remainingWitnesses.has(signature)) continue;
+		remainingWitnesses.add(signature);
+		if (targetArchive)
+			targetArchive.records[witnessId] = structuredClone(record);
+		result.push(continuity);
 	}
 	return result;
 }

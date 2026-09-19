@@ -85,7 +85,7 @@ test("v4 rejects missing evidence, mislabeled context and inconsistent condition
 	).not.toHaveProperty("opportunity");
 });
 
-test("continuity only reports actual matching prefixes, never advances moves or claims a plan commitment", () => {
+test("continuity only reports actual compatible geometry, never advances moves or claims a plan commitment", () => {
 	const state = baseState();
 	const built = buildDecisionContext(publicState(state));
 	const id =
@@ -106,7 +106,11 @@ test("continuity only reports actual matching prefixes, never advances moves or 
 	const before = structuredClone(state);
 	const continuity = witnessContinuity(publicState(state));
 	expect(continuity).toContainEqual(
-		expect.objectContaining({ witnessId: id, originTick: 0, matchedMoves: 1 }),
+		expect.objectContaining({
+			witnessId: id,
+			originTick: 0,
+			stateCompatibleAfterMoves: 1,
+		}),
 	);
 	expect(state).toEqual(before);
 	state.apple = { x: 0, y: 0 };

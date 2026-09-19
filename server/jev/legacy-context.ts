@@ -146,7 +146,7 @@ export function buildPlanContext(
 					factsSemantics:
 						base.state.rules.factsSemantics + " " + positiveSemantics,
 				},
-				witnessContinuity: witnessContinuity(state),
+				witnessContinuity: witnessContinuity(state, evidence),
 			},
 			questions: {
 				plan: {

@@ -1,0 +1,710 @@
+{
+	"sourceMatchId": "334e1e69-17b0-4875-8f48-916a8d4b1db8",
+	"description": "Actual tick1628: up/left had identical summary; left all136 continuations die within14 moves after entry; up has a verified escape.",
+	"state": {
+		"id": "334e1e69-17b0-4875-8f48-916a8d4b1db8",
+		"agentName": "JEV \u00b7 \u81ea\u4e3b\u51b3\u7b56\u5927\u5730\u56fe",
+		"model": "typesafe/jev-1.13",
+		"config": {
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 24,
+			"height": 18,
+			"obstacleCount": 12,
+			"tickIntervalMs": null,
+			"seed": "e98652d3-c374-45a9-b548-6448a3f18e67"
+		},
+		"recordVersion": 3,
+		"rulesVersion": 3,
+		"status": "running",
+		"createdAt": "2026-09-19T13:23:01.674Z",
+		"startedAt": "2026-09-19T13:23:01.692Z",
+		"endedAt": null,
+		"seq": 3273,
+		"tick": 1628,
+		"gameTimeMs": 595989.0477919998,
+		"score": 1080,
+		"applesEaten": 84,
+		"snake": [
+			{
+				"x": 5,
+				"y": 9
+			},
+			{
+				"x": 6,
+				"y": 9
+			},
+			{
+				"x": 7,
+				"y": 9
+			},
+			{
+				"x": 7,
+				"y": 8
+			},
+			{
+				"x": 7,
+				"y": 7
+			},
+			{
+				"x": 6,
+				"y": 7
+			},
+			{
+				"x": 5,
+				"y": 7
+			},
+			{
+				"x": 4,
+				"y": 7
+			},
+			{
+				"x": 4,
+				"y": 6
+			},
+			{
+				"x": 4,
+				"y": 5
+			},
+			{
+				"x": 3,
+				"y": 5
+			},
+			{
+				"x": 2,
+				"y": 5
+			},
+			{
+				"x": 1,
+				"y": 5
+			},
+			{
+				"x": 1,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 7,
+				"y": 4
+			},
+			{
+				"x": 8,
+				"y": 4
+			},
+			{
+				"x": 8,
+				"y": 5
+			},
+			{
+				"x": 8,
+				"y": 6
+			},
+			{
+				"x": 8,
+				"y": 7
+			},
+			{
+				"x": 8,
+				"y": 8
+			},
+			{
+				"x": 8,
+				"y": 9
+			},
+			{
+				"x": 8,
+				"y": 10
+			},
+			{
+				"x": 7,
+				"y": 10
+			},
+			{
+				"x": 6,
+				"y": 10
+			},
+			{
+				"x": 5,
+				"y": 10
+			},
+			{
+				"x": 4,
+				"y": 10
+			},
+			{
+				"x": 3,
+				"y": 10
+			},
+			{
+				"x": 2,
+				"y": 10
+			},
+			{
+				"x": 1,
+				"y": 10
+			},
+			{
+				"x": 1,
+				"y": 11
+			},
+			{
+				"x": 1,
+				"y": 12
+			},
+			{
+				"x": 1,
+				"y": 13
+			},
+			{
+				"x": 2,
+				"y": 13
+			},
+			{
+				"x": 2,
+				"y": 12
+			},
+			{
+				"x": 3,
+				"y": 12
+			},
+			{
+				"x": 4,
+				"y": 12
+			},
+			{
+				"x": 5,
+				"y": 12
+			},
+			{
+				"x": 6,
+				"y": 12
+			},
+			{
+				"x": 7,
+				"y": 12
+			},
+			{
+				"x": 8,
+				"y": 12
+			},
+			{
+				"x": 9,
+				"y": 12
+			},
+			{
+				"x": 9,
+				"y": 11
+			},
+			{
+				"x": 9,
+				"y": 10
+			},
+			{
+				"x": 9,
+				"y": 9
+			},
+			{
+				"x": 9,
+				"y": 8
+			},
+			{
+				"x": 9,
+				"y": 7
+			},
+			{
+				"x": 9,
+				"y": 6
+			},
+			{
+				"x": 9,
+				"y": 5
+			},
+			{
+				"x": 9,
+				"y": 4
+			},
+			{
+				"x": 9,
+				"y": 3
+			},
+			{
+				"x": 9,
+				"y": 2
+			},
+			{
+				"x": 9,
+				"y": 1
+			},
+			{
+				"x": 8,
+				"y": 1
+			},
+			{
+				"x": 7,
+				"y": 1
+			},
+			{
+				"x": 6,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 1
+			},
+			{
+				"x": 4,
+				"y": 1
+			},
+			{
+				"x": 3,
+				"y": 1
+			},
+			{
+				"x": 2,
+				"y": 1
+			},
+			{
+				"x": 1,
+				"y": 1
+			},
+			{
+				"x": 0,
+				"y": 1
+			},
+			{
+				"x": 0,
+				"y": 2
+			},
+			{
+				"x": 0,
+				"y": 3
+			},
+			{
+				"x": 0,
+				"y": 4
+			},
+			{
+				"x": 0,
+				"y": 5
+			},
+			{
+				"x": 0,
+				"y": 6
+			},
+			{
+				"x": 0,
+				"y": 7
+			},
+			{
+				"x": 0,
+				"y": 8
+			},
+			{
+				"x": 0,
+				"y": 9
+			},
+			{
+				"x": 0,
+				"y": 10
+			},
+			{
+				"x": 0,
+				"y": 11
+			},
+			{
+				"x": 0,
+				"y": 12
+			},
+			{
+				"x": 0,
+				"y": 13
+			},
+			{
+				"x": 0,
+				"y": 14
+			},
+			{
+				"x": 0,
+				"y": 15
+			},
+			{
+				"x": 1,
+				"y": 15
+			},
+			{
+				"x": 2,
+				"y": 15
+			},
+			{
+				"x": 3,
+				"y": 15
+			},
+			{
+				"x": 4,
+				"y": 15
+			},
+			{
+				"x": 5,
+				"y": 15
+			},
+			{
+				"x": 6,
+				"y": 15
+			},
+			{
+				"x": 7,
+				"y": 15
+			},
+			{
+				"x": 8,
+				"y": 15
+			}
+		],
+		"direction": "left",
+		"obstacles": [
+			{
+				"x": 17,
+				"y": 9
+			},
+			{
+				"x": 2,
+				"y": 7
+			},
+			{
+				"x": 18,
+				"y": 14
+			},
+			{
+				"x": 5,
+				"y": 5
+			},
+			{
+				"x": 11,
+				"y": 9
+			},
+			{
+				"x": 7,
+				"y": 16
+			},
+			{
+				"x": 9,
+				"y": 13
+			},
+			{
+				"x": 2,
+				"y": 3
+			},
+			{
+				"x": 22,
+				"y": 11
+			},
+			{
+				"x": 8,
+				"y": 3
+			},
+			{
+				"x": 13,
+				"y": 9
+			},
+			{
+				"x": 11,
+				"y": 14
+			}
+		],
+		"apple": {
+			"x": 20,
+			"y": 1
+		},
+		"star": null,
+		"endReason": null,
+		"lastDecision": null,
+		"lastStepDurationMs": 428.91908300016075,
+		"lastAppliedAction": {
+			"source": "primary",
+			"direction": "left",
+			"tick": 1628,
+			"targetTick": 1628,
+			"requestId": "413add29-f563-4178-adb4-fcf8613af436",
+			"observedTick": 1627
+		}
+	},
+	"request": {
+		"model": "typesafe/jev-1.13",
+		"state": {
+			"contextVersion": "action-facts-v3",
+			"rules": {
+				"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+				"applePoints": 10,
+				"starPoints": 30,
+				"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, a fork whose every legal exit has a death certificate, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy; no_static_path does not prove that a route with a moving body is impossible. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown."
+			},
+			"board": {
+				"width": 24,
+				"height": 18,
+				"obstacleCount": 12
+			},
+			"player": {
+				"head": {
+					"x": 5,
+					"y": 9
+				},
+				"direction": "left",
+				"length": 88,
+				"score": 1080
+			},
+			"food": {
+				"apple": {
+					"x": 20,
+					"y": 1
+				},
+				"star": null
+			},
+			"timing": {
+				"stateIsProjected": false,
+				"observedTick": 1628,
+				"targetTick": 1629,
+				"gameTimeMs": 595997.3217089996,
+				"stepMode": "response",
+				"deadlineInMs": null,
+				"tickIntervalMs": null
+			},
+			"progress": {
+				"historyVersion": "progress-v1",
+				"historyStartTick": 0,
+				"throughTick": 1628,
+				"lastAppleTick": 1591,
+				"movesSinceApple": 37,
+				"positionVisits": 1,
+				"previousVisitTick": null,
+				"repeatAfterMoves": null,
+				"actions": {
+					"up": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"right": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"down": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"left": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					}
+				}
+			}
+		},
+		"questions": {
+			"direction": {
+				"type": "choice",
+				"instructions": "Choose one absolute direction for the immediately upcoming move. Play to complete the board by growing the snake, collecting rewards along the way. Decide your strategy from the observed position, candidate consequences and recorded history. state.progress records committed movement, not a forecast. It counts visits to this full body, heading and food configuration since the last apple. actions counts actual departures and how often each was followed by returning here without an apple; rejected or merely proposed actions do not count. A historical return describes what happened, not which direction to choose or whether an alternative is safe. Return your own choice from the four options.",
+				"criteria": {
+					"up": {
+						"immediateCollision": null,
+						"danger": null,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						},
+						"terminal": "none",
+						"space": {
+							"staticReachableCells": 15,
+							"bodyLength": 88,
+							"relativeToBody": "less",
+							"legalNextMoves": 2,
+							"tailConnection": "disconnected"
+						},
+						"appleRoute": {
+							"status": "no_static_path",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "absent",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward y-1."
+					},
+					"right": {
+						"immediateCollision": "reverse",
+						"danger": "immediate_collision",
+						"eatsApple": false,
+						"forcedPath": null,
+						"terminal": "none",
+						"space": null,
+						"appleRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward x+1."
+					},
+					"down": {
+						"immediateCollision": "body",
+						"danger": "immediate_collision",
+						"eatsApple": false,
+						"forcedPath": null,
+						"terminal": "none",
+						"space": null,
+						"appleRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward y+1."
+					},
+					"left": {
+						"immediateCollision": null,
+						"danger": null,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						},
+						"terminal": "none",
+						"space": {
+							"staticReachableCells": 15,
+							"bodyLength": 88,
+							"relativeToBody": "less",
+							"legalNextMoves": 2,
+							"tailConnection": "disconnected"
+						},
+						"appleRoute": {
+							"status": "no_static_path",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "absent",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward x-1."
+					}
+				}
+			}
+		}
+	},
+	"escapePath": [
+		"up",
+		"left",
+		"down",
+		"left",
+		"up",
+		"up",
+		"up",
+		"left",
+		"left",
+		"down",
+		"down",
+		"right",
+		"down",
+		"left",
+		"left"
+	],
+	"foodContinuation": [
+		"down",
+		"down",
+		"down",
+		"down",
+		"down",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"up",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right"
+	],
+	"fatalEvidence": {
+		"candidate": "left",
+		"method": "Exhaust every legal continuation with inspectMove/advanceGeometry; no observed or unknown apple encountered; frontier becomes empty.",
+		"frontierCountsAfterCandidate": [
+			1, 2, 4, 9, 11, 18, 15, 17, 13, 15, 12, 15, 2, 2, 0
+		],
+		"totalStatesIncludingAfterCandidate": 136,
+		"maxSuccessfulMovesAfterCandidate": 13,
+		"collisionWithinMovesAfterCandidate": 14,
+		"collisionWithinMovesIncludingCandidate": 15
+	}
+}

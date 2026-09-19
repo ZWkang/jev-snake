@@ -1,0 +1,306 @@
+{
+	"sourceMatchId": "6cf14499-8182-4831-99cf-11dc41ebaee0",
+	"description": "Observed tick644 seq1297: right enters edge column x11; from its fork up dies within6 and down within4; left has a verified 26-move continuation.",
+	"state": {
+		"id": "6cf14499-8182-4831-99cf-11dc41ebaee0",
+		"agentName": "JEV \u00b7 \u4fee\u590d\u540e\u5927\u5730\u56fe\u8bd5\u73a9",
+		"model": "typesafe/jev-1.13",
+		"config": {
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 12,
+			"height": 9,
+			"obstacleCount": 4,
+			"tickIntervalMs": null,
+			"seed": "6f7554db-e246-4c9c-be96-44a03ed3942d"
+		},
+		"recordVersion": 3,
+		"rulesVersion": 3,
+		"status": "running",
+		"createdAt": "2026-09-19T12:41:48.245Z",
+		"startedAt": "2026-09-19T12:41:48.254Z",
+		"endedAt": null,
+		"seq": 1297,
+		"tick": 644,
+		"gameTimeMs": 230897.9418749998,
+		"score": 640,
+		"applesEaten": 49,
+		"snake": [
+			{
+				"x": 10,
+				"y": 5
+			},
+			{
+				"x": 10,
+				"y": 6
+			},
+			{
+				"x": 10,
+				"y": 7
+			},
+			{
+				"x": 10,
+				"y": 8
+			},
+			{
+				"x": 9,
+				"y": 8
+			},
+			{
+				"x": 8,
+				"y": 8
+			},
+			{
+				"x": 8,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 7
+			},
+			{
+				"x": 6,
+				"y": 7
+			},
+			{
+				"x": 5,
+				"y": 7
+			},
+			{
+				"x": 5,
+				"y": 8
+			},
+			{
+				"x": 4,
+				"y": 8
+			},
+			{
+				"x": 3,
+				"y": 8
+			},
+			{
+				"x": 3,
+				"y": 7
+			},
+			{
+				"x": 3,
+				"y": 6
+			},
+			{
+				"x": 3,
+				"y": 5
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 3,
+				"y": 3
+			},
+			{
+				"x": 3,
+				"y": 2
+			},
+			{
+				"x": 3,
+				"y": 1
+			},
+			{
+				"x": 3,
+				"y": 0
+			},
+			{
+				"x": 4,
+				"y": 0
+			},
+			{
+				"x": 5,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 0
+			},
+			{
+				"x": 7,
+				"y": 0
+			},
+			{
+				"x": 7,
+				"y": 1
+			},
+			{
+				"x": 6,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 1
+			},
+			{
+				"x": 4,
+				"y": 1
+			},
+			{
+				"x": 4,
+				"y": 2
+			},
+			{
+				"x": 4,
+				"y": 3
+			},
+			{
+				"x": 5,
+				"y": 3
+			},
+			{
+				"x": 6,
+				"y": 3
+			},
+			{
+				"x": 7,
+				"y": 3
+			},
+			{
+				"x": 8,
+				"y": 3
+			},
+			{
+				"x": 8,
+				"y": 2
+			},
+			{
+				"x": 9,
+				"y": 2
+			},
+			{
+				"x": 9,
+				"y": 1
+			},
+			{
+				"x": 9,
+				"y": 0
+			},
+			{
+				"x": 10,
+				"y": 0
+			},
+			{
+				"x": 10,
+				"y": 1
+			},
+			{
+				"x": 10,
+				"y": 2
+			},
+			{
+				"x": 10,
+				"y": 3
+			},
+			{
+				"x": 10,
+				"y": 4
+			},
+			{
+				"x": 9,
+				"y": 4
+			},
+			{
+				"x": 8,
+				"y": 4
+			},
+			{
+				"x": 7,
+				"y": 4
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 5
+			},
+			{
+				"x": 6,
+				"y": 5
+			},
+			{
+				"x": 7,
+				"y": 5
+			},
+			{
+				"x": 8,
+				"y": 5
+			}
+		],
+		"direction": "up",
+		"obstacles": [
+			{
+				"x": 9,
+				"y": 7
+			},
+			{
+				"x": 2,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 6
+			},
+			{
+				"x": 6,
+				"y": 2
+			}
+		],
+		"apple": {
+			"x": 2,
+			"y": 3
+		},
+		"star": null,
+		"endReason": null,
+		"lastDecision": null,
+		"lastStepDurationMs": 337.42924999957904,
+		"lastAppliedAction": {
+			"source": "primary",
+			"direction": "up",
+			"tick": 644,
+			"targetTick": 644,
+			"requestId": "0c3ff715-1865-4591-ad9b-c69d36e8a04e",
+			"observedTick": 643
+		}
+	},
+	"escapePath": [
+		"left",
+		"left",
+		"left",
+		"left",
+		"left",
+		"up",
+		"right",
+		"right",
+		"right",
+		"right",
+		"right",
+		"up",
+		"up",
+		"up",
+		"up",
+		"left",
+		"down",
+		"down",
+		"left",
+		"down",
+		"left",
+		"left",
+		"left",
+		"left",
+		"up",
+		"up"
+	]
+}

@@ -1,0 +1,412 @@
+{
+	"sourceMatchId": "7ddc8a56-0ae5-4ad2-9e36-e11d212d55ff",
+	"description": "Actual observed tick848: up returned without apple17 times; right untried; both danger null and no_static_path. Old choice up.",
+	"state": {
+		"id": "7ddc8a56-0ae5-4ad2-9e36-e11d212d55ff",
+		"agentName": "JEV \u00b7 \u5faa\u73af\u4e0e\u5403\u540e\u9000\u8def\u4fee\u590d",
+		"model": "typesafe/jev-1.13",
+		"config": {
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 7,
+			"height": 5,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "2d6ccc8f-ad40-4f44-b917-b1ba65c94e5d"
+		},
+		"recordVersion": 3,
+		"rulesVersion": 3,
+		"status": "running",
+		"createdAt": "2026-09-19T12:18:03.722Z",
+		"startedAt": "2026-09-19T12:18:03.730Z",
+		"endedAt": null,
+		"seq": 1701,
+		"tick": 848,
+		"gameTimeMs": 296887.65158299997,
+		"score": 360,
+		"applesEaten": 27,
+		"snake": [
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 3
+			},
+			{
+				"x": 4,
+				"y": 2
+			},
+			{
+				"x": 3,
+				"y": 2
+			},
+			{
+				"x": 3,
+				"y": 3
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 3
+			},
+			{
+				"x": 2,
+				"y": 2
+			},
+			{
+				"x": 1,
+				"y": 2
+			},
+			{
+				"x": 1,
+				"y": 3
+			},
+			{
+				"x": 1,
+				"y": 4
+			},
+			{
+				"x": 0,
+				"y": 4
+			},
+			{
+				"x": 0,
+				"y": 3
+			},
+			{
+				"x": 0,
+				"y": 2
+			},
+			{
+				"x": 0,
+				"y": 1
+			},
+			{
+				"x": 0,
+				"y": 0
+			},
+			{
+				"x": 1,
+				"y": 0
+			},
+			{
+				"x": 1,
+				"y": 1
+			},
+			{
+				"x": 2,
+				"y": 1
+			},
+			{
+				"x": 2,
+				"y": 0
+			},
+			{
+				"x": 3,
+				"y": 0
+			},
+			{
+				"x": 4,
+				"y": 0
+			},
+			{
+				"x": 5,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 1
+			},
+			{
+				"x": 5,
+				"y": 2
+			},
+			{
+				"x": 6,
+				"y": 2
+			},
+			{
+				"x": 6,
+				"y": 3
+			}
+		],
+		"direction": "right",
+		"obstacles": [
+			{
+				"x": 3,
+				"y": 1
+			}
+		],
+		"apple": {
+			"x": 4,
+			"y": 1
+		},
+		"star": null,
+		"endReason": null,
+		"lastDecision": null,
+		"lastStepDurationMs": 312.4755409999052,
+		"lastAppliedAction": {
+			"source": "primary",
+			"direction": "right",
+			"tick": 848,
+			"targetTick": 848,
+			"requestId": "ce778ddc-ade7-494c-a9eb-a3c4577f5a23",
+			"observedTick": 847
+		}
+	},
+	"progress": {
+		"historyVersion": "progress-v1",
+		"historyStartTick": 0,
+		"throughTick": 848,
+		"lastAppleTick": 203,
+		"movesSinceApple": 645,
+		"positionVisits": 18,
+		"previousVisitTick": 816,
+		"repeatAfterMoves": 32,
+		"actions": {
+			"up": {
+				"timesTaken": 17,
+				"returnsWithoutApple": 17,
+				"lastTakenTick": 817
+			},
+			"right": {
+				"timesTaken": 0,
+				"returnsWithoutApple": 0,
+				"lastTakenTick": null
+			},
+			"down": {
+				"timesTaken": 0,
+				"returnsWithoutApple": 0,
+				"lastTakenTick": null
+			},
+			"left": {
+				"timesTaken": 0,
+				"returnsWithoutApple": 0,
+				"lastTakenTick": null
+			}
+		}
+	},
+	"request": {
+		"model": "typesafe/jev-1.13",
+		"state": {
+			"contextVersion": "action-facts-v3",
+			"rules": {
+				"objective": "Eat apples and stars while staying alive. The snake waits for your response, then moves exactly one cell. No direct reversal. Coordinates: x increases right, y increases down.",
+				"applePoints": 10,
+				"starPoints": 30,
+				"factsSemantics": "danger=immediate_collision marks an immediately blocked move; danger=proven_fatal marks a forced collision, a proven trapped region, or unavoidable post-apple death even with no further growth; danger=null means neither is proven, not guaranteed safety. branch stops at a choice, cycle repeats the full body and direction, unknown_after_apple stops at unknown new food when a next move exists. Frozen space blocks body including tail; tailConnection only opens the tail endpoint. Routes are one static shortest candidate, then dynamically verified, not an exhaustive strategy. Distances and forcedPath.steps include the analyzed move (and a fatal attempt); postEat describes only that candidate's growth. Star arrival is conditional on schedule; response timing is unknown."
+			},
+			"board": {
+				"width": 7,
+				"height": 5,
+				"obstacleCount": 1
+			},
+			"player": {
+				"head": {
+					"x": 5,
+					"y": 4
+				},
+				"direction": "right",
+				"length": 31,
+				"score": 360
+			},
+			"food": {
+				"apple": {
+					"x": 4,
+					"y": 1
+				},
+				"star": null
+			},
+			"timing": {
+				"stateIsProjected": false,
+				"observedTick": 848,
+				"targetTick": 849,
+				"gameTimeMs": 296890.79737499997,
+				"stepMode": "response",
+				"deadlineInMs": null,
+				"tickIntervalMs": null
+			},
+			"progress": {
+				"historyVersion": "progress-v1",
+				"historyStartTick": 0,
+				"throughTick": 848,
+				"lastAppleTick": 203,
+				"movesSinceApple": 645,
+				"positionVisits": 18,
+				"previousVisitTick": 816,
+				"repeatAfterMoves": 32,
+				"actions": {
+					"up": {
+						"timesTaken": 17,
+						"returnsWithoutApple": 17,
+						"lastTakenTick": 817
+					},
+					"right": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"down": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					},
+					"left": {
+						"timesTaken": 0,
+						"returnsWithoutApple": 0,
+						"lastTakenTick": null
+					}
+				}
+			}
+		},
+		"questions": {
+			"direction": {
+				"type": "choice",
+				"instructions": "Choose one absolute direction for the immediately upcoming move. First compare danger. If any action has danger=null, choose among those actions. Never choose danger=immediate_collision or danger=proven_fatal for food or to break a loop while a danger=null option exists. A proven fatal region stays fatal even if it contains an apple or has a branch. danger=null means no fatal proof, not guaranteed safety. Compare post-growth exits and escape evidence among these remaining options, then seek food. A larger frozen space count alone is not a reason to avoid normal growth. Unknown future food is not itself proof of death. state.progress records committed movement, not a forecast. It counts visits to this full body, heading and food configuration since the last apple. actions counts actual departures and how often each was followed by returning here without an apple; rejected or merely proposed actions do not count. This exact position has already repeated without an apple. Indefinitely repeating a reward-free lap is not success. Only after applying the danger rule, prefer an apple route retaining an exit over repeating a departure with returnsWithoutApple > 0. For a danger=null move, directly eating an apple with legal postEat exits and tailConnection=connected should not be rejected merely because growth reduces staticReachableCells. Do not maximize frozen area or avoid all growth. History does not override non-null danger or prove an alternative safe. Return your own choice from the four options.",
+				"criteria": {
+					"up": {
+						"immediateCollision": null,
+						"danger": null,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 2
+						},
+						"terminal": "none",
+						"space": {
+							"staticReachableCells": 3,
+							"bodyLength": 31,
+							"relativeToBody": "less",
+							"legalNextMoves": 1,
+							"tailConnection": "connected"
+						},
+						"appleRoute": {
+							"status": "no_static_path",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "absent",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward y-1."
+					},
+					"right": {
+						"immediateCollision": null,
+						"danger": null,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 2
+						},
+						"terminal": "none",
+						"space": {
+							"staticReachableCells": 3,
+							"bodyLength": 31,
+							"relativeToBody": "less",
+							"legalNextMoves": 1,
+							"tailConnection": "connected"
+						},
+						"appleRoute": {
+							"status": "no_static_path",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "absent",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward x+1."
+					},
+					"down": {
+						"immediateCollision": "wall",
+						"danger": "immediate_collision",
+						"eatsApple": false,
+						"forcedPath": null,
+						"terminal": "none",
+						"space": null,
+						"appleRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward y+1."
+					},
+					"left": {
+						"immediateCollision": "reverse",
+						"danger": "immediate_collision",
+						"eatsApple": false,
+						"forcedPath": null,
+						"terminal": "none",
+						"space": null,
+						"appleRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"postEat": null
+						},
+						"starRoute": {
+							"status": "not_applicable",
+							"distance": null,
+							"verified": null,
+							"remainingMs": null,
+							"nominalArrivalMs": null,
+							"timingStatus": "not_applicable"
+						},
+						"meaning": "Move one cell toward x-1."
+					}
+				}
+			}
+		}
+	},
+	"decision": {
+		"choice": "up",
+		"probabilities": {
+			"up": 0.63,
+			"right": 0.31,
+			"down": 0.01,
+			"left": 0.05
+		},
+		"model": "typesafe/jev-1.13-20260917"
+	}
+}

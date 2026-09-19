@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"strict": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"outDir": "../.server-build",
+		"rootDir": "..",
+		"types": ["node"],
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	},
+	"include": [
+		"**/*.ts",
+		"../shared/**/*.ts",
+		"../scripts/run-jev.ts",
+		"../scripts/evaluate-context.ts"
+	]
+}

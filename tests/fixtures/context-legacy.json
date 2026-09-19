@@ -1,0 +1,213 @@
+{
+	"v1": {
+		"model": "jev-1.13.0",
+		"state": {
+			"contextVersion": "action-facts-v1",
+			"actionFacts": {
+				"up": {
+					"target": {
+						"x": 7,
+						"y": 8
+					},
+					"immediateCollision": null,
+					"appleDistance": 25,
+					"eatsApple": false
+				},
+				"right": {
+					"target": {
+						"x": 8,
+						"y": 9
+					},
+					"immediateCollision": null,
+					"appleDistance": 23,
+					"eatsApple": false
+				},
+				"down": {
+					"target": {
+						"x": 7,
+						"y": 10
+					},
+					"immediateCollision": null,
+					"appleDistance": 23,
+					"eatsApple": false
+				},
+				"left": {
+					"target": {
+						"x": 6,
+						"y": 9
+					},
+					"immediateCollision": "reverse",
+					"appleDistance": 25,
+					"eatsApple": false
+				}
+			},
+			"rules": {
+				"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+				"applePoints": 10,
+				"starPoints": 30
+			},
+			"board": {
+				"width": 24,
+				"height": 18,
+				"obstacles": []
+			},
+			"player": {
+				"head": {
+					"x": 7,
+					"y": 9
+				},
+				"bodyHeadToTail": [
+					{
+						"x": 7,
+						"y": 9
+					},
+					{
+						"x": 6,
+						"y": 9
+					},
+					{
+						"x": 5,
+						"y": 9
+					},
+					{
+						"x": 4,
+						"y": 9
+					}
+				],
+				"direction": "right",
+				"score": 0
+			},
+			"food": {
+				"apple": {
+					"x": 23,
+					"y": 17
+				},
+				"star": null
+			},
+			"timing": {
+				"stateIsProjected": false,
+				"observedTick": 0,
+				"targetTick": 1,
+				"gameTimeMs": 0,
+				"stepMode": "fixed",
+				"tickIntervalMs": 500
+			}
+		},
+		"questions": {
+			"direction": {
+				"type": "choice",
+				"instructions": "Choose the direction for this one immediately upcoming move, considering survival beyond that move. Use actionFacts as exact facts from the game rules. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Return your own choice from the four options.",
+				"criteria": {
+					"up": {
+						"meaning": "Move one cell toward y-1.",
+						"target": {
+							"x": 7,
+							"y": 8
+						},
+						"immediateCollision": null,
+						"appleDistance": 25,
+						"eatsApple": false
+					},
+					"right": {
+						"meaning": "Move one cell toward x+1.",
+						"target": {
+							"x": 8,
+							"y": 9
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false
+					},
+					"down": {
+						"meaning": "Move one cell toward y+1.",
+						"target": {
+							"x": 7,
+							"y": 10
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false
+					},
+					"left": {
+						"meaning": "Move one cell toward x-1.",
+						"target": {
+							"x": 6,
+							"y": 9
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 25,
+						"eatsApple": false
+					}
+				}
+			}
+		}
+	},
+	"unversioned": {
+		"model": "jev-1.13.0",
+		"state": {
+			"rules": {
+				"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+				"applePoints": 10,
+				"starPoints": 30
+			},
+			"board": {
+				"width": 24,
+				"height": 18,
+				"obstacles": []
+			},
+			"player": {
+				"head": {
+					"x": 7,
+					"y": 9
+				},
+				"bodyHeadToTail": [
+					{
+						"x": 7,
+						"y": 9
+					},
+					{
+						"x": 6,
+						"y": 9
+					},
+					{
+						"x": 5,
+						"y": 9
+					},
+					{
+						"x": 4,
+						"y": 9
+					}
+				],
+				"direction": "right",
+				"score": 0
+			},
+			"food": {
+				"apple": {
+					"x": 23,
+					"y": 17
+				},
+				"star": null
+			},
+			"timing": {
+				"stateIsProjected": false,
+				"observedTick": 0,
+				"targetTick": 1,
+				"gameTimeMs": 0,
+				"stepMode": "fixed",
+				"tickIntervalMs": 500
+			}
+		},
+		"questions": {
+			"direction": {
+				"type": "choice",
+				"instructions": "Choose the direction for this one immediately upcoming move, considering survival beyond that move. Use actionFacts as exact facts from the game rules. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Return your own choice from the four options.",
+				"criteria": {
+					"up": "up",
+					"right": "right",
+					"down": "down",
+					"left": "left"
+				}
+			}
+		}
+	}
+}

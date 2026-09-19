@@ -1,0 +1,142 @@
+{
+	"sourceMatchId": "fd1614b1-ba1e-4fdc-9d61-2891049f52c7",
+	"description": "tick183 down eats apple; after growth only down continuation, forced collision within3 moves even with no further growth; left has branching escape.",
+	"state": {
+		"id": "fd1614b1-ba1e-4fdc-9d61-2891049f52c7",
+		"agentName": "JEV \u00b7 \u9632\u5faa\u73af\u4e0e\u5371\u9669\u4f18\u5148\u9a8c\u8bc1",
+		"model": "typesafe/jev-1.13",
+		"config": {
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 7,
+			"height": 5,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "2d6ccc8f-ad40-4f44-b917-b1ba65c94e5d"
+		},
+		"recordVersion": 3,
+		"rulesVersion": 3,
+		"status": "running",
+		"createdAt": "2026-09-19T12:07:37.615Z",
+		"startedAt": "2026-09-19T12:07:37.626Z",
+		"endedAt": null,
+		"seq": 369,
+		"tick": 183,
+		"gameTimeMs": 70089.698667,
+		"score": 240,
+		"applesEaten": 18,
+		"snake": [
+			{
+				"x": 2,
+				"y": 0
+			},
+			{
+				"x": 3,
+				"y": 0
+			},
+			{
+				"x": 4,
+				"y": 0
+			},
+			{
+				"x": 5,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 0
+			},
+			{
+				"x": 6,
+				"y": 1
+			},
+			{
+				"x": 6,
+				"y": 2
+			},
+			{
+				"x": 5,
+				"y": 2
+			},
+			{
+				"x": 5,
+				"y": 3
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 3
+			},
+			{
+				"x": 4,
+				"y": 2
+			},
+			{
+				"x": 3,
+				"y": 2
+			},
+			{
+				"x": 3,
+				"y": 3
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			},
+			{
+				"x": 1,
+				"y": 4
+			},
+			{
+				"x": 1,
+				"y": 3
+			},
+			{
+				"x": 1,
+				"y": 2
+			},
+			{
+				"x": 1,
+				"y": 1
+			},
+			{
+				"x": 1,
+				"y": 0
+			}
+		],
+		"direction": "left",
+		"obstacles": [
+			{
+				"x": 3,
+				"y": 1
+			}
+		],
+		"apple": {
+			"x": 2,
+			"y": 1
+		},
+		"star": null,
+		"endReason": null,
+		"lastDecision": null,
+		"lastStepDurationMs": 321.94820900000923,
+		"lastAppliedAction": {
+			"source": "primary",
+			"direction": "left",
+			"tick": 183,
+			"targetTick": 183,
+			"requestId": "3a422684-80d7-4bdf-a24f-e0fa8bd5b8c7",
+			"observedTick": 182
+		}
+	}
+}

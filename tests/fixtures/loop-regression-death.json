@@ -1,0 +1,260 @@
+{
+	"sourceMatchId": "7c3221ba-ef6b-48f5-b462-d289c410f6cc",
+	"description": "tick70 right eats apple into proven trapped region; left has no fatal proof. tick71 up collides with body, right forced fatal; captured before fix.",
+	"states": [
+		{
+			"id": "7c3221ba-ef6b-48f5-b462-d289c410f6cc",
+			"agentName": "JEV \u00b7 \u5faa\u73af\u4fee\u590d\u540c\u56fe\u9a8c\u8bc1",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 7,
+				"height": 5,
+				"obstacleCount": 1,
+				"tickIntervalMs": null,
+				"seed": "2d6ccc8f-ad40-4f44-b917-b1ba65c94e5d"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T11:58:35.932Z",
+			"startedAt": "2026-09-19T11:58:35.948Z",
+			"endedAt": null,
+			"seq": 143,
+			"tick": 70,
+			"gameTimeMs": 26346.305957999997,
+			"score": 170,
+			"applesEaten": 14,
+			"snake": [
+				{
+					"x": 1,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 3
+				},
+				{
+					"x": 3,
+					"y": 3
+				},
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 5,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 2
+				},
+				{
+					"x": 5,
+					"y": 2
+				},
+				{
+					"x": 4,
+					"y": 2
+				},
+				{
+					"x": 4,
+					"y": 1
+				},
+				{
+					"x": 4,
+					"y": 0
+				},
+				{
+					"x": 3,
+					"y": 0
+				},
+				{
+					"x": 2,
+					"y": 0
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 1,
+					"y": 1
+				}
+			],
+			"direction": "down",
+			"obstacles": [
+				{
+					"x": 3,
+					"y": 1
+				}
+			],
+			"apple": {
+				"x": 2,
+				"y": 4
+			},
+			"star": null,
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 331.4965830000001,
+			"lastAppliedAction": {
+				"source": "primary",
+				"direction": "down",
+				"tick": 70,
+				"targetTick": 70,
+				"requestId": "ce56275a-95e1-418f-82dd-554411187a4b",
+				"observedTick": 69
+			}
+		},
+		{
+			"id": "7c3221ba-ef6b-48f5-b462-d289c410f6cc",
+			"agentName": "JEV \u00b7 \u5faa\u73af\u4fee\u590d\u540c\u56fe\u9a8c\u8bc1",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 7,
+				"height": 5,
+				"obstacleCount": 1,
+				"tickIntervalMs": null,
+				"seed": "2d6ccc8f-ad40-4f44-b917-b1ba65c94e5d"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T11:58:35.932Z",
+			"startedAt": "2026-09-19T11:58:35.948Z",
+			"endedAt": null,
+			"seq": 145,
+			"tick": 71,
+			"gameTimeMs": 26680.541832999996,
+			"score": 180,
+			"applesEaten": 15,
+			"snake": [
+				{
+					"x": 2,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 3
+				},
+				{
+					"x": 3,
+					"y": 3
+				},
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 5,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 2
+				},
+				{
+					"x": 5,
+					"y": 2
+				},
+				{
+					"x": 4,
+					"y": 2
+				},
+				{
+					"x": 4,
+					"y": 1
+				},
+				{
+					"x": 4,
+					"y": 0
+				},
+				{
+					"x": 3,
+					"y": 0
+				},
+				{
+					"x": 2,
+					"y": 0
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 1,
+					"y": 1
+				}
+			],
+			"direction": "right",
+			"obstacles": [
+				{
+					"x": 3,
+					"y": 1
+				}
+			],
+			"apple": {
+				"x": 5,
+				"y": 1
+			},
+			"star": {
+				"point": {
+					"x": 0,
+					"y": 3
+				},
+				"expiresAt": 34680.541832999996
+			},
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 334.2358749999985,
+			"lastAppliedAction": {
+				"source": "primary",
+				"direction": "right",
+				"tick": 71,
+				"targetTick": 71,
+				"requestId": "72e50b57-35c1-42c3-be8c-24393163c3ab",
+				"observedTick": 70
+			}
+		}
+	]
+}

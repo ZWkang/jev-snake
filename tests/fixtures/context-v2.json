@@ -1,0 +1,1196 @@
+{
+	"opening": {
+		"single": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "action-facts-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 7,
+							"y": 8
+						},
+						"immediateCollision": null,
+						"appleDistance": 25,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"right": {
+						"target": {
+							"x": 8,
+							"y": 9
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 7,
+							"y": 10
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"left": {
+						"target": {
+							"x": 6,
+							"y": 9
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 25,
+						"eatsApple": false,
+						"forcedPath": null
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 24,
+					"height": 18,
+					"obstacles": []
+				},
+				"player": {
+					"head": {
+						"x": 7,
+						"y": 9
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 7,
+							"y": 9
+						},
+						{
+							"x": 6,
+							"y": 9
+						},
+						{
+							"x": 5,
+							"y": 9
+						},
+						{
+							"x": 4,
+							"y": 9
+						}
+					],
+					"direction": "right",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 23,
+						"y": 17
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 0,
+					"targetTick": 1,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				}
+			},
+			"questions": {
+				"direction": {
+					"type": "choice",
+					"instructions": "Choose the direction for this one immediately upcoming move, considering survival beyond that move. Use actionFacts as exact facts from the game rules. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Return your own choice from the four options.",
+					"criteria": {
+						"up": {
+							"meaning": "Move one cell toward y-1.",
+							"target": {
+								"x": 7,
+								"y": 8
+							},
+							"immediateCollision": null,
+							"appleDistance": 25,
+							"eatsApple": false,
+							"forcedPath": {
+								"outcome": "branch",
+								"steps": 1
+							}
+						},
+						"right": {
+							"meaning": "Move one cell toward x+1.",
+							"target": {
+								"x": 8,
+								"y": 9
+							},
+							"immediateCollision": null,
+							"appleDistance": 23,
+							"eatsApple": false,
+							"forcedPath": {
+								"outcome": "branch",
+								"steps": 1
+							}
+						},
+						"down": {
+							"meaning": "Move one cell toward y+1.",
+							"target": {
+								"x": 7,
+								"y": 10
+							},
+							"immediateCollision": null,
+							"appleDistance": 23,
+							"eatsApple": false,
+							"forcedPath": {
+								"outcome": "branch",
+								"steps": 1
+							}
+						},
+						"left": {
+							"meaning": "Move one cell toward x-1.",
+							"target": {
+								"x": 6,
+								"y": 9
+							},
+							"immediateCollision": "reverse",
+							"appleDistance": 25,
+							"eatsApple": false,
+							"forcedPath": null
+						}
+					}
+				}
+			}
+		},
+		"plan": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "two-step-plan-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 7,
+							"y": 8
+						},
+						"immediateCollision": null,
+						"appleDistance": 25,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"right": {
+						"target": {
+							"x": 8,
+							"y": 9
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 7,
+							"y": 10
+						},
+						"immediateCollision": null,
+						"appleDistance": 23,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"left": {
+						"target": {
+							"x": 6,
+							"y": 9
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 25,
+						"eatsApple": false,
+						"forcedPath": null
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 24,
+					"height": 18,
+					"obstacles": []
+				},
+				"player": {
+					"head": {
+						"x": 7,
+						"y": 9
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 7,
+							"y": 9
+						},
+						{
+							"x": 6,
+							"y": 9
+						},
+						{
+							"x": 5,
+							"y": 9
+						},
+						{
+							"x": 4,
+							"y": 9
+						}
+					],
+					"direction": "right",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 23,
+						"y": 17
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 0,
+					"targetTick": 1,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				},
+				"planningHorizon": 2,
+				"targetTicks": [1, 2]
+			},
+			"questions": {
+				"plan": {
+					"type": "choice",
+					"instructions": "Choose a two-move ordered plan. The first move is for the immediately upcoming tick. The second is a backup for the following tick only if the first actually executes and no fresh decision is available. No direct reversal on either move. actionFacts describes each possible first move; each pair's criteria gives second-move facts after executing its first move, with steps counted from that resulting position. Apply the survival priorities to BOTH moves; avoid a pair whose second move collides or leads into forced_collision whenever a pair avoiding both exists. State is the actual observed position. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Future randomly spawned food is unknown. Choose one of the provided pairs.",
+					"criteria": {
+						"up_up": "First up (see actionFacts.up); then up as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"up_right": "First up (see actionFacts.up); then right as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"up_down": "First up (see actionFacts.up); then down as backup. Second-move facts after first: {\"immediateCollision\":\"reverse\",\"forcedPath\":null}.",
+						"up_left": "First up (see actionFacts.up); then left as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_up": "First right (see actionFacts.right); then up as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_right": "First right (see actionFacts.right); then right as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_down": "First right (see actionFacts.right); then down as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_left": "First right (see actionFacts.right); then left as backup. Second-move facts after first: {\"immediateCollision\":\"reverse\",\"forcedPath\":null}.",
+						"down_up": "First down (see actionFacts.down); then up as backup. Second-move facts after first: {\"immediateCollision\":\"reverse\",\"forcedPath\":null}.",
+						"down_right": "First down (see actionFacts.down); then right as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"down_down": "First down (see actionFacts.down); then down as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"down_left": "First down (see actionFacts.down); then left as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"left_up": "First left (see actionFacts.left); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"left_right": "First left (see actionFacts.left); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"left_down": "First left (see actionFacts.left); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"left_left": "First left (see actionFacts.left); then left as backup. First move is blocked or completes the board; no second move executes."
+					}
+				}
+			}
+		}
+	},
+	"corridor": {
+		"single": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "action-facts-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 11,
+							"y": 6
+						},
+						"immediateCollision": "body",
+						"appleDistance": 15,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"right": {
+						"target": {
+							"x": 12,
+							"y": 7
+						},
+						"immediateCollision": null,
+						"appleDistance": 15,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 11,
+							"y": 8
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 13,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"left": {
+						"target": {
+							"x": 10,
+							"y": 7
+						},
+						"immediateCollision": null,
+						"appleDistance": 13,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "forced_collision",
+							"steps": 7
+						}
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 24,
+					"height": 18,
+					"obstacles": [
+						{
+							"x": 8,
+							"y": 13
+						},
+						{
+							"x": 1,
+							"y": 6
+						},
+						{
+							"x": 1,
+							"y": 4
+						},
+						{
+							"x": 20,
+							"y": 7
+						},
+						{
+							"x": 17,
+							"y": 9
+						},
+						{
+							"x": 10,
+							"y": 5
+						},
+						{
+							"x": 11,
+							"y": 11
+						},
+						{
+							"x": 5,
+							"y": 15
+						},
+						{
+							"x": 7,
+							"y": 1
+						},
+						{
+							"x": 20,
+							"y": 5
+						},
+						{
+							"x": 4,
+							"y": 16
+						},
+						{
+							"x": 17,
+							"y": 13
+						}
+					]
+				},
+				"player": {
+					"head": {
+						"x": 11,
+						"y": 7
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 11,
+							"y": 7
+						},
+						{
+							"x": 11,
+							"y": 8
+						},
+						{
+							"x": 10,
+							"y": 8
+						},
+						{
+							"x": 9,
+							"y": 8
+						},
+						{
+							"x": 8,
+							"y": 8
+						},
+						{
+							"x": 7,
+							"y": 8
+						},
+						{
+							"x": 6,
+							"y": 8
+						},
+						{
+							"x": 5,
+							"y": 8
+						},
+						{
+							"x": 4,
+							"y": 8
+						},
+						{
+							"x": 4,
+							"y": 7
+						},
+						{
+							"x": 4,
+							"y": 6
+						},
+						{
+							"x": 5,
+							"y": 6
+						},
+						{
+							"x": 6,
+							"y": 6
+						},
+						{
+							"x": 7,
+							"y": 6
+						},
+						{
+							"x": 8,
+							"y": 6
+						},
+						{
+							"x": 9,
+							"y": 6
+						},
+						{
+							"x": 10,
+							"y": 6
+						},
+						{
+							"x": 11,
+							"y": 6
+						},
+						{
+							"x": 12,
+							"y": 6
+						},
+						{
+							"x": 13,
+							"y": 6
+						},
+						{
+							"x": 14,
+							"y": 6
+						},
+						{
+							"x": 15,
+							"y": 6
+						},
+						{
+							"x": 16,
+							"y": 6
+						},
+						{
+							"x": 17,
+							"y": 6
+						},
+						{
+							"x": 18,
+							"y": 6
+						},
+						{
+							"x": 19,
+							"y": 6
+						},
+						{
+							"x": 19,
+							"y": 5
+						},
+						{
+							"x": 19,
+							"y": 4
+						}
+					],
+					"direction": "up",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 7,
+						"y": 17
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 364,
+					"targetTick": 365,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				}
+			},
+			"questions": {
+				"direction": {
+					"type": "choice",
+					"instructions": "Choose the direction for this one immediately upcoming move, considering survival beyond that move. Use actionFacts as exact facts from the game rules. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Return your own choice from the four options.",
+					"criteria": {
+						"up": {
+							"meaning": "Move one cell toward y-1.",
+							"target": {
+								"x": 11,
+								"y": 6
+							},
+							"immediateCollision": "body",
+							"appleDistance": 15,
+							"eatsApple": false,
+							"forcedPath": null
+						},
+						"right": {
+							"meaning": "Move one cell toward x+1.",
+							"target": {
+								"x": 12,
+								"y": 7
+							},
+							"immediateCollision": null,
+							"appleDistance": 15,
+							"eatsApple": false,
+							"forcedPath": {
+								"outcome": "branch",
+								"steps": 1
+							}
+						},
+						"down": {
+							"meaning": "Move one cell toward y+1.",
+							"target": {
+								"x": 11,
+								"y": 8
+							},
+							"immediateCollision": "reverse",
+							"appleDistance": 13,
+							"eatsApple": false,
+							"forcedPath": null
+						},
+						"left": {
+							"meaning": "Move one cell toward x-1.",
+							"target": {
+								"x": 10,
+								"y": 7
+							},
+							"immediateCollision": null,
+							"appleDistance": 13,
+							"eatsApple": false,
+							"forcedPath": {
+								"outcome": "forced_collision",
+								"steps": 7
+							}
+						}
+					}
+				}
+			}
+		},
+		"plan": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "two-step-plan-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 11,
+							"y": 6
+						},
+						"immediateCollision": "body",
+						"appleDistance": 15,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"right": {
+						"target": {
+							"x": 12,
+							"y": 7
+						},
+						"immediateCollision": null,
+						"appleDistance": 15,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "branch",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 11,
+							"y": 8
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 13,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"left": {
+						"target": {
+							"x": 10,
+							"y": 7
+						},
+						"immediateCollision": null,
+						"appleDistance": 13,
+						"eatsApple": false,
+						"forcedPath": {
+							"outcome": "forced_collision",
+							"steps": 7
+						}
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 24,
+					"height": 18,
+					"obstacles": [
+						{
+							"x": 8,
+							"y": 13
+						},
+						{
+							"x": 1,
+							"y": 6
+						},
+						{
+							"x": 1,
+							"y": 4
+						},
+						{
+							"x": 20,
+							"y": 7
+						},
+						{
+							"x": 17,
+							"y": 9
+						},
+						{
+							"x": 10,
+							"y": 5
+						},
+						{
+							"x": 11,
+							"y": 11
+						},
+						{
+							"x": 5,
+							"y": 15
+						},
+						{
+							"x": 7,
+							"y": 1
+						},
+						{
+							"x": 20,
+							"y": 5
+						},
+						{
+							"x": 4,
+							"y": 16
+						},
+						{
+							"x": 17,
+							"y": 13
+						}
+					]
+				},
+				"player": {
+					"head": {
+						"x": 11,
+						"y": 7
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 11,
+							"y": 7
+						},
+						{
+							"x": 11,
+							"y": 8
+						},
+						{
+							"x": 10,
+							"y": 8
+						},
+						{
+							"x": 9,
+							"y": 8
+						},
+						{
+							"x": 8,
+							"y": 8
+						},
+						{
+							"x": 7,
+							"y": 8
+						},
+						{
+							"x": 6,
+							"y": 8
+						},
+						{
+							"x": 5,
+							"y": 8
+						},
+						{
+							"x": 4,
+							"y": 8
+						},
+						{
+							"x": 4,
+							"y": 7
+						},
+						{
+							"x": 4,
+							"y": 6
+						},
+						{
+							"x": 5,
+							"y": 6
+						},
+						{
+							"x": 6,
+							"y": 6
+						},
+						{
+							"x": 7,
+							"y": 6
+						},
+						{
+							"x": 8,
+							"y": 6
+						},
+						{
+							"x": 9,
+							"y": 6
+						},
+						{
+							"x": 10,
+							"y": 6
+						},
+						{
+							"x": 11,
+							"y": 6
+						},
+						{
+							"x": 12,
+							"y": 6
+						},
+						{
+							"x": 13,
+							"y": 6
+						},
+						{
+							"x": 14,
+							"y": 6
+						},
+						{
+							"x": 15,
+							"y": 6
+						},
+						{
+							"x": 16,
+							"y": 6
+						},
+						{
+							"x": 17,
+							"y": 6
+						},
+						{
+							"x": 18,
+							"y": 6
+						},
+						{
+							"x": 19,
+							"y": 6
+						},
+						{
+							"x": 19,
+							"y": 5
+						},
+						{
+							"x": 19,
+							"y": 4
+						}
+					],
+					"direction": "up",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 7,
+						"y": 17
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 364,
+					"targetTick": 365,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				},
+				"planningHorizon": 2,
+				"targetTicks": [365, 366]
+			},
+			"questions": {
+				"plan": {
+					"type": "choice",
+					"instructions": "Choose a two-move ordered plan. The first move is for the immediately upcoming tick. The second is a backup for the following tick only if the first actually executes and no fresh decision is available. No direct reversal on either move. actionFacts describes each possible first move; each pair's criteria gives second-move facts after executing its first move, with steps counted from that resulting position. Apply the survival priorities to BOTH moves; avoid a pair whose second move collides or leads into forced_collision whenever a pair avoiding both exists. State is the actual observed position. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Future randomly spawned food is unknown. Choose one of the provided pairs.",
+					"criteria": {
+						"up_up": "First up (see actionFacts.up); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"up_right": "First up (see actionFacts.up); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"up_down": "First up (see actionFacts.up); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"up_left": "First up (see actionFacts.up); then left as backup. First move is blocked or completes the board; no second move executes.",
+						"right_up": "First right (see actionFacts.right); then up as backup. Second-move facts after first: {\"immediateCollision\":\"body\",\"forcedPath\":null}.",
+						"right_right": "First right (see actionFacts.right); then right as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_down": "First right (see actionFacts.right); then down as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"branch\",\"steps\":1}}.",
+						"right_left": "First right (see actionFacts.right); then left as backup. Second-move facts after first: {\"immediateCollision\":\"reverse\",\"forcedPath\":null}.",
+						"down_up": "First down (see actionFacts.down); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"down_right": "First down (see actionFacts.down); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"down_down": "First down (see actionFacts.down); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"down_left": "First down (see actionFacts.down); then left as backup. First move is blocked or completes the board; no second move executes.",
+						"left_up": "First left (see actionFacts.left); then up as backup. Second-move facts after first: {\"immediateCollision\":\"body\",\"forcedPath\":null}.",
+						"left_right": "First left (see actionFacts.left); then right as backup. Second-move facts after first: {\"immediateCollision\":\"reverse\",\"forcedPath\":null}.",
+						"left_down": "First left (see actionFacts.left); then down as backup. Second-move facts after first: {\"immediateCollision\":\"body\",\"forcedPath\":null}.",
+						"left_left": "First left (see actionFacts.left); then left as backup. Second-move facts after first: {\"immediateCollision\":null,\"forcedPath\":{\"outcome\":\"forced_collision\",\"steps\":6}}."
+					}
+				}
+			}
+		}
+	},
+	"nearComplete": {
+		"single": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "action-facts-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 5,
+							"y": -1
+						},
+						"immediateCollision": "wall",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"right": {
+						"target": {
+							"x": 6,
+							"y": 0
+						},
+						"immediateCollision": null,
+						"appleDistance": 0,
+						"eatsApple": true,
+						"forcedPath": {
+							"outcome": "board_complete",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 5,
+							"y": 1
+						},
+						"immediateCollision": "wall",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"left": {
+						"target": {
+							"x": 4,
+							"y": 0
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 7,
+					"height": 1,
+					"obstacles": []
+				},
+				"player": {
+					"head": {
+						"x": 5,
+						"y": 0
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 5,
+							"y": 0
+						},
+						{
+							"x": 4,
+							"y": 0
+						},
+						{
+							"x": 3,
+							"y": 0
+						},
+						{
+							"x": 2,
+							"y": 0
+						},
+						{
+							"x": 1,
+							"y": 0
+						},
+						{
+							"x": 0,
+							"y": 0
+						}
+					],
+					"direction": "right",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 6,
+						"y": 0
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 0,
+					"targetTick": 1,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				}
+			},
+			"questions": {
+				"direction": {
+					"type": "choice",
+					"instructions": "Choose the direction for this one immediately upcoming move, considering survival beyond that move. Use actionFacts as exact facts from the game rules. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Return your own choice from the four options.",
+					"criteria": {
+						"up": {
+							"meaning": "Move one cell toward y-1.",
+							"target": {
+								"x": 5,
+								"y": -1
+							},
+							"immediateCollision": "wall",
+							"appleDistance": 2,
+							"eatsApple": false,
+							"forcedPath": null
+						},
+						"right": {
+							"meaning": "Move one cell toward x+1.",
+							"target": {
+								"x": 6,
+								"y": 0
+							},
+							"immediateCollision": null,
+							"appleDistance": 0,
+							"eatsApple": true,
+							"forcedPath": {
+								"outcome": "board_complete",
+								"steps": 1
+							}
+						},
+						"down": {
+							"meaning": "Move one cell toward y+1.",
+							"target": {
+								"x": 5,
+								"y": 1
+							},
+							"immediateCollision": "wall",
+							"appleDistance": 2,
+							"eatsApple": false,
+							"forcedPath": null
+						},
+						"left": {
+							"meaning": "Move one cell toward x-1.",
+							"target": {
+								"x": 4,
+								"y": 0
+							},
+							"immediateCollision": "reverse",
+							"appleDistance": 2,
+							"eatsApple": false,
+							"forcedPath": null
+						}
+					}
+				}
+			}
+		},
+		"plan": {
+			"model": "jev-1.13.0",
+			"state": {
+				"contextVersion": "two-step-plan-v2",
+				"actionFacts": {
+					"up": {
+						"target": {
+							"x": 5,
+							"y": -1
+						},
+						"immediateCollision": "wall",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"right": {
+						"target": {
+							"x": 6,
+							"y": 0
+						},
+						"immediateCollision": null,
+						"appleDistance": 0,
+						"eatsApple": true,
+						"forcedPath": {
+							"outcome": "board_complete",
+							"steps": 1
+						}
+					},
+					"down": {
+						"target": {
+							"x": 5,
+							"y": 1
+						},
+						"immediateCollision": "wall",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					},
+					"left": {
+						"target": {
+							"x": 4,
+							"y": 0
+						},
+						"immediateCollision": "reverse",
+						"appleDistance": 2,
+						"eatsApple": false,
+						"forcedPath": null
+					}
+				},
+				"rules": {
+					"objective": "Eat apples and stars while staying alive. The snake keeps moving. No direct reversal. Coordinates: x increases right, y increases down.",
+					"applePoints": 10,
+					"starPoints": 30
+				},
+				"board": {
+					"width": 7,
+					"height": 1,
+					"obstacles": []
+				},
+				"player": {
+					"head": {
+						"x": 5,
+						"y": 0
+					},
+					"bodyHeadToTail": [
+						{
+							"x": 5,
+							"y": 0
+						},
+						{
+							"x": 4,
+							"y": 0
+						},
+						{
+							"x": 3,
+							"y": 0
+						},
+						{
+							"x": 2,
+							"y": 0
+						},
+						{
+							"x": 1,
+							"y": 0
+						},
+						{
+							"x": 0,
+							"y": 0
+						}
+					],
+					"direction": "right",
+					"score": 0
+				},
+				"food": {
+					"apple": {
+						"x": 6,
+						"y": 0
+					},
+					"star": null
+				},
+				"timing": {
+					"stateIsProjected": false,
+					"observedTick": 0,
+					"targetTick": 1,
+					"gameTimeMs": 0,
+					"stepMode": "fixed",
+					"tickIntervalMs": 500
+				},
+				"planningHorizon": 2,
+				"targetTicks": [1, 2]
+			},
+			"questions": {
+				"plan": {
+					"type": "choice",
+					"instructions": "Choose a two-move ordered plan. The first move is for the immediately upcoming tick. The second is a backup for the following tick only if the first actually executes and no fresh decision is available. No direct reversal on either move. actionFacts describes each possible first move; each pair's criteria gives second-move facts after executing its first move, with steps counted from that resulting position. Apply the survival priorities to BOTH moves; avoid a pair whose second move collides or leads into forced_collision whenever a pair avoiding both exists. State is the actual observed position. Treat both fixed obstacles and the snake body as path obstacles. The tail vacates on a non-apple move; eating an apple grows the body and keeps the tail in place. Priority 1: choose immediateCollision=null whenever possible. Priority 2: among those directions, avoid forcedPath.outcome=forced_collision whenever an alternative exists, even if it leads away from food. Priority 3: preserve escape routes and room to turn, then approach food. An empty next cell is not proof of an escape route. appleDistance is Manhattan distance ignoring obstacles and body, not a reachable path length. forcedPath follows the chosen move and then every sole non-colliding continuation with the body and tail moving. steps counts moves from the analyzed position, including a fatal move. forced_collision proves a dead end; branch stops at multiple next moves and does not prove safety; cycle means the same body and direction repeat; unknown_after_apple stops after known growth because the next apple location is unknown; board_complete means victory. null means the analyzed move is blocked. Reason beyond the returned move count using the full bodyHeadToTail coordinates. Future randomly spawned food is unknown. Choose one of the provided pairs.",
+					"criteria": {
+						"up_up": "First up (see actionFacts.up); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"up_right": "First up (see actionFacts.up); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"up_down": "First up (see actionFacts.up); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"up_left": "First up (see actionFacts.up); then left as backup. First move is blocked or completes the board; no second move executes.",
+						"right_up": "First right (see actionFacts.right); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"right_right": "First right (see actionFacts.right); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"right_down": "First right (see actionFacts.right); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"right_left": "First right (see actionFacts.right); then left as backup. First move is blocked or completes the board; no second move executes.",
+						"down_up": "First down (see actionFacts.down); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"down_right": "First down (see actionFacts.down); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"down_down": "First down (see actionFacts.down); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"down_left": "First down (see actionFacts.down); then left as backup. First move is blocked or completes the board; no second move executes.",
+						"left_up": "First left (see actionFacts.left); then up as backup. First move is blocked or completes the board; no second move executes.",
+						"left_right": "First left (see actionFacts.left); then right as backup. First move is blocked or completes the board; no second move executes.",
+						"left_down": "First left (see actionFacts.left); then down as backup. First move is blocked or completes the board; no second move executes.",
+						"left_left": "First left (see actionFacts.left); then left as backup. First move is blocked or completes the board; no second move executes."
+					}
+				}
+			}
+		}
+	}
+}

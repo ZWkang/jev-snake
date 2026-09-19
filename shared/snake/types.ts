@@ -273,6 +273,8 @@ export type DecisionRequest =
 	| DecisionRequestV4;
 export type PlanRequest = LegacyPlanRequest | PlanRequestV3 | PlanRequestV4;
 type BoardConfig = {
+	// Missing means the original fixed-spawn generator, including its RNG order.
+	layoutVersion?: 2;
 	width: number;
 	height: number;
 	obstacleCount: number;

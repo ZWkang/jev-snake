@@ -190,6 +190,7 @@ export const planRequestSchema = z.unknown().transform((value, context) => {
 });
 const fixedConfigSchema = z
 	.object({
+		layoutVersion: z.literal(2).optional(),
 		stepMode: z.literal("fixed").optional(),
 		decisionMode: z.enum(decisionModes).optional(),
 		width: z.number().int().min(7).default(24),

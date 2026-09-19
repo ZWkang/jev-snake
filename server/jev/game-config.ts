@@ -23,6 +23,7 @@ export function gameConfig(
 	if (stepMode === "response" && decisionMode === "two_step_fallback")
 		throw new Error("response step-mode cannot use two_step_fallback");
 	return configSchema.parse({
+		layoutVersion: 2,
 		stepMode,
 		decisionMode,
 		width: Number(values.width ?? env.SNAKE_WIDTH ?? 24),

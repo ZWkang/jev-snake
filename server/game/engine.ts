@@ -6,7 +6,12 @@ import type {
 	MatchState,
 	Point,
 } from "../../shared/snake/types.js";
-import { isResponseMode, opposite, vectors } from "../../shared/snake/types.js";
+import {
+	directions,
+	isResponseMode,
+	opposite,
+	vectors,
+} from "../../shared/snake/types.js";
 import { GameError } from "../errors.js";
 
 const key = (p: Point) => `${p.x},${p.y}`;
@@ -118,8 +123,39 @@ export function createState(
 		endReason: null,
 		lastDecision: null,
 	};
+	if (config.layoutVersion === 2) {
+		// Sample headings equally, then sample a head position with room for the
+		// four-cell body behind it and three clear cells ahead of it.
+		const headings = directions.filter((direction) =>
+			vectors[direction].x === 0 ? config.height >= 7 : config.width >= 7,
+		);
+		if (!headings.length)
+			throw new GameError(
+				"invalid_map",
+				"No room for the initial snake and runway",
+			);
+		s.direction = headings[Math.floor(random(s) * headings.length)];
+		const v = vectors[s.direction];
+		const marginX = Math.abs(v.x) * 3;
+		const marginY = Math.abs(v.y) * 3;
+		const head = {
+			x: marginX + Math.floor(random(s) * (config.width - marginX * 2)),
+			y: marginY + Math.floor(random(s) * (config.height - marginY * 2)),
+		};
+		s.snake = Array.from({ length: 4 }, (_, i) => ({
+			x: head.x - v.x * i,
+			y: head.y - v.y * i,
+		}));
+	}
+	const heading = vectors[s.direction];
 	const safe = new Set(
-		[...s.snake, ...[1, 2, 3].map((i) => ({ x: x + i, y }))].map(key),
+		[
+			...s.snake,
+			...[1, 2, 3].map((i) => ({
+				x: s.snake[0].x + heading.x * i,
+				y: s.snake[0].y + heading.y * i,
+			})),
+		].map(key),
 	);
 	const candidates: Point[] = [];
 	for (let cy = 1; cy < config.height - 1; cy++)

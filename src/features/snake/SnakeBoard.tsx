@@ -1,5 +1,6 @@
 import {
 	createEffect,
+	createMemo,
 	createSignal,
 	createUniqueId,
 	Index,
@@ -10,6 +11,7 @@ import {
 import type { Point, PublicState } from "../../../shared/snake/types";
 import { isResponseMode } from "../../../shared/snake/types";
 import { directionName, reasonName, statusName } from "./api";
+import { snakeColors } from "./appearance";
 
 export function SnakeBoard(props: {
 	state: PublicState;
@@ -84,7 +86,7 @@ export function SnakeBoard(props: {
 	});
 	const width = () => props.state.config.width * 32;
 	const height = () => props.state.config.height * 32;
-	const colors = ["#ff7286", "#f1db4e", "#66d6bb", "#a697ef", "#ffb15c"];
+	const colors = createMemo(() => snakeColors(props.state.config));
 	const angle = () =>
 		({ right: 0, down: 90, left: 180, up: 270 })[props.state.direction];
 	function Reward(rewardProps: { point: Point; star: boolean }) {
@@ -204,7 +206,7 @@ export function SnakeBoard(props: {
 								width="29"
 								height="29"
 								rx={i === 0 ? "10" : "7"}
-								fill={colors[i % colors.length]}
+								fill={colors()[i % colors().length]}
 								stroke="#171717"
 								stroke-width="2.5"
 							/>

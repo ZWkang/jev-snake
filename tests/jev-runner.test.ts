@@ -169,7 +169,9 @@ globalThis.fetch = async (input, init) => {
 					"0",
 					...(mode.startsWith("response-") ? [] : ["--tick-ms", "500"]),
 					"--seed",
-					"runner-test",
+					// These transport scenarios deliberately answer right/down. Keep a
+					// reproducible right-facing opening with room for their test paths.
+					"runner-spawn-45",
 					...(["failure", "fast", "late", "late-error", "rounded"].includes(
 						mode,
 					)

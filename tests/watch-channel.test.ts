@@ -106,6 +106,12 @@ test("owner intent runs two actual engine rounds without viewers, then drains wi
 	expect(f.jobs).toHaveLength(2);
 	const second = f.start();
 	expect(second).not.toBe(first);
+	expect(f.jobs.map((job) => job.options.state.config.layoutVersion)).toEqual([
+		2, 2,
+	]);
+	expect(f.jobs[1].options.state.config.seed).not.toBe(
+		f.jobs[0].options.state.config.seed,
+	);
 	f.command(false);
 	expect(f.channel.snapshot()).toMatchObject({
 		enabled: false,

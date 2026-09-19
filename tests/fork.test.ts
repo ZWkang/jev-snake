@@ -218,35 +218,38 @@ test("fork copies only the complete prefix, preserves history, and starts a sepa
 	expect(savedRows(f.store, f.source.id)).toEqual(original);
 });
 
-test("restored RNG generates the same next apple after the inherited prefix", () => {
-	const f = fixture();
-	f.start();
-	const initialRng = f.store.get(f.source.id).rngState;
-	for (const direction of routeToApple(f.store.get(f.source.id)))
-		f.move(direction);
-	const checkpoint = f.store.get(f.source.id);
-	expect(checkpoint.applesEaten).toBe(1);
-	expect(checkpoint.rngState).not.toBe(initialRng);
-	const route = routeToApple(checkpoint);
-	for (const direction of route)
-		expect(f.move(direction).status).toBe("applied");
-	const expected = f.store.get(f.source.id);
-	const fork = f.fork(checkpoint.seq);
-	expect(f.store.get(fork.id).rngState).toBe(checkpoint.rngState);
-	f.time(100000);
-	f.start(fork.id);
-	for (const direction of route)
-		expect(f.move(direction, fork.id).status).toBe("applied");
-	const actual = f.store.get(fork.id);
-	expect(actual).toMatchObject({
-		apple: expected.apple,
-		rngState: expected.rngState,
-		snake: expected.snake,
-		score: expected.score,
-		applesEaten: 2,
-		gameTimeMs: expected.gameTimeMs,
-	});
-});
+test.each([undefined, 2] as const)(
+	"layout %s restores RNG and generates the same next apple after the inherited prefix",
+	(layoutVersion) => {
+		const f = fixture({ layoutVersion });
+		f.start();
+		const initialRng = f.store.get(f.source.id).rngState;
+		for (const direction of routeToApple(f.store.get(f.source.id)))
+			f.move(direction);
+		const checkpoint = f.store.get(f.source.id);
+		expect(checkpoint.applesEaten).toBe(1);
+		expect(checkpoint.rngState).not.toBe(initialRng);
+		const route = routeToApple(checkpoint);
+		for (const direction of route)
+			expect(f.move(direction).status).toBe("applied");
+		const expected = f.store.get(f.source.id);
+		const fork = f.fork(checkpoint.seq);
+		expect(f.store.get(fork.id).rngState).toBe(checkpoint.rngState);
+		f.time(100000);
+		f.start(fork.id);
+		for (const direction of route)
+			expect(f.move(direction, fork.id).status).toBe("applied");
+		const actual = f.store.get(fork.id);
+		expect(actual).toMatchObject({
+			apple: expected.apple,
+			rngState: expected.rngState,
+			snake: expected.snake,
+			score: expected.score,
+			applesEaten: 2,
+			gameTimeMs: expected.gameTimeMs,
+		});
+	},
+);
 
 test("response start preserves inherited elapsed and last movement time but excludes downtime", () => {
 	const f = fixture();

@@ -10,9 +10,10 @@ import {
 	stateHash,
 } from "../server/game/engine.js";
 import { decisionBody, JEV_MODEL } from "../server/jev/client.js";
+import { gameConfig } from "../server/jev/game-config.js";
 import { MatchService } from "../server/matches/service.js";
 import type { GameConfig } from "../shared/snake/types.js";
-import { publicState } from "../shared/snake/types.js";
+import { directions, publicState, vectors } from "../shared/snake/types.js";
 
 const config: GameConfig = {
 	width: 24,
@@ -111,51 +112,111 @@ test("actual decision request survives acceptance, late rejection and SQLite rer
 	).toThrow();
 });
 describe("engine", () => {
-	test("random layouts are reproducible, connected, non-overlapping and protect spawn", () => {
-		for (const seed of ["red", "green", "blue"]) {
-			const cfg = { ...config, seed, obstacleCount: 12 };
-			const a = createState("a", "A", null, cfg, "now");
-			const b = createState("b", "B", null, cfg, "later");
-			expect(a.obstacles).toEqual(b.obstacles);
-			expect(a.apple).toEqual(b.apple);
-			expect(new Set(a.obstacles.map((p) => `${p.x},${p.y}`)).size).toBe(12);
-			for (const p of a.obstacles) {
-				expect(p.x).toBeGreaterThan(0);
-				expect(p.x).toBeLessThan(cfg.width - 1);
-				expect(p.y).toBeGreaterThan(0);
-				expect(p.y).toBeLessThan(cfg.height - 1);
-				expect(a.snake).not.toContainEqual(p);
-				expect(
-					[1, 2, 3].map((x) => ({ x: a.snake[0].x + x, y: a.snake[0].y })),
-				).not.toContainEqual(p);
+	test.each([undefined, 2] as const)(
+		"layout %s is reproducible, connected, non-overlapping and protects spawn",
+		(layoutVersion) => {
+			for (const seed of ["red", "green", "blue"]) {
+				const cfg = { ...config, seed, obstacleCount: 12, layoutVersion };
+				const a = createState("a", "A", null, cfg, "now");
+				const b = createState("b", "B", null, cfg, "later");
+				expect(a.snake).toEqual(b.snake);
+				expect(a.direction).toBe(b.direction);
+				expect(a.rngState).toBe(b.rngState);
+				expect(a.obstacles).toEqual(b.obstacles);
+				expect(a.apple).toEqual(b.apple);
+				expect(new Set(a.obstacles.map((p) => `${p.x},${p.y}`)).size).toBe(12);
+				for (const p of a.obstacles) {
+					expect(p.x).toBeGreaterThan(0);
+					expect(p.x).toBeLessThan(cfg.width - 1);
+					expect(p.y).toBeGreaterThan(0);
+					expect(p.y).toBeLessThan(cfg.height - 1);
+					expect(a.snake).not.toContainEqual(p);
+					expect(
+						[1, 2, 3].map((step) => ({
+							x: a.snake[0].x + vectors[a.direction].x * step,
+							y: a.snake[0].y + vectors[a.direction].y * step,
+						})),
+					).not.toContainEqual(p);
+				}
+				const blocked = new Set(a.obstacles.map((p) => `${p.x},${p.y}`));
+				const seen = new Set(["0,0"]);
+				const queue = [{ x: 0, y: 0 }];
+				for (let i = 0; i < queue.length; i++)
+					for (const [dx, dy] of [
+						[1, 0],
+						[-1, 0],
+						[0, 1],
+						[0, -1],
+					]) {
+						const p = { x: queue[i].x + dx, y: queue[i].y + dy };
+						const key = `${p.x},${p.y}`;
+						if (
+							p.x >= 0 &&
+							p.y >= 0 &&
+							p.x < cfg.width &&
+							p.y < cfg.height &&
+							!blocked.has(key) &&
+							!seen.has(key)
+						) {
+							seen.add(key);
+							queue.push(p);
+						}
+					}
+				expect(seen.size).toBe(cfg.width * cfg.height - 12);
 			}
-			const blocked = new Set(a.obstacles.map((p) => `${p.x},${p.y}`));
-			const seen = new Set(["0,0"]);
-			const queue = [{ x: 0, y: 0 }];
-			for (let i = 0; i < queue.length; i++)
-				for (const [dx, dy] of [
-					[1, 0],
-					[-1, 0],
-					[0, 1],
-					[0, -1],
-				]) {
-					const p = { x: queue[i].x + dx, y: queue[i].y + dy };
-					const key = `${p.x},${p.y}`;
-					if (
-						p.x >= 0 &&
-						p.y >= 0 &&
-						p.x < cfg.width &&
-						p.y < cfg.height &&
-						!blocked.has(key) &&
-						!seen.has(key)
-					) {
-						seen.add(key);
-						queue.push(p);
+		},
+	);
+	test.each([
+		[24, 18],
+		[7, 7],
+		[7, 1],
+		[8, 6],
+	])(
+		"new %s x %s rounds vary spawn, fit the board and can move three steps",
+		(width, height) => {
+			const headings = new Set<string>();
+			const heads = new Set<string>();
+			for (let i = 0; i < 64; i++) {
+				const cfg = gameConfig(
+					{},
+					{
+						width: String(width),
+						height: String(height),
+						obstacles: height === 18 ? "12" : "0",
+						seed: `spawn-${i}`,
+					},
+				);
+				expect(cfg.layoutVersion).toBe(2);
+				const s = createState("spawn", "Test", null, cfg, "now");
+				headings.add(s.direction);
+				heads.add(JSON.stringify(s.snake[0]));
+				expect(s.snake).toHaveLength(4);
+				expect(new Set(s.snake.map((p) => `${p.x},${p.y}`)).size).toBe(4);
+				for (const [index, point] of s.snake.entries()) {
+					expect(point.x).toBeGreaterThanOrEqual(0);
+					expect(point.y).toBeGreaterThanOrEqual(0);
+					expect(point.x).toBeLessThan(width);
+					expect(point.y).toBeLessThan(height);
+					if (index > 0) {
+						const previous = s.snake[index - 1];
+						expect({
+							x: previous.x - point.x,
+							y: previous.y - point.y,
+						}).toEqual(vectors[s.direction]);
 					}
 				}
-			expect(seen.size).toBe(cfg.width * cfg.height - 12);
-		}
-	});
+				expect(s.snake).not.toContainEqual(s.apple);
+				expect(s.obstacles).not.toContainEqual(s.apple);
+				s.status = "running";
+				for (let step = 0; step < 3; step++)
+					expect(move(s, s.direction).type).not.toBe("gameover");
+			}
+			expect(headings).toEqual(
+				new Set(height >= 7 ? directions : ["right", "left"]),
+			);
+			if (width > 7 || height > 1) expect(heads.size).toBeGreaterThan(1);
+		},
+	);
 	test("apple grows, star does not, expiry happens at its exact boundary", () => {
 		const s = createState("a", "A", null, config, "now");
 		s.status = "running";

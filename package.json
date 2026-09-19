@@ -1,47 +1,63 @@
 {
-  "name": "poker-game",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev --port 3000",
-    "generate-routes": "tsr generate",
-    "build": "vite build",
-    "start": "node .output/server/index.mjs",
-    "preview": "vite preview",
-    "format": "biome format",
-    "lint": "biome lint",
-    "check": "biome check"
-  },
-  "dependencies": {
-    "@fontsource/inter": "^5.1.1",
-    "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/solid-query": "latest",
-    "@tanstack/solid-query-devtools": "latest",
-    "@tanstack/solid-router": "latest",
-    "@tanstack/solid-router-devtools": "latest",
-    "@tanstack/solid-start": "latest",
-    "@tanstack/solid-store": "latest",
-    "@tanstack/store": "latest",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "nitro": "3.0.260610-beta",
-    "solid-js": "^1.9.12",
-    "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^4.1.18",
-    "tailwindcss-animate": "^1.0.7"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.4.5",
-    "@tanstack/devtools-vite": "latest",
-    "@tanstack/router-cli": "^1.133.21",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.0",
-    "vite-plugin-solid": "^2.11.12"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
-  }
+	"name": "poker-game",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev --port 3000",
+		"generate-routes": "tsr generate",
+		"build": "vite build",
+		"start": "node .output/server/index.mjs",
+		"preview": "vite preview",
+		"format": "oxfmt --write src .vscode package.json tsconfig.json tsr.config.json ui.config.json vercel.json vite.config.ts .oxfmtrc.json .oxlintrc.json",
+		"lint": "oxlint src vite.config.ts",
+		"check": "npm run format:check && npm run lint",
+		"format:check": "oxfmt --check src .vscode package.json tsconfig.json tsr.config.json ui.config.json vercel.json vite.config.ts .oxfmtrc.json .oxlintrc.json",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@fontsource/inter": "^5.1.1",
+		"@hono/node-server": "^2.1.1",
+		"@kobalte/core": "^0.13.14",
+		"@tailwindcss/vite": "^4.1.18",
+		"@tanstack/solid-query": "latest",
+		"@tanstack/solid-query-devtools": "latest",
+		"@tanstack/solid-router": "latest",
+		"@tanstack/solid-router-devtools": "latest",
+		"@tanstack/solid-start": "latest",
+		"@tanstack/solid-store": "latest",
+		"@tanstack/store": "latest",
+		"better-sqlite3": "^13.0.3",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"dotenv": "^18.0.1",
+		"hono": "^4.13.8",
+		"nitro": "3.0.260610-beta",
+		"solid-js": "^1.9.12",
+		"tailwind-merge": "^3.0.2",
+		"tailwindcss": "^4.1.18",
+		"tailwindcss-animate": "^1.0.7",
+		"ws": "^8.21.3",
+		"zod": "^4.6.5"
+	},
+	"devDependencies": {
+		"@tanstack/devtools-vite": "latest",
+		"@tanstack/router-cli": "^1.133.21",
+		"@types/better-sqlite3": "^9.6.0",
+		"@types/node": "^26.6.2",
+		"@types/ws": "^8.18.1",
+		"concurrently": "^10.0.5",
+		"oxfmt": "0.68.0",
+		"oxlint": "1.83.0",
+		"tsx": "^4.23.13",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.0",
+		"vite-plugin-solid": "^2.11.12",
+		"vitest": "^5.0.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"lightningcss"
+		]
+	}
 }

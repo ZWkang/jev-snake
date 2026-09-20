@@ -8,7 +8,6 @@ import {
 	Show,
 } from "solid-js";
 import {
-	isJevModel,
 	isResponseMode,
 	type MatchEvent,
 	type PublicState,
@@ -26,6 +25,7 @@ import {
 	stepStatusName,
 } from "./api";
 import { savedProbabilityGaps } from "./contextPresentation";
+import { decisionModelName } from "./modelPresentation";
 
 export function Shell(props: {
 	page: "home" | "watch" | "live" | "history" | "replay";
@@ -36,7 +36,7 @@ export function Shell(props: {
 			<main class="snake-main">{props.children}</main>
 			<footer class="snake-footer">
 				<span>四个方向，无数种可能。</span>
-				<span>每次选择，都有迹可循 · JEV 1.13</span>
+				<span>每次选择，都有迹可循 · 模型决策实验</span>
 			</footer>
 		</div>
 	);
@@ -136,9 +136,7 @@ export function DecisionPanel(props: {
 		<section class="snake-panel decision-panel">
 			<div class="panel-title">
 				<h2>最近收到的决策</h2>
-				<span class="model-tag">
-					{isJevModel(props.state.model) ? "JEV" : "玩家"}
-				</span>
+				<span class="model-tag">{decisionModelName(props.state)}</span>
 			</div>
 			<p class="agent-name">{props.state.agentName}</p>
 			<Show when={props.state.lastAppliedAction}>

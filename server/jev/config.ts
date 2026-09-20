@@ -1,4 +1,3 @@
-import type { JevProvider } from "../../shared/snake/types.js";
 import { parseStagnationSettings } from "./stagnation.js";
 
 export const JEV_PROVIDERS = {
@@ -14,6 +13,8 @@ export const JEV_PROVIDERS = {
 	},
 } as const;
 
+export type ActiveJevProvider = keyof typeof JEV_PROVIDERS;
+
 export function jevConfig(
 	env: Record<string, string | undefined> = process.env,
 ) {
@@ -28,7 +29,7 @@ export function jevConfig(
 	const config = JEV_PROVIDERS[provider];
 	return {
 		...config,
-		provider: provider as JevProvider,
+		provider: provider as ActiveJevProvider,
 		model: env.JEV_MODEL || config.model,
 		apiKey: env[config.keyEnv] ?? "",
 		...(env.JEV_DYNAMIC_ANALYSIS === "false" ? { dynamicAnalysis: false } : {}),

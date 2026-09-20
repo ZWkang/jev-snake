@@ -62,19 +62,16 @@ test("the actual OOM position becomes a complete independent snapshot without re
 	const context = buildDecisionContext(observed);
 	const request = context.request;
 	expect(Object.keys(context)).toEqual(["request"]);
-	expect(request.state.contextVersion).toBe("growth-space-v15");
+	expect(request.state.contextVersion).toBe("compact-growth-v16");
 	expect(Object.keys(request.state).sort()).toEqual([
 		"analysisLimits",
 		"board",
 		"contextVersion",
 		"dynamicFacts",
-		"dynamicSemantics",
 		"excludedMoves",
-		"factsSemantics",
 		"food",
 		"moveFacts",
 		"player",
-		"rules",
 		"timing",
 	]);
 	expect(request.state.timing.observedTick).toBe(275);
@@ -108,7 +105,7 @@ test("live transport preserves an offered model choice and logs at the HTTP boun
 		.mockImplementation(async (_input, init) => {
 			order.push("fetch");
 			const request = JSON.parse(init!.body as string);
-			expect(request.state.contextVersion).toBe("growth-space-v15");
+			expect(request.state.contextVersion).toBe("compact-growth-v16");
 			expect(request.state).not.toHaveProperty("immediateMoves");
 			expect(request.state).not.toHaveProperty("observedSpace");
 			expect(request.state).not.toHaveProperty("localSearch");

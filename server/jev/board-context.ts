@@ -1,6 +1,10 @@
 import { renderAsciiBoard } from "../../shared/snake/ascii-board.js";
 import type { DecisionRequestV6 } from "../../shared/snake/board-context.js";
 import {
+	compactGrowthRequest,
+	type DecisionRequestV16,
+} from "../../shared/snake/compact-growth.js";
+import {
 	analyzeDynamicSpace,
 	describeDynamicSpaceMove,
 	dynamicSpaceSemantics,
@@ -11,8 +15,12 @@ import {
 	analyzeGrowthSpace,
 	describeGrowthSpaceMove,
 	growthSpaceSemantics,
+	liveGrowthLimits,
 } from "../../shared/snake/growth-space-analysis.js";
-import type { DecisionRequestV15 } from "../../shared/snake/growth-space.js";
+import type {
+	DecisionRequestV15,
+	GrowthAnalysisLimits,
+} from "../../shared/snake/growth-space.js";
 import {
 	analyzeLegalSpace,
 	describeLegalSpaceMove,
@@ -33,6 +41,7 @@ import {
 	opposite,
 } from "../../shared/snake/types.js";
 import { JEV_PROVIDERS } from "./config.js";
+import type { GrowthRouteMemory } from "./growth-route-memory.js";
 const JEV_MODEL = JEV_PROVIDERS.typesafe.model;
 export type DecisionTiming = Pick<
 	DecisionContext,
@@ -378,21 +387,29 @@ export function decisionBodyV14(
 }
 
 /** Bounded dynamic evidence; the provider still chooses every submitted move. */
-export function buildDecisionContext(
+export function buildDecisionContextV15(
 	state: PublicState,
 	model: string = JEV_MODEL,
 	timing?: DecisionTiming,
 	progress?: DecisionProgress,
+	search?: { limits: GrowthAnalysisLimits; memory?: GrowthRouteMemory },
 ): { request: DecisionRequestV15 } {
 	const base = buildDecisionContextV13(state, model, timing, progress).request;
 	const observed = base.state;
-	const analysis = analyzeGrowthSpace({
+	const input = {
 		...observed.board,
 		bodyHeadToTail: observed.player.bodyHeadToTail,
 		direction: observed.player.direction,
 		apple: observed.food.apple,
 		star: observed.food.star?.point ?? null,
-	});
+	};
+	const analysis = search?.memory
+		? search.memory.analyze(
+				input,
+				{ matchId: state.id, tick: state.tick },
+				search.limits,
+			)
+		: analyzeGrowthSpace(input, search?.limits);
 	const criteria = Object.fromEntries(
 		directions.flatMap((direction) => {
 			const facts = observed.moveFacts[direction];
@@ -440,11 +457,38 @@ export function buildDecisionContext(
 	};
 }
 
-export function decisionBody(
+export function decisionBodyV15(
 	state: PublicState,
 	model: string = JEV_MODEL,
 	timing?: DecisionTiming,
 	progress?: DecisionProgress,
 ): DecisionRequestV15 {
+	return buildDecisionContextV15(state, model, timing, progress).request;
+}
+
+/** Live search retains bounded proofs and revalidates the previous candidate. */
+export function buildDecisionContext(
+	state: PublicState,
+	model: string = JEV_MODEL,
+	timing?: DecisionTiming,
+	progress?: DecisionProgress,
+	routeMemory?: GrowthRouteMemory,
+): { request: DecisionRequestV16 } {
+	return {
+		request: compactGrowthRequest(
+			buildDecisionContextV15(state, model, timing, progress, {
+				limits: liveGrowthLimits,
+				memory: routeMemory,
+			}).request,
+		),
+	};
+}
+
+export function decisionBody(
+	state: PublicState,
+	model: string = JEV_MODEL,
+	timing?: DecisionTiming,
+	progress?: DecisionProgress,
+): DecisionRequestV16 {
 	return buildDecisionContext(state, model, timing, progress).request;
 }

@@ -18,6 +18,7 @@ import {
 	type DecisionRequestV13,
 	type DecisionRequestV14,
 	type DecisionRequestV15,
+	type DecisionRequestV16,
 	type Direction,
 	type PublicState,
 	directions,
@@ -91,16 +92,18 @@ function validateInput(value: unknown, model: string): EvaluationInput {
 					"legal-space-v13",
 					"dynamic-space-v14",
 					"growth-space-v15",
+					"compact-growth-v16",
 				].includes(request.state.contextVersion)
 			)
 				throw new Error(
-					`${label}: this evaluator accepts V12, V13, V14 or V15 board requests only`,
+					`${label}: this evaluator accepts V12 through V16 board requests only`,
 				);
 			const rawRequest = request as
 				| DecisionRequestV12
 				| DecisionRequestV13
 				| DecisionRequestV14
-				| DecisionRequestV15;
+				| DecisionRequestV15
+				| DecisionRequestV16;
 			const state = rawRequest.state;
 			const observation = entry.observation;
 			const comparisons = {

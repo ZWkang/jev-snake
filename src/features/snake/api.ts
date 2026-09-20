@@ -98,7 +98,7 @@ export const reasonName = (reason: string | null) =>
 				server_shutdown: "服务关闭",
 				controller_stop: "控制者结束对局",
 				stagnation_loop: "费用保护：重复无果循环，已暂停",
-				stagnation_no_apple: "费用保护：长时间未吃苹果，已暂停",
+				stagnation_no_apple: "长时间未吃苹果，结束本局",
 				model_error: "模型调用失败",
 				stale_state: "预期局面已变化",
 				late_action: "动作抵达时已过期",

@@ -50,7 +50,7 @@ test.each([
 			.fn<typeof fetch>()
 			.mockImplementation(async (_, init) => {
 				const request = JSON.parse(String(init?.body));
-				expect(request.state.contextVersion).toBe("growth-space-v15");
+				expect(request.state.contextVersion).toBe("compact-growth-v16");
 				expect(request.state.dynamicFacts[chosen].trap).toMatchObject({
 					status: "proven_trap",
 					moves: maxMoves,

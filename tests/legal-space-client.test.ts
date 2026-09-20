@@ -39,13 +39,12 @@ test("sends static evidence for the real down-51 trap without replacing the mode
 		.fn<typeof globalThis.fetch>()
 		.mockImplementation(async (_, init) => {
 			const sent = JSON.parse(String(init?.body));
-			expect(sent.state.contextVersion).toBe("growth-space-v15");
+			expect(sent.state.contextVersion).toBe("compact-growth-v16");
 			expect(Object.keys(sent.questions.direction.criteria)).toEqual([
 				"up",
 				"down",
 			]);
-			expect(sent.questions.direction.criteria.down).toContain("NO_NEXT_MOVE");
-			expect(sent.questions.direction.criteria.down).toContain("PROVEN_TRAP");
+			expect(sent.questions.direction.criteria.down).toBe("down");
 			expect(sent.state.dynamicFacts.down.trap.status).toBe("proven_trap");
 			expect(sent.state.moveFacts.down).toMatchObject({
 				reachableFreeCells: 0,

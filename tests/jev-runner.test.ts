@@ -196,20 +196,17 @@ function expectProgressForwarded(
 ) {
 	expect(bodies.length).toBeGreaterThan(0);
 	for (const body of bodies) {
-		expect(body.state.contextVersion).toBe("growth-space-v15");
+		expect(body.state.contextVersion).toBe("compact-growth-v16");
 		expect(Object.keys(body.state).sort()).toEqual([
 			"analysisLimits",
 			"board",
 			"contextVersion",
 			"dynamicFacts",
-			"dynamicSemantics",
 			"excludedMoves",
-			"factsSemantics",
 			"food",
 			"moveFacts",
 			"player",
 			"progress",
-			"rules",
 			"timing",
 		]);
 		const context = contexts.find(
@@ -292,7 +289,7 @@ test.each(["response-fast", "response-slow"] as const)(
 				action.state.lastDecision?.request,
 			);
 			expect(action.state.lastDecision?.request?.state.contextVersion).toBe(
-				"growth-space-v15",
+				"compact-growth-v16",
 			);
 			expect(action.state.lastDecision?.contextBuildMs).toBeGreaterThanOrEqual(
 				0,

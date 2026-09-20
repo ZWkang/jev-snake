@@ -386,9 +386,9 @@ test("with spending protection explicitly disabled, fork runner continues from h
 	expect(bodies.map((body) => body.state.timing.observedTick)).toEqual([
 		11, 12, 13, 14,
 	]);
-	expect(bodies[0].state.contextVersion).toBe("growth-space-v15");
+	expect(bodies[0].state.contextVersion).toBe("compact-growth-v16");
 	for (const body of bodies) {
-		expect(body.state.contextVersion).toBe("growth-space-v15");
+		expect(body.state.contextVersion).toBe("compact-growth-v16");
 		const geometry = {
 			config: body.state.board,
 			snake: body.state.player.bodyHeadToTail,
@@ -407,14 +407,11 @@ test("with spending protection explicitly disabled, fork runner continues from h
 			"board",
 			"contextVersion",
 			"dynamicFacts",
-			"dynamicSemantics",
 			"excludedMoves",
-			"factsSemantics",
 			"food",
 			"moveFacts",
 			"player",
 			"progress",
-			"rules",
 			"timing",
 		]);
 		for (const criterion of Object.values(body.questions.direction.criteria))

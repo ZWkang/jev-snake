@@ -13,6 +13,7 @@ import { GrowthSpaceInput } from "./GrowthSpaceInput";
 import { ImmediateMovesInput } from "./ImmediateMovesInput";
 import { LegalSpaceInput } from "./LegalSpaceInput";
 import { LocalSearchInput } from "./LocalSearchInput";
+import { providerName } from "./modelPresentation";
 import { ObservedSpaceInput } from "./ObservedSpaceInput";
 import { OpportunityEvidence } from "./OpportunityEvidence";
 import {
@@ -183,11 +184,7 @@ export function DecisionInput(props: {
 										<dt>请求模型</dt>
 										<dd>{input().model}</dd>
 										<Show when={decision()?.provider}>
-											<small>
-												{decision()?.provider === "typesafe"
-													? "Typesafe 直连"
-													: "OpenRouter"}
-											</small>
+											{(provider) => <small>{providerName(provider())}</small>}
 										</Show>
 									</div>
 								</dl>

@@ -86,7 +86,7 @@ test("V13 displays archived board, legal-space facts and exact string criteria w
 	expect(presentation.legalSpaceRequest).toBe(request);
 	expect(presentation.modelPlanningRequest).toBeUndefined();
 	expect(presentation.semantics).toContain(
-		"即使只剩一个合法选项，也会实际调用 JEV",
+		"即使只剩一个合法选项，也会实际调用 test-model",
 	);
 	expect(presentation.semantics).toContain("启发式风险，不是必死证明");
 	expect(presentation.probabilityNote).toBe(

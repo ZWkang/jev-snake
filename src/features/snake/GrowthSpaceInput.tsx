@@ -1,10 +1,17 @@
 import { For, Show } from "solid-js";
+import type { DecisionRequestV16 } from "../../../shared/snake/compact-growth";
 import type { DecisionRequestV15 } from "../../../shared/snake/growth-space";
 import { directions } from "../../../shared/snake/types";
 import { directionName } from "./api";
-import { presentGrowthSpaceMove } from "./contextPresentation";
+import {
+	presentGrowthSpaceMove,
+	savedDynamicSemantics,
+} from "./contextPresentation";
+import { modelName } from "./modelPresentation";
 
-export function GrowthSpaceInput(props: { request: DecisionRequestV15 }) {
+export function GrowthSpaceInput(props: {
+	request: DecisionRequestV15 | DecisionRequestV16;
+}) {
 	const limits = () => props.request.state.analysisLimits;
 	const options = () =>
 		directions.filter((direction) =>
@@ -14,8 +21,11 @@ export function GrowthSpaceInput(props: { request: DecisionRequestV15 }) {
 		<section aria-label="动态空间与吃果后续检查">
 			<h3>动态空间与吃果后续检查</h3>
 			<p class="decision-input-note">
-				以下是当时保存的模型输入。方向必困分析最多检查 {limits().trapDepth}{" "}
-				步，寻找当前苹果最多检查 {limits().appleDepth}{" "}
+				{props.request.state.contextVersion === "compact-growth-v16"
+					? "以下按当时保存的动态事实提供中文解释，这些解释原文不是请求正文。"
+					: "以下是当时保存的模型输入。"}
+				方向必困分析最多检查 {limits().trapDepth} 步，寻找当前苹果最多检查{" "}
+				{limits().appleDepth}{" "}
 				步，两者都包含本次候选移动。每个吃果到达方式继续检查最多{" "}
 				{limits().postAppleDepth} 步，这部分从吃果后开始计数，不含吃果这一步。
 			</p>
@@ -26,13 +36,15 @@ export function GrowthSpaceInput(props: { request: DecisionRequestV15 }) {
 			</p>
 			<p class="decision-input-note">
 				吃果后按“不再增长”的乐观条件检查身体与尾巴移动，不生成或预测新苹果。窗口内能走不保证真实后续安全，未知与节点限额也不是安全结论。跳过已证明困死的吃果到达方式，不会从
-				JEV 选项中移除整个方向；每一步仍执行模型真实选择。
+				{modelName(props.request.model)}{" "}
+				选项中移除整个方向；每一步仍执行模型真实选择。
 			</p>
 			<For each={options()}>
 				{(direction) => (
 					<Show when={props.request.state.dynamicFacts[direction]}>
 						{(facts) => {
-							const view = () => presentGrowthSpaceMove(facts());
+							const view = () =>
+								presentGrowthSpaceMove(facts(), modelName(props.request.model));
 							const rows = () => [
 								["方向必困判断", view().trap],
 								["方向分析已探索", view().trapNodes],
@@ -65,10 +77,14 @@ export function GrowthSpaceInput(props: { request: DecisionRequestV15 }) {
 					</Show>
 				)}
 			</For>
-			<details>
-				<summary>实际发送的动态事实定义</summary>
-				<p>{props.request.state.dynamicSemantics}</p>
-			</details>
+			<Show when={savedDynamicSemantics(props.request)}>
+				{(semantics) => (
+					<details>
+						<summary>实际发送的动态事实定义</summary>
+						<p>{semantics()}</p>
+					</details>
+				)}
+			</Show>
 		</section>
 	);
 }

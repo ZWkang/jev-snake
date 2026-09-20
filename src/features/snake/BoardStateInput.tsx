@@ -1,6 +1,7 @@
 import { Show } from "solid-js";
 import type { DecisionRequestV6 } from "../../../shared/snake/board-context";
 import type { DecisionRequestV9 } from "../../../shared/snake/bounded-search";
+import type { DecisionRequestV16 } from "../../../shared/snake/compact-growth";
 import type { DecisionRequestV14 } from "../../../shared/snake/dynamic-space";
 import type { DecisionRequestV8 } from "../../../shared/snake/global-view";
 import type { DecisionRequestV15 } from "../../../shared/snake/growth-space";
@@ -36,7 +37,8 @@ export function BoardStateInput(props: {
 		| DecisionRequestV12
 		| DecisionRequestV13
 		| DecisionRequestV14
-		| DecisionRequestV15;
+		| DecisionRequestV15
+		| DecisionRequestV16;
 	currentTick?: number;
 	onShowDecisionFrame?: () => void;
 }) {

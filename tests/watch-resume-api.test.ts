@@ -80,7 +80,7 @@ test("HTTP/WS runner resumes the same saved round after shutdown with a fresh co
 		const originalTokenHash = game.store.controlHash(id);
 		expect(before.tick).toBe(1);
 		expect(before.lastDecision?.request?.state.contextVersion).toBe(
-			"growth-space-v15",
+			"compact-growth-v16",
 		);
 		await game.close();
 		allowTick = 1;
@@ -110,13 +110,13 @@ test("HTTP/WS runner resumes the same saved round after shutdown with a fresh co
 		const restored = (await response.json()) as PublicState;
 		expect(restored.tick).toBe(2);
 		expect(restored.lastDecision?.request?.state.contextVersion).toBe(
-			"growth-space-v15",
+			"compact-growth-v16",
 		);
 		expect(requests.map((r) => r.state.timing.observedTick)).toEqual([
 			0, 1, 1, 2,
 		]);
 		for (const request of requests) {
-			expect(request.state.contextVersion).toBe("growth-space-v15");
+			expect(request.state.contextVersion).toBe("compact-growth-v16");
 			expect(Object.keys(request.questions.direction.criteria)).toEqual(
 				directions.filter(
 					(direction) =>
@@ -137,14 +137,11 @@ test("HTTP/WS runner resumes the same saved round after shutdown with a fresh co
 				"board",
 				"contextVersion",
 				"dynamicFacts",
-				"dynamicSemantics",
 				"excludedMoves",
-				"factsSemantics",
 				"food",
 				"moveFacts",
 				"player",
 				"progress",
-				"rules",
 				"timing",
 			]);
 			for (const criterion of Object.values(
@@ -160,7 +157,7 @@ test("HTTP/WS runner resumes the same saved round after shutdown with a fresh co
 		expect(actions).toHaveLength(2);
 		for (const event of actions) {
 			expect(event.state.lastDecision?.request?.state.contextVersion).toBe(
-				"growth-space-v15",
+				"compact-growth-v16",
 			);
 			expect(requests).toContainEqual(event.state.lastDecision?.request);
 			expect(Object.keys(event.state.lastDecision!.probabilities)).toEqual(

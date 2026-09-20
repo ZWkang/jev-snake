@@ -4,6 +4,7 @@ import type {
 	DecisionRequestV9,
 	LocalSearchMove,
 } from "../../../shared/snake/bounded-search";
+import type { DecisionRequestV16 } from "../../../shared/snake/compact-growth";
 import type {
 	DecisionRequestV14,
 	DynamicMoveFacts,
@@ -41,6 +42,7 @@ import type {
 	DecisionRequestV5,
 	PublicState,
 } from "../../../shared/snake/types";
+import { modelName } from "./modelPresentation";
 
 function storedVersion(request: unknown): unknown {
 	if (typeof request !== "object" || request === null || !("state" in request))
@@ -127,13 +129,28 @@ function isDynamicSpaceContext(
 	return storedVersion(request) === "dynamic-space-v14";
 }
 
-function isGrowthSpaceContext(request: unknown): request is DecisionRequestV15 {
-	return storedVersion(request) === "growth-space-v15";
+function isCompactGrowthContext(
+	request: unknown,
+): request is DecisionRequestV16 {
+	return storedVersion(request) === "compact-growth-v16";
+}
+
+function isGrowthSpaceContext(
+	request: unknown,
+): request is DecisionRequestV15 | DecisionRequestV16 {
+	return (
+		storedVersion(request) === "growth-space-v15" ||
+		isCompactGrowthContext(request)
+	);
 }
 
 function isSpaceContext(
 	request: unknown,
-): request is DecisionRequestV13 | DecisionRequestV14 | DecisionRequestV15 {
+): request is
+	| DecisionRequestV13
+	| DecisionRequestV14
+	| DecisionRequestV15
+	| DecisionRequestV16 {
 	return (
 		isLegalSpaceContext(request) ||
 		isDynamicSpaceContext(request) ||
@@ -236,6 +253,18 @@ export function savedStrategyGuide(request: unknown) {
 		: undefined;
 }
 
+export function savedFactsSemantics(request: unknown) {
+	return isSpaceContext(request) && "factsSemantics" in request.state
+		? request.state.factsSemantics
+		: undefined;
+}
+
+export function savedDynamicSemantics(request: unknown) {
+	return isSpaceContext(request) && "dynamicSemantics" in request.state
+		? request.state.dynamicSemantics
+		: undefined;
+}
+
 function isBoardStateContext(
 	request: unknown,
 ): request is
@@ -248,7 +277,8 @@ function isBoardStateContext(
 	| DecisionRequestV12
 	| DecisionRequestV13
 	| DecisionRequestV14
-	| DecisionRequestV15 {
+	| DecisionRequestV15
+	| DecisionRequestV16 {
 	return (
 		storedVersion(request) === "board-state-v6" ||
 		isLocalMovesContext(request) ||
@@ -388,7 +418,10 @@ export function presentGrowthPostApple(check: GrowthPostAppleCheck | null) {
 	}
 }
 
-export function presentGrowthSpaceMove(move: GrowthMoveFacts) {
+export function presentGrowthSpaceMove(
+	move: GrowthMoveFacts,
+	modelLabel = "模型",
+) {
 	let trap: string;
 	switch (move.trap.status) {
 		case "proven_trap":
@@ -458,7 +491,7 @@ export function presentGrowthSpaceMove(move: GrowthMoveFacts) {
 				? "无单个到达方式的检查结果"
 				: `${move.apple.postApple.exploredNodes} 个节点（该到达方式）`,
 		postAppleTotal: `${move.apple.postAppleNodes} 个节点（本方向所有吃果到达方式累计，共享预算）`,
-		rejectedArrivals: `${move.apple.rejectedTrapArrivals} 次吃果到达检查被证明困死并跳过（按检查次数统计）；未因此移除该方向的 JEV 选项`,
+		rejectedArrivals: `${move.apple.rejectedTrapArrivals} 次吃果到达检查被证明困死并跳过（按检查次数统计）；未因此移除该方向的 ${modelLabel} 选项`,
 		appleTermination: {
 			found: "找到候选到达方式后停止，不表示路线最短或已比较全部路线",
 			exhausted:
@@ -561,18 +594,18 @@ export function presentDecisionContext(
 	const version = storedVersion(request);
 	let supportedRequest: DecisionRequest | PlanRequest | undefined;
 	let semantics: string;
-	if (isGrowthSpaceContext(request)) {
+	if (isCompactGrowthContext(request)) {
 		supportedRequest = request;
-		semantics =
-			"程序为全部本步合法方向计算静态事实和有限动态续路，并继续检查候选路线吃果后的身体移动。吃果后不再增长是乐观条件，不代表真实未来；只有穷尽续路且排除未来提前满盘的可能，才标记必困。窗口续路、近满盘未知与节点限额均不等于安全。被跳过的是已证明困死的吃果到达方式，不是模型方向；同方向所有到达方式共享吃果后续检查预算。JEV 仍从全部本步合法方向中真实选择，程序不替换选择、不自动沿路线执行，也不预测新苹果。";
+		semantics = `这是精简后的真实请求：完整字符图、坐标、静态事实、动态检查、预算和历史仍按保存值展示；方向选项使用实际发送的短字符串。规则与判定要求集中在 instructions，没有另行发送 rules、factsSemantics 或 dynamicSemantics。下面的中文事实解释由回放界面提供，不代表这些解释原文曾发送给模型；复制 JSON 只包含实际保存的正文。有限窗口和乐观续路不保证安全，未知不等于无路；${modelName(request.model)} 仍自行选择，本地不会自动沿路线执行。`;
+	} else if (isGrowthSpaceContext(request)) {
+		supportedRequest = request;
+		semantics = `程序为全部本步合法方向计算静态事实和有限动态续路，并继续检查候选路线吃果后的身体移动。吃果后不再增长是乐观条件，不代表真实未来；只有穷尽续路且排除未来提前满盘的可能，才标记必困。窗口续路、近满盘未知与节点限额均不等于安全。被跳过的是已证明困死的吃果到达方式，不是模型方向；同方向所有到达方式共享吃果后续检查预算。${modelName(request.model)} 仍从全部本步合法方向中真实选择，程序不替换选择、不自动沿路线执行，也不预测新苹果。`;
 	} else if (isDynamicSpaceContext(request)) {
 		supportedRequest = request;
-		semantics =
-			"程序先排除直接反向及本步碰撞，再为全部本步合法方向提供静态空间事实和有限动态分析。动态分析跟随身体与蛇尾移动，区分全部分支已证明必困、仅窗口内存活、到达苹果后的未知和节点限额；另查当前苹果候选路线及其增长后的即时出口与静态尾部邻接。不预测新苹果，不把未知当安全或无路。模型仍从全部本步合法方向中选择，程序不替换模型选择，也不自动沿候选路线移动；只有一个合法选项时仍调用 JEV。";
+		semantics = `程序先排除直接反向及本步碰撞，再为全部本步合法方向提供静态空间事实和有限动态分析。动态分析跟随身体与蛇尾移动，区分全部分支已证明必困、仅窗口内存活、到达苹果后的未知和节点限额；另查当前苹果候选路线及其增长后的即时出口与静态尾部邻接。不预测新苹果，不把未知当安全或无路。模型仍从全部本步合法方向中选择，程序不替换模型选择，也不自动沿候选路线移动；只有一个合法选项时仍调用 ${modelName(request.model)}。`;
 	} else if (isLegalSpaceContext(request)) {
 		supportedRequest = request;
-		semantics =
-			"程序先排除直接反向及本步会撞墙、障碍或蛇身的方向，再为每个合法方向模拟一步，计算静态可达空格、尾部邻接和下一步合法出口。JEV 根据这些事实和完整棋盘选择方向；本步合法不保证长期安全，DEAD_END_RISK 是启发式风险，不是必死证明。即使只剩一个合法选项，也会实际调用 JEV。";
+		semantics = `程序先排除直接反向及本步会撞墙、障碍或蛇身的方向，再为每个合法方向模拟一步，计算静态可达空格、尾部邻接和下一步合法出口。${modelName(request.model)} 根据这些事实和完整棋盘选择方向；本步合法不保证长期安全，DEAD_END_RISK 是启发式风险，不是必死证明。即使只剩一个合法选项，也会实际调用 ${modelName(request.model)}。`;
 	} else if (isNonReverseContext(request)) {
 		supportedRequest = request;
 		semantics =

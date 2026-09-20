@@ -97,19 +97,16 @@ test("uses the real Decisions contract and preserves probabilities", async () =>
 		"obstacles",
 		"width",
 	]);
-	expect(body.state.contextVersion).toBe("growth-space-v15");
+	expect(body.state.contextVersion).toBe("compact-growth-v16");
 	expect(Object.keys(body.state).sort()).toEqual([
 		"analysisLimits",
 		"board",
 		"contextVersion",
 		"dynamicFacts",
-		"dynamicSemantics",
 		"excludedMoves",
-		"factsSemantics",
 		"food",
 		"moveFacts",
 		"player",
-		"rules",
 		"timing",
 	]);
 	expect(Object.keys(body.questions.direction.criteria)).toEqual(
@@ -335,8 +332,10 @@ test("response requests describe one real move with observed elapsed time and no
 		tickIntervalMs: null,
 		deadlineInMs: null,
 	});
-	expect(body.state.rules.mechanics).toContain("waits for your response");
-	expect(body.state.rules.objective).not.toContain("keeps moving");
+	expect(body.questions.direction.instructions).toContain(
+		"one offered absolute direction for the next move",
+	);
+	expect(body.state).not.toHaveProperty("rules");
 	expect(result.request).toEqual(body);
 	expect(responseState).toEqual(before);
 	expect(JSON.stringify(result)).not.toContain("response-test-key");

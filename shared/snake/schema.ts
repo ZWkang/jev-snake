@@ -18,6 +18,7 @@ import { decisionRequestV12Schema } from "./context-v12-schema.js";
 import { decisionRequestV13Schema } from "./context-v13-schema.js";
 import { decisionRequestV14Schema } from "./context-v14-schema.js";
 import { decisionRequestV15Schema } from "./context-v15-schema.js";
+import { decisionRequestV16Schema } from "./context-v16-schema.js";
 import {
 	isStagnationStopReason,
 	stagnationStopReasons,
@@ -182,33 +183,35 @@ function contextVersion(value: unknown): unknown {
 // Select the shape before parsing. A malformed versioned request never reaches a legacy parser.
 export const decisionRequestSchema = z.unknown().transform((value, context) => {
 	const result = (
-		contextVersion(value) === "growth-space-v15"
-			? decisionRequestV15Schema
-			: contextVersion(value) === "dynamic-space-v14"
-				? decisionRequestV14Schema
-				: contextVersion(value) === "legal-space-v13"
-					? decisionRequestV13Schema
-					: contextVersion(value) === "non-reverse-v12"
-						? decisionRequestV12Schema
-						: contextVersion(value) === "model-planning-v11"
-							? decisionRequestV11Schema
-							: contextVersion(value) === "post-apple-v10"
-								? decisionRequestV10Schema
-								: contextVersion(value) === "bounded-search-v9"
-									? decisionRequestV9Schema
-									: contextVersion(value) === "global-view-v8"
-										? decisionRequestV8Schema
-										: contextVersion(value) === "local-moves-v7"
-											? decisionRequestV7Schema
-											: contextVersion(value) === "board-state-v6"
-												? decisionRequestV6Schema
-												: contextVersion(value) === "action-outcomes-v5"
-													? decisionRequestV5Schema
-													: contextVersion(value) === "action-facts-v4"
-														? decisionRequestV4Schema
-														: contextVersion(value) === "action-facts-v3"
-															? decisionRequestV3Schema
-															: legacyDecisionRequestSchema
+		contextVersion(value) === "compact-growth-v16"
+			? decisionRequestV16Schema
+			: contextVersion(value) === "growth-space-v15"
+				? decisionRequestV15Schema
+				: contextVersion(value) === "dynamic-space-v14"
+					? decisionRequestV14Schema
+					: contextVersion(value) === "legal-space-v13"
+						? decisionRequestV13Schema
+						: contextVersion(value) === "non-reverse-v12"
+							? decisionRequestV12Schema
+							: contextVersion(value) === "model-planning-v11"
+								? decisionRequestV11Schema
+								: contextVersion(value) === "post-apple-v10"
+									? decisionRequestV10Schema
+									: contextVersion(value) === "bounded-search-v9"
+										? decisionRequestV9Schema
+										: contextVersion(value) === "global-view-v8"
+											? decisionRequestV8Schema
+											: contextVersion(value) === "local-moves-v7"
+												? decisionRequestV7Schema
+												: contextVersion(value) === "board-state-v6"
+													? decisionRequestV6Schema
+													: contextVersion(value) === "action-outcomes-v5"
+														? decisionRequestV5Schema
+														: contextVersion(value) === "action-facts-v4"
+															? decisionRequestV4Schema
+															: contextVersion(value) === "action-facts-v3"
+																? decisionRequestV3Schema
+																: legacyDecisionRequestSchema
 	).safeParse(value);
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) context.addIssue({ ...issue });
@@ -270,7 +273,7 @@ export const forkSchema = createSchema
 	.strict();
 const decisionEnvelopeSchema = z
 	.object({
-		provider: z.enum(["typesafe", "openrouter"]).optional(),
+		provider: z.enum(["typesafe", "openrouter", "laya"]).optional(),
 		model: z.string().min(1),
 		choice: z.enum(directions),
 		probabilities: z.partialRecord(
@@ -294,7 +297,8 @@ export const decisionSchema = decisionEnvelopeSchema.superRefine(
 			request?.state.contextVersion === "non-reverse-v12" ||
 			request?.state.contextVersion === "legal-space-v13" ||
 			request?.state.contextVersion === "dynamic-space-v14" ||
-			request?.state.contextVersion === "growth-space-v15"
+			request?.state.contextVersion === "growth-space-v15" ||
+			request?.state.contextVersion === "compact-growth-v16"
 				? Object.keys(request.questions.direction.criteria)
 				: [...directions];
 		const keys = Object.keys(value.probabilities);

@@ -5,7 +5,6 @@ import {
 	type DecisionProgress,
 	type DecisionRequest,
 	directions,
-	type JevProvider,
 	type PublicState,
 } from "../../shared/snake/types.js";
 import type { WitnessArchive } from "../../shared/snake/witness-context.js";
@@ -14,7 +13,8 @@ import {
 	buildDecisionContextV13,
 	type DecisionTiming,
 } from "./board-context.js";
-import { JEV_PROVIDERS } from "./config.js";
+import { JEV_PROVIDERS, type ActiveJevProvider } from "./config.js";
+import type { GrowthRouteMemory } from "./growth-route-memory.js";
 export {
 	buildDecisionContext,
 	decisionBody,
@@ -27,6 +27,8 @@ export {
 	decisionBodyV13,
 	buildDecisionContextV14,
 	decisionBodyV14,
+	buildDecisionContextV15,
+	decisionBodyV15,
 } from "./board-context.js";
 export type { DecisionTiming } from "./board-context.js";
 
@@ -53,11 +55,12 @@ export const JEV_ENDPOINT = JEV_PROVIDERS.typesafe.endpoint;
 type JevOptions = {
 	fetch?: typeof fetch;
 	signal?: AbortSignal;
-	provider?: JevProvider;
+	provider?: ActiveJevProvider;
 	model?: string;
 	timing?: DecisionTiming;
 	progress?: DecisionProgress;
 	dynamicAnalysis?: boolean;
+	routeMemory?: GrowthRouteMemory;
 	onRequestStarted?: () => void;
 };
 export function askJev(
@@ -66,16 +69,18 @@ export function askJev(
 	options: JevOptions = {},
 ): Promise<Decision> {
 	const started = performance.now();
-	const build =
+	const model =
+		options.model ?? JEV_PROVIDERS[options.provider ?? "typesafe"].model;
+	const { request } =
 		options.dynamicAnalysis === false
-			? buildDecisionContextV13
-			: buildDecisionContext;
-	const { request } = build(
-		state,
-		options.model ?? JEV_PROVIDERS[options.provider ?? "typesafe"].model,
-		options.timing,
-		options.progress,
-	);
+			? buildDecisionContextV13(state, model, options.timing, options.progress)
+			: buildDecisionContext(
+					state,
+					model,
+					options.timing,
+					options.progress,
+					options.routeMemory,
+				);
 	const contextBuildMs = performance.now() - started;
 	return sendJevRequest(apiKey, request, { ...options, contextBuildMs }).then(
 		(result) => result.decision,

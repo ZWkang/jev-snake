@@ -29,7 +29,7 @@ export function HomePage() {
 		<Shell page="home">
 			<div class="page-heading">
 				<div>
-					<p class="page-context">JEV 贪吃蛇 · 实时决策实验</p>
+					<p class="page-context">贪吃蛇 · 模型实时决策实验</p>
 					<h1>四个方向，无数种可能。</h1>
 				</div>
 				<span class="outlined-tag">免登录 · 只读观战</span>

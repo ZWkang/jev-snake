@@ -19,10 +19,10 @@ export const Route = createRootRouteWithContext()({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "SNAKE · JEV 贪吃蛇观战" },
+			{ title: "SNAKE · 贪吃蛇模型观战" },
 			{
 				name: "description",
-				content: "看 JEV 实时做出方向选择，浏览真实对局与历史回放。",
+				content: "看模型实时做出方向选择，浏览真实对局与历史回放。",
 			},
 		],
 	}),

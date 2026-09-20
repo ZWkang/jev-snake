@@ -12,6 +12,7 @@ import {
 import { askJev } from "./client.js";
 import type { jevConfig } from "./config.js";
 import { gameClient } from "./game-client.js";
+import { GrowthRouteMemory } from "./growth-route-memory.js";
 import { evaluateStagnation } from "./stagnation.js";
 
 export type RunJevOptions = {
@@ -35,6 +36,7 @@ export async function runJevMatch(
 		throw new Error("Only response single-step matches can run");
 	const protocolVersion = 1;
 	const request = gameClient(root);
+	const routeMemory = new GrowthRouteMemory();
 	const socket = new WebSocket(
 		`${root.replace(/^http/, "ws")}/ws/matches/${latest.id}/control`,
 		{ headers: { Authorization: `Bearer ${controlToken}` } },
@@ -253,6 +255,7 @@ export async function runJevMatch(
 			inference = new AbortController();
 			const decision = await askJev(jev.apiKey, context.state, {
 				dynamicAnalysis: jev.dynamicAnalysis,
+				routeMemory,
 				onRequestStarted: () => {
 					inFlight.request = {
 						observedTick: context.state.tick,

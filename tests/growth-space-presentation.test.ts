@@ -190,7 +190,7 @@ test("V15 distinguishes apple-arrival moves from subsequent post-apple moves and
 		"23 个节点（本方向所有吃果到达方式累计，共享预算）",
 	);
 	expect(view.rejectedArrivals).toContain("2 次吃果到达检查");
-	expect(view.rejectedArrivals).toContain("未因此移除该方向的 JEV 选项");
+	expect(view.rejectedArrivals).toContain("未因此移除该方向的 模型 选项");
 	expect(view.appleExit).toContain("后续检查另列");
 	expect(view.appleTail).toContain("不保证动态追尾可行");
 	expect(view.appleTermination).toContain("不表示路线最短");

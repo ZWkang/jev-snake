@@ -17,6 +17,17 @@ export const defaultGrowthLimits: Readonly<GrowthAnalysisLimits> =
 		postAppleDepth: 8,
 		maxNodesPerSearch: 2048,
 	});
+export const liveGrowthLimits: Readonly<GrowthAnalysisLimits> = Object.freeze({
+	...defaultGrowthLimits,
+	appleDepth: 128,
+});
+
+/** Internal search witnesses; neither paths nor automatic actions are emitted. */
+export type GrowthRouteWitnesses = Partial<Record<Direction, Direction[]>>;
+export type GrowthSearchOptions = {
+	retainedRoutes?: GrowthRouteWitnesses;
+	onRouteFound?: (direction: Direction, route: Direction[]) => void;
+};
 export const growthSpaceSemantics =
 	"Every legal first direction is retained and analyzed independently with identical explicit limits. Trap moves includes the first action as move 1. The full ordered body moves and grows at the currently observed apple. After that apple, ateApple remains true and no future food or RNG is sampled: further growth is omitted as an optimistic relaxation. Failure of every optimistic continuation proves a trap only after excluding a possible earlier board-completion win from additional growth. If the remaining free cells could be filled within the longest remaining continuation, unknown_near_win with null moves is reported instead of death. horizon_reached witnesses the checked window before any apple; optimistic_horizon_reached witnesses only a no-further-growth continuation, not survival under real future food. node_limit is unresolved and has null moves. board_complete is a found winning continuation, not necessarily this first move. Apple search is bounded best-first using g+16*Manhattan, and a found route is not shortest or optimal. Each apple arrival is checked for up to postAppleDepth subsequent moves; its postApple.moves excludes the eating move and starts at 0. A proven-trapped arrival is rejected and other body arrangements are still searched. route_with_optimistic_continuation requires a full postAppleDepth optimistic continuation; it is not a safe route. route_postcheck_unknown retains only an unresolved postcheck, never a safety certificate. route_wins fills all traversable cells. Unknown arrivals do not stop the search for a stronger arrival while budgets remain. Apple exploredNodes counts expanded states, excluding stale worse arrivals. Total enqueued and visited states are also bounded by maxNodesPerSearch. All post-apple checks for one first direction share a separate cumulative maxNodesPerSearch node budget; postAppleNodes includes every such check, including rejectedTrapArrivals. Each postcheck exploredNodes counts its root at depth0 when budget is available, and may be0 if the shared budget is already exhausted. Search exhaustion, depth limits, node limits and postcheck node limits are explicit; no_qualifying_route_found is not proof that no useful route exists. Paths and recommendations are never supplied. Static tail connection and immediate exits are supporting facts, not long-term safety.";
 
@@ -175,15 +186,32 @@ function positionKey(position: Position): string {
 	return `${position.ateApple ? 1 : 0}:${position.direction}:${position.snake.map((point) => `${point.x},${point.y}`).join(";")}`;
 }
 
+type RouteLink = { direction: Direction; previous: RouteLink | null };
+function routeDirections(link: RouteLink): Direction[] {
+	const route: Direction[] = [];
+	for (
+		let current: RouteLink | null = link;
+		current;
+		current = current.previous
+	)
+		route.push(current.direction);
+	return route.reverse();
+}
+
 type QueuedPosition = {
 	position: Position;
 	key: string;
 	estimate: number;
 	distance: number;
 	order: number;
+	route: RouteLink;
+	followsRetainedRoute: boolean;
 };
 const priority = (a: QueuedPosition, b: QueuedPosition) =>
-	a.estimate - b.estimate || a.distance - b.distance || a.order - b.order;
+	Number(b.followsRetainedRoute) - Number(a.followsRetainedRoute) ||
+	a.estimate - b.estimate ||
+	a.distance - b.distance ||
+	a.order - b.order;
 
 class PositionHeap {
 	private items: QueuedPosition[] = [];
@@ -227,6 +255,7 @@ function appleSearch(
 	input: LegalSpaceInput,
 	first: Position,
 	limits: GrowthAnalysisLimits,
+	options: GrowthSearchOptions,
 ): GrowthMoveFacts["apple"] {
 	const empty = {
 		moves: null,
@@ -256,7 +285,13 @@ function appleSearch(
 	let depthLimited = false,
 		nodeLimited = false,
 		postLimited = false;
-	function enqueue(position: Position, key: string) {
+	const retainedRoute = options.retainedRoutes?.[first.direction];
+	function enqueue(
+		position: Position,
+		key: string,
+		route: RouteLink,
+		followsRetainedRoute: boolean,
+	) {
 		const head = position.snake[0];
 		const distance =
 			Math.abs(head.x - input.apple!.x) + Math.abs(head.y - input.apple!.y);
@@ -266,15 +301,23 @@ function appleSearch(
 			distance,
 			estimate: position.depth + 16 * distance,
 			order: queuedNodes++,
+			route,
+			followsRetainedRoute,
 		});
 		visited.set(key, position.depth);
 	}
-	enqueue(first, positionKey(first));
+	enqueue(
+		first,
+		positionKey(first),
+		{ direction: first.direction, previous: null },
+		retainedRoute?.[0] === first.direction,
+	);
 	while (queue.length) {
-		const { position, key } = queue.pop();
+		const { position, key, route, followsRetainedRoute } = queue.pop();
 		if (visited.get(key) !== position.depth) continue;
 		exploredNodes++;
-		if (wins(input, position))
+		if (wins(input, position)) {
+			options.onRouteFound?.(first.direction, routeDirections(route));
 			return {
 				status: "route_wins",
 				...empty,
@@ -284,6 +327,7 @@ function appleSearch(
 				postAppleNodes: postBudget.used,
 				rejectedTrapArrivals,
 			};
+		}
 		const next = legalNext(input, position);
 		if (position.ateApple) {
 			const postApple = postAppleCheck(input, position, limits, postBudget);
@@ -295,7 +339,8 @@ function appleSearch(
 					canReachTail: staticTailConnection(input, position.snake),
 					postApple,
 				};
-				if (postApple.status === "optimistic_horizon_reached")
+				if (postApple.status === "optimistic_horizon_reached") {
+					options.onRouteFound?.(first.direction, routeDirections(route));
 					return {
 						status: "route_with_optimistic_continuation",
 						...arrival,
@@ -304,6 +349,7 @@ function appleSearch(
 						postAppleNodes: postBudget.used,
 						rejectedTrapArrivals,
 					};
+				}
 				if (
 					!unknown ||
 					(unknown.postApple!.status === "node_limit" &&
@@ -333,7 +379,12 @@ function appleSearch(
 				nodeLimited = true;
 				continue;
 			}
-			enqueue(child, key);
+			enqueue(
+				child,
+				key,
+				{ direction, previous: route },
+				followsRetainedRoute && retainedRoute?.[child.depth - 1] === direction,
+			);
 		}
 	}
 	const termination = postLimited
@@ -356,6 +407,7 @@ function appleSearch(
 export function analyzeGrowthSpace(
 	input: LegalSpaceInput,
 	limits: GrowthAnalysisLimits = defaultGrowthLimits,
+	options: GrowthSearchOptions = {},
 ): GrowthSpaceAnalysis {
 	for (const name of [
 		"trapDepth",
@@ -384,7 +436,7 @@ export function analyzeGrowthSpace(
 				used: 0,
 				max: limits.maxNodesPerSearch,
 			}),
-			apple: appleSearch(input, first, limits),
+			apple: appleSearch(input, first, limits, options),
 		};
 	}
 	return { analysisLimits: { ...limits }, dynamicFacts };

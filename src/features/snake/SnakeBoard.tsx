@@ -349,7 +349,7 @@ export function SnakeBoard(props: {
 						}
 						fallback={
 							<>
-								<h2>等待玩家开始</h2>
+								<h2>等待对局开始</h2>
 								<p>棋盘已生成，时钟尚未启动。</p>
 							</>
 						}

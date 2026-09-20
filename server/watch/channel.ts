@@ -110,7 +110,7 @@ export class WatchChannel {
 					throw new Error("Channel recovery cannot take over an unowned match");
 				if (
 					current.status === "interrupted" &&
-					isStagnationStopReason(current.endReason)
+					current.endReason === "stagnation_loop"
 				) {
 					// The match interruption and channel completion are separate commits.
 					// A restart between them must retain the cost-protection decision.
@@ -464,15 +464,17 @@ export class WatchChannel {
 			s = record.snapshot;
 		if (record.generation !== generation || s.currentMatchId !== id) return;
 		const actual = this.service.store.get(id);
-		const protectedStop =
+		const guardStop =
 			actual.status === "interrupted" &&
 			isStagnationStopReason(actual.endReason);
+		const protectedStop =
+			actual.status === "interrupted" && actual.endReason === "stagnation_loop";
 		if (
 			result.id !== id ||
 			result.seq !== actual.seq ||
 			result.status !== actual.status ||
 			result.endReason !== actual.endReason ||
-			(!protectedStop && !["gameover", "won"].includes(actual.status))
+			(!guardStop && !["gameover", "won"].includes(actual.status))
 		)
 			throw new Error(
 				`Channel round ended unexpectedly: ${actual.status} / ${actual.endReason}`,

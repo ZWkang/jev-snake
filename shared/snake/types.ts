@@ -1,5 +1,6 @@
 import type { DecisionRequestV6 } from "./board-context.js";
 import type { DecisionRequestV9 } from "./bounded-search.js";
+import type { DecisionRequestV16 } from "./compact-growth.js";
 import type { DecisionRequestV14 } from "./dynamic-space.js";
 import type { DecisionRequestV8 } from "./global-view.js";
 import type { DecisionRequestV15 } from "./growth-space.js";
@@ -25,6 +26,7 @@ export type { DecisionRequestV7, ImmediateMoveFacts } from "./local-moves.js";
 export type { DecisionRequestV13 } from "./legal-space.js";
 export type { DecisionRequestV14 } from "./dynamic-space.js";
 export type { DecisionRequestV15 } from "./growth-space.js";
+export type { DecisionRequestV16 } from "./compact-growth.js";
 export type { DecisionRequestV11 } from "./model-planning.js";
 export type { DecisionRequestV12 } from "./non-reverse.js";
 export type { DecisionRequestV5 } from "./outcome-context.js";
@@ -62,7 +64,8 @@ export type ActionFact = {
 	// Absent in historical v1 contexts; null when the first move is blocked.
 	forcedPath?: ForcedPath | null;
 };
-export type JevProvider = "typesafe" | "openrouter";
+// Retired providers remain valid in saved decisions and historical replays.
+export type JevProvider = "typesafe" | "openrouter" | "laya";
 export function isJevModel(model: string | null | undefined) {
 	return (
 		!!model && (model.startsWith("jev-") || model.startsWith("typesafe/jev-"))
@@ -306,7 +309,8 @@ export type DecisionRequest =
 	| DecisionRequestV12
 	| DecisionRequestV13
 	| DecisionRequestV14
-	| DecisionRequestV15;
+	| DecisionRequestV15
+	| DecisionRequestV16;
 export type PlanRequest = LegacyPlanRequest | PlanRequestV3 | PlanRequestV4;
 type BoardConfig = {
 	// Missing means the original fixed-spawn generator, including its RNG order.

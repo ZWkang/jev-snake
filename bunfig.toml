@@ -1,0 +1,7 @@
+# Keep environment loading explicit: Vite uses loadEnv; server/CLI use dotenv.
+# Tests and their subprocesses must not automatically inherit the project's .env.
+env = false
+
+[run]
+# Run tool entrypoints and their child processes with Bun, including Node shebangs.
+bun = true

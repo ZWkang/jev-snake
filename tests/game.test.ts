@@ -81,7 +81,12 @@ test("actual decision request survives application, stale rejection and SQLite r
 		decision: {
 			model: JEV_MODEL,
 			choice: "right",
-			probabilities: { up: 0, right: 1, down: 0, left: 0 },
+			probabilities: Object.fromEntries(
+				Object.keys(request.questions.direction.criteria).map((d) => [
+					d,
+					d === "right" ? 1 : 0,
+				]),
+			),
 			confidence: 1,
 			requestMs: 15,
 			request,
@@ -187,7 +192,7 @@ describe("engine", () => {
 						seed: `spawn-${i}`,
 					},
 				);
-				expect(cfg.layoutVersion).toBe(2);
+				expect(cfg.layoutVersion).toBe(3);
 				const s = createState("spawn", "Test", null, cfg, "now");
 				headings.add(s.direction);
 				heads.add(JSON.stringify(s.snake[0]));

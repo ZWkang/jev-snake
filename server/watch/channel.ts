@@ -1,5 +1,9 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
+	isStagnationStopReason,
+	stagnationMessage,
+} from "../../shared/snake/stagnation.js";
+import {
 	isResponseMode,
 	type GameConfig,
 	type PublicState,
@@ -96,6 +100,7 @@ export class WatchChannel {
 		let recovery:
 			| { state: PublicState; controlToken: string; generation: number }
 			| undefined;
+		let protectionRecovered = false;
 		try {
 			const record = this.store.read(),
 				s = record.snapshot;
@@ -104,6 +109,29 @@ export class WatchChannel {
 				if (!this.store.owned(current.id))
 					throw new Error("Channel recovery cannot take over an unowned match");
 				if (
+					current.status === "interrupted" &&
+					isStagnationStopReason(current.endReason)
+				) {
+					// The match interruption and channel completion are separate commits.
+					// A restart between them must retain the cost-protection decision.
+					record.generation++;
+					record.snapshot = {
+						...s,
+						revision: s.revision + 1,
+						enabled: false,
+						phase: "fault",
+						currentMatchId: null,
+						lastMatchId: current.id,
+						nextStartAt: null,
+						serverTime: this.now(),
+						error: {
+							code: current.endReason,
+							message: stagnationMessage(current.endReason),
+						},
+					};
+					this.persist(() => this.store.write(record));
+					protectionRecovered = true;
+				} else if (
 					s.phase !== "fault" &&
 					isResponseMode(current.config) &&
 					(current.status === "ready" ||
@@ -136,6 +164,7 @@ export class WatchChannel {
 			}
 			if (
 				!recovery &&
+				!protectionRecovered &&
 				(s.currentMatchId || (s.enabled && s.phase !== "fault"))
 			) {
 				record.generation++;
@@ -229,7 +258,21 @@ export class WatchChannel {
 			}
 		}
 		let cancel: string | null = null;
-		if (c.enabled) {
+		if (c.stopCurrent) {
+			if (s.phase !== "stopped") {
+				cancel = s.currentMatchId;
+				record.generation++;
+				record.snapshot = {
+					...s,
+					enabled: false,
+					phase: "stopped",
+					currentMatchId: null,
+					lastMatchId: cancel ?? s.lastMatchId,
+					nextStartAt: null,
+					error: null,
+				};
+			}
+		} else if (c.enabled) {
 			if (s.phase === "stopped" || s.phase === "fault")
 				record.snapshot = {
 					...s,
@@ -275,8 +318,17 @@ export class WatchChannel {
 			this.store.remember(c.requestId, hash, receipt);
 		});
 		if (cancel) {
-			this.stopMatch(this.service.store.get(cancel), "controller_stop");
-			this.controller?.abort(new DOMException("controller_stop", "AbortError"));
+			let stopped = false;
+			try {
+				const current = this.service.store.get(cancel);
+				if (current.status === "ready" || current.status === "running")
+					this.stopMatch(current, "controller_stop");
+				stopped = true;
+			} finally {
+				const reason = new DOMException("controller_stop", "AbortError");
+				if (stopped) Object.assign(reason, { matchStopped: cancel });
+				this.controller?.abort(reason);
+			}
 		}
 		this.publish();
 		this.schedule();
@@ -412,11 +464,15 @@ export class WatchChannel {
 			s = record.snapshot;
 		if (record.generation !== generation || s.currentMatchId !== id) return;
 		const actual = this.service.store.get(id);
+		const protectedStop =
+			actual.status === "interrupted" &&
+			isStagnationStopReason(actual.endReason);
 		if (
 			result.id !== id ||
 			result.seq !== actual.seq ||
 			result.status !== actual.status ||
-			!["gameover", "won"].includes(actual.status)
+			result.endReason !== actual.endReason ||
+			(!protectedStop && !["gameover", "won"].includes(actual.status))
 		)
 			throw new Error(
 				`Channel round ended unexpectedly: ${actual.status} / ${actual.endReason}`,
@@ -424,10 +480,21 @@ export class WatchChannel {
 		record.snapshot = {
 			...s,
 			revision: s.revision + 1,
+			enabled: protectedStop ? false : s.enabled,
 			currentMatchId: null,
 			lastMatchId: id,
-			phase: s.enabled ? "countdown" : "stopped",
-			nextStartAt: s.enabled ? this.now() + this.settings.intermissionMs : null,
+			phase: protectedStop ? "fault" : s.enabled ? "countdown" : "stopped",
+			nextStartAt:
+				!protectedStop && s.enabled
+					? this.now() + this.settings.intermissionMs
+					: null,
+			error:
+				protectedStop && isStagnationStopReason(actual.endReason)
+					? {
+							code: actual.endReason,
+							message: stagnationMessage(actual.endReason),
+						}
+					: null,
 			serverTime: this.now(),
 		};
 		this.persist(() => this.store.write(record));

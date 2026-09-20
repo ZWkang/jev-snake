@@ -6,10 +6,11 @@ import { join, resolve } from "node:path";
 import { afterEach, expect, test } from "vitest";
 import { JEV_ENDPOINT } from "../server/jev/client.js";
 import { startServer } from "../server/start.js";
-import type {
-	DecisionContext,
-	DecisionRequestV3,
-	PlanRequestV3,
+import { inspectMove } from "../shared/snake/move-rules.js";
+import {
+	directions,
+	type DecisionContext,
+	type DecisionRequestV15,
 } from "../shared/snake/types.js";
 
 const disposers: (() => void | Promise<void>)[] = [];
@@ -80,7 +81,8 @@ globalThis.fetch = async (input, init) => {
       requestsInFlight--;
       if (mode === "response-error" || mode === "response-stop-error") return new Response("response-test-upstream-error", {status:503});
       const choice = mode === "response-reverse" && callNumber === 1 ? "left" : mode === "response-loop" && callNumber <= 12 ? ["right","down","left","up"][(callNumber - 1) % 4] : "right";
-      return Response.json({model:"test-only-response-mode",answers:{direction:{type:"choice",choice,probabilities:Object.fromEntries(["up","right","down","left"].map(direction => [direction,direction === choice ? (mode === "response-rounded" ? 0.99 : 1) : 0])),confidence:1}}});
+      if (mode !== "response-reverse" && !(choice in body.questions.direction.criteria)) throw new Error("Test fixture chose an unoffered direction");
+      return Response.json({model:"test-only-response-mode",answers:{direction:{type:"choice",choice,probabilities:Object.fromEntries(Object.keys(body.questions.direction.criteria).map(direction => [direction,direction === choice ? (mode === "response-rounded" ? 0.99 : 1) : 0])),confidence:1}}});
   }
   if (!String(input).startsWith(${JSON.stringify(`${root}/`)}))
     throw new Error("Unexpected test network destination");
@@ -88,6 +90,12 @@ globalThis.fetch = async (input, init) => {
     const response = await originalFetch(input, init);
     const context = await response.json();
     if (response.ok) appendFileSync(${JSON.stringify(join(dir, "contexts.jsonl"))}, JSON.stringify(context) + "\\n");
+    if (response.ok && ${JSON.stringify(mode)} === "response-loop" && context.state.tick === 12) {
+      // Observe three complete cycles, then explicitly stop the real controller.
+      // This test does not manufacture an illegal final model choice to terminate.
+      process.kill(process.pid, "SIGINT");
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
     if (response.ok && ${JSON.stringify(mode)} === "response-no-progress") delete context.progress;
     if (response.ok && ${JSON.stringify(mode)} === "response-progress-mismatch") context.progress.throughTick += 1;
     if (response.ok && ++contextCount === 1 && ["response-stale","response-protocol"].includes(${JSON.stringify(mode)})) {
@@ -119,8 +127,7 @@ globalThis.fetch = async (input, init) => {
 			const child = spawn(
 				process.execPath,
 				[
-					"--import",
-					"tsx",
+					"--no-env-file",
 					"--import",
 					hook,
 					resolve("scripts/run-jev.ts"),
@@ -131,7 +138,9 @@ globalThis.fetch = async (input, init) => {
 					"--width",
 					"24",
 					"--height",
-					"18",
+					// A one-row board naturally ends when every direction is blocked.
+					// Loop scenarios explicitly override this geometry below.
+					"1",
 					"--obstacles",
 					"0",
 					"--seed",
@@ -183,15 +192,41 @@ globalThis.fetch = async (input, init) => {
 
 function expectProgressForwarded(
 	contexts: DecisionContext[],
-	bodies: (DecisionRequestV3 | PlanRequestV3)[],
+	bodies: DecisionRequestV15[],
 ) {
 	expect(bodies.length).toBeGreaterThan(0);
 	for (const body of bodies) {
+		expect(body.state.contextVersion).toBe("growth-space-v15");
+		expect(Object.keys(body.state).sort()).toEqual([
+			"analysisLimits",
+			"board",
+			"contextVersion",
+			"dynamicFacts",
+			"dynamicSemantics",
+			"excludedMoves",
+			"factsSemantics",
+			"food",
+			"moveFacts",
+			"player",
+			"progress",
+			"rules",
+			"timing",
+		]);
 		const context = contexts.find(
 			(item) => item.state.tick === body.state.timing.observedTick,
 		);
 		expect(context).toBeDefined();
 		expect(body.state.progress).toEqual(context?.progress);
+		expect(body.state.board.obstacles).toEqual(context?.state.obstacles);
+		expect(body.state.player.bodyHeadToTail).toEqual(context?.state.snake);
+		expect(Object.keys(body.questions.direction.criteria)).toEqual(
+			directions.filter(
+				(direction) =>
+					inspectMove(context!.state, direction).immediateCollision === null,
+			),
+		);
+		for (const criterion of Object.values(body.questions.direction.criteria))
+			expect(typeof criterion).toBe("string");
 		expect(body.state.progress).toMatchObject({
 			historyVersion: "progress-v1",
 			historyStartTick: 0,
@@ -243,6 +278,7 @@ test.each(["response-fast", "response-slow"] as const)(
 			tickIntervalMs: null,
 		});
 		expect(match.status).toBe("gameover");
+		expect(match.endReason).toBe("no_legal_moves");
 		const events = f.game.store.events(match.id, -1).events;
 		expectProgressForwarded(f.decisionContexts(), f.transportBodies());
 		const actions = events.filter((e) => e.type === "action_accepted");
@@ -256,7 +292,7 @@ test.each(["response-fast", "response-slow"] as const)(
 				action.state.lastDecision?.request,
 			);
 			expect(action.state.lastDecision?.request?.state.contextVersion).toBe(
-				"action-outcomes-v5",
+				"growth-space-v15",
 			);
 			expect(action.state.lastDecision?.contextBuildMs).toBeGreaterThanOrEqual(
 				0,
@@ -348,9 +384,7 @@ test("a reverse model answer fails once without re-requesting the unchanged posi
 	const f = await fixture("response-reverse");
 	const result = await f.run(["--step-mode", "response", "--width", "7"]);
 	expect(result.code).not.toBe(0);
-	expect(result.output).toContain(
-		"Response action rejected: invalid_direction",
-	);
+	expect(result.output).toContain("Invalid JEV");
 	expect(f.transportBodies()).toHaveLength(1);
 	const match = f.game.store.list().matches[0];
 	expect(match).toMatchObject({
@@ -359,7 +393,7 @@ test("a reverse model answer fails once without re-requesting the unchanged posi
 		endReason: "model_error",
 	});
 	const events = f.game.store.events(match.id, -1).events;
-	expect(events.filter((e) => e.type === "action_rejected")).toHaveLength(1);
+	expect(events.filter((e) => e.type === "action_rejected")).toHaveLength(0);
 	expect(events.some((e) => e.type === "action_accepted")).toBe(false);
 });
 
@@ -400,22 +434,19 @@ test.each(["response-no-progress", "response-progress-mismatch"] as const)(
 	},
 );
 
-test("response runner sends and persists actual repeated-position and departure history without replacing choices", async () => {
+test("with spending protection explicitly disabled, runner preserves repeated-position history without replacing choices", async () => {
 	const f = await fixture("response-loop");
-	const result = await f.run([
-		"--step-mode",
-		"response",
-		"--width",
-		"7",
-		"--height",
-		"5",
-	]);
+	const result = await f.run(
+		["--step-mode", "response", "--width", "7", "--height", "5"],
+		undefined,
+		{ JEV_STAGNATION_GUARD: "false" },
+	);
 	expect(result.code, result.output).toBe(0);
 	const match = f.game.store.list({}).matches[0];
 	expect(match).toMatchObject({
-		status: "gameover",
-		endReason: "wall",
-		tick: 16,
+		status: "interrupted",
+		endReason: "controller_stop",
+		tick: 12,
 	});
 	const bodies = f.transportBodies();
 	expectProgressForwarded(f.decisionContexts(), bodies);
@@ -438,11 +469,12 @@ test("response runner sends and persists actual repeated-position and departure 
 	});
 	const events = f.game.store.events(match.id, -1).events;
 	const accepted = events.filter((event) => event.type === "action_accepted");
-	expect(accepted).toHaveLength(16);
+	expect(accepted).toHaveLength(12);
+	expect(bodies).toHaveLength(12);
 	for (const [index, event] of accepted.entries()) {
 		expect(event.state.lastDecision?.request).toEqual(bodies[index]);
 		expect(event.state.lastDecision?.choice).toBe(
-			index < 12 ? ["right", "down", "left", "up"][index % 4] : "right",
+			["right", "down", "left", "up"][index % 4],
 		);
 	}
 	expect(events.some((event) => event.type === "action_rejected")).toBe(false);
@@ -529,4 +561,39 @@ test("a real upstream error after stop is reported as failure rather than succes
 		tick: 0,
 		endReason: "controller_stop",
 	});
+});
+
+test("default loop protection stops before paying for the third visit to the same complete position", async () => {
+	const f = await fixture("response-loop");
+	const result = await f.run([
+		"--step-mode",
+		"response",
+		"--width",
+		"7",
+		"--height",
+		"5",
+	]);
+	expect(result.code, result.output).toBe(0);
+	const summary = f.game.store.list({}).matches[0];
+	const match = f.game.store.get(summary.id);
+	expect(match).toMatchObject({
+		status: "interrupted",
+		endReason: "stagnation_loop",
+		tick: 11,
+	});
+	const bodies = f.transportBodies();
+	expect(bodies).toHaveLength(11);
+	expect(bodies.at(-1).state.timing.observedTick).toBe(10);
+	const events = f.game.store.events(match.id, -1).events;
+	const interrupted = events.filter((e) => e.type === "interrupted");
+	expect(interrupted).toHaveLength(1);
+	expect(interrupted[0].data.guard).toMatchObject({
+		reason: "stagnation_loop",
+		observedTick: 11,
+		movesSinceApple: 11,
+		positionVisits: 3,
+		maxPositionVisits: 3,
+	});
+	expect(events.filter((e) => e.type === "action_rejected")).toHaveLength(0);
+	expect(result.output).toContain('"type":"stagnation_guard_triggered"');
 });

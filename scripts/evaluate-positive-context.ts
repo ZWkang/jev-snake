@@ -6,8 +6,8 @@ import { parseArgs } from "node:util";
 import {
 	buildDecisionContextV4 as buildDecisionContext,
 	decisionBodyV3,
-	sendJevRequest,
-} from "../server/jev/client.js";
+} from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import { jevConfig } from "../server/jev/config.js";
 import type { PositiveEvidence } from "../shared/snake/positive-evidence.js";
 import { decisionRequestSchema } from "../shared/snake/schema.js";

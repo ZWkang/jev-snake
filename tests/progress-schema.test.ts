@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { decisionBody } from "../server/jev/client.js";
+import { decisionBodyV5 as decisionBody } from "../server/jev/analysis-context.js";
 import { planBody } from "../server/jev/legacy-context.js";
 import {
 	decisionRequestSchema,

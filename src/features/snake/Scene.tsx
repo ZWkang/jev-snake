@@ -25,6 +25,7 @@ import {
 	stepModeName,
 	stepStatusName,
 } from "./api";
+import { savedProbabilityGaps } from "./contextPresentation";
 
 export function Shell(props: {
 	page: "home" | "watch" | "live" | "history" | "replay";
@@ -230,6 +231,18 @@ export function DecisionPanel(props: {
 									)}
 								</For>
 							</section>
+							<For
+								each={savedProbabilityGaps(
+									decision().request,
+									decision().probabilities,
+								)}
+							>
+								{(gap) => (
+									<p class="tiny">
+										{directionName(gap.direction)}：{gap.status}
+									</p>
+								)}
+							</For>
 						</details>
 						<div class="decision-outcome">
 							<span>

@@ -1,9 +1,32 @@
+import type { DecisionRequestV6 } from "./board-context.js";
+import type { DecisionRequestV9 } from "./bounded-search.js";
+import type { DecisionRequestV14 } from "./dynamic-space.js";
+import type { DecisionRequestV8 } from "./global-view.js";
+import type { DecisionRequestV15 } from "./growth-space.js";
+import type { DecisionRequestV13 } from "./legal-space.js";
+import type { DecisionRequestV7 } from "./local-moves.js";
+import type { DecisionRequestV11 } from "./model-planning.js";
+import type { DecisionRequestV12 } from "./non-reverse.js";
 import type { DecisionRequestV5 } from "./outcome-context.js";
+import type { DecisionRequestV10 } from "./post-apple-search.js";
 import type {
 	DecisionRequestV4,
 	PlanRequestV4,
 	WitnessArchive,
 } from "./witness-context.js";
+export type { DecisionRequestV6 } from "./board-context.js";
+export type { DecisionRequestV9 } from "./bounded-search.js";
+export type { DecisionRequestV10 } from "./post-apple-search.js";
+export type {
+	DecisionRequestV8,
+	ImmediateMoveObservation,
+} from "./global-view.js";
+export type { DecisionRequestV7, ImmediateMoveFacts } from "./local-moves.js";
+export type { DecisionRequestV13 } from "./legal-space.js";
+export type { DecisionRequestV14 } from "./dynamic-space.js";
+export type { DecisionRequestV15 } from "./growth-space.js";
+export type { DecisionRequestV11 } from "./model-planning.js";
+export type { DecisionRequestV12 } from "./non-reverse.js";
 export type { DecisionRequestV5 } from "./outcome-context.js";
 export type { DecisionRequestV4, PlanRequestV4 } from "./witness-context.js";
 export const directions = ["up", "right", "down", "left"] as const;
@@ -273,11 +296,21 @@ export type DecisionRequest =
 	| LegacyDecisionRequest
 	| DecisionRequestV3
 	| DecisionRequestV4
-	| DecisionRequestV5;
+	| DecisionRequestV5
+	| DecisionRequestV6
+	| DecisionRequestV7
+	| DecisionRequestV8
+	| DecisionRequestV9
+	| DecisionRequestV10
+	| DecisionRequestV11
+	| DecisionRequestV12
+	| DecisionRequestV13
+	| DecisionRequestV14
+	| DecisionRequestV15;
 export type PlanRequest = LegacyPlanRequest | PlanRequestV3 | PlanRequestV4;
 type BoardConfig = {
 	// Missing means the original fixed-spawn generator, including its RNG order.
-	layoutVersion?: 2;
+	layoutVersion?: 2 | 3;
 	width: number;
 	height: number;
 	obstacleCount: number;

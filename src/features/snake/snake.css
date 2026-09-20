@@ -446,6 +446,17 @@
 	width: 100%;
 	height: auto;
 }
+.snake-face {
+	transform-origin: 0 0;
+	transition-property: transform;
+	transition-duration: var(--snake-turn-duration, 0ms);
+	transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+	.snake-face {
+		transition: none;
+	}
+}
 .board-state {
 	position: absolute;
 	inset: 0;
@@ -1511,6 +1522,95 @@
 }
 .watch-channel-status > span {
 	font-size: 12px;
+}
+.round-loading {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 216px;
+	max-width: calc(100% - 24px);
+	padding: 10px 16px;
+	border: 2px solid var(--ink);
+	border-radius: 12px;
+	background: var(--yellow);
+	color: var(--ink);
+	line-height: 1.4;
+}
+.watch-channel-status > .round-loading {
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+.round-loading-copy {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.round-loading-copy > span {
+	font-size: 11px;
+}
+.round-loading-copy > strong {
+	font-size: 14px;
+}
+.round-loading-copy > .round-countdown {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	font-size: 28px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+.round-countdown .t-digit-group {
+	min-width: 1ch;
+}
+.round-countdown-unit {
+	font-size: 11px;
+	font-weight: 600;
+}
+.round-clock {
+	flex: 0 0 42px;
+	width: 42px;
+	height: 42px;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-width: 2.5;
+}
+.round-clock-track {
+	opacity: 0.2;
+}
+.round-clock-ticks {
+	opacity: 0.45;
+	stroke-width: 1.5;
+}
+.round-clock-sweep,
+.round-clock-hand {
+	transform-origin: 24px 24px;
+	animation: round-clock-turn 4s linear infinite;
+}
+.round-clock-sweep {
+	animation-duration: 2s;
+}
+.round-loading[data-state="syncing"] {
+	background: var(--paper);
+}
+.round-loading[data-state="syncing"] .round-clock-sweep,
+.round-loading[data-state="syncing"] .round-clock-hand {
+	animation-play-state: paused;
+}
+.board-state:has(.round-loading) {
+	gap: 10px;
+}
+@keyframes round-clock-turn {
+	to {
+		transform: rotate(360deg);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.round-clock-sweep,
+	.round-clock-hand {
+		animation: none;
+	}
 }
 .watch-empty,
 .watch-owner {

@@ -18,9 +18,18 @@ export default defineConfig(({ mode }) => {
 				"/ws": { target: gameOrigin.replace(/^http/, "ws"), ws: true },
 			},
 		},
+		preview: {
+			host: "127.0.0.1",
+			port: 3000,
+			strictPort: true,
+		},
 		plugins: [
 			...(env.VITE_ROUTER_DEVTOOLS === "true" ? [devtools()] : []),
 			nitro({
+				// Nitro handles preview HTTP before Vite's proxy middleware.
+				routeRules: {
+					"/api/**": { proxy: `${gameOrigin}/api/**` },
+				},
 				devProxy: {
 					"/api/**": { target: gameOrigin, changeOrigin: true },
 				},

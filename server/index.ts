@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { resolve } from "node:path";
 import { jevConfig } from "./jev/config.js";
-import { gameConfig } from "./jev/game-config.js";
+import { watchGameConfig } from "./jev/game-config.js";
 import { startServer } from "./start.js";
 
 const adminToken = process.env.GAME_ADMIN_TOKEN;
@@ -24,7 +24,7 @@ const game = startServer({
 	jevModel: jev.model,
 	watch: {
 		jev,
-		makeConfig: () => gameConfig(process.env),
+		makeConfig: () => watchGameConfig(process.env),
 		intermissionMs: Number(process.env.WATCH_INTERMISSION_MS ?? 5000),
 	},
 	watchPublicOrigin: process.env.WATCH_PUBLIC_ORIGIN,

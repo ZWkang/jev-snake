@@ -1,0 +1,584 @@
+[
+	{
+		"source": {
+			"matchId": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"seq": 303,
+			"tick": 150
+		},
+		"state": {
+			"id": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 12,
+				"height": 9,
+				"obstacleCount": 3,
+				"tickIntervalMs": null,
+				"seed": "906439f3-ad43-4d1d-8693-299e4b8de9ab"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T20:30:43.751Z",
+			"startedAt": "2026-09-19T20:30:43.768Z",
+			"endedAt": null,
+			"seq": 303,
+			"tick": 150,
+			"gameTimeMs": 55089.85266699997,
+			"score": 200,
+			"applesEaten": 17,
+			"snake": [
+				{
+					"x": 5,
+					"y": 5
+				},
+				{
+					"x": 4,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 4
+				},
+				{
+					"x": 2,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 1,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 0
+				},
+				{
+					"x": 3,
+					"y": 0
+				},
+				{
+					"x": 4,
+					"y": 0
+				},
+				{
+					"x": 5,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 1
+				},
+				{
+					"x": 6,
+					"y": 2
+				},
+				{
+					"x": 6,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 4
+				},
+				{
+					"x": 6,
+					"y": 5
+				},
+				{
+					"x": 6,
+					"y": 6
+				}
+			],
+			"direction": "right",
+			"obstacles": [
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 10,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				}
+			],
+			"apple": {
+				"x": 8,
+				"y": 1
+			},
+			"star": {
+				"point": {
+					"x": 11,
+					"y": 4
+				},
+				"expiresAt": 59680.173458000005
+			},
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 336.8173340000212,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "right",
+				"tick": 150,
+				"targetTick": 150,
+				"requestId": "0fa3f90a-33a8-4477-8084-43ef5ee7419f",
+				"observedTick": 149
+			}
+		},
+		"progress": {
+			"historyVersion": "progress-v1",
+			"historyStartTick": 0,
+			"throughTick": 150,
+			"lastAppleTick": 148,
+			"movesSinceApple": 2,
+			"positionVisits": 1,
+			"previousVisitTick": null,
+			"repeatAfterMoves": null,
+			"actions": {
+				"up": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"right": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"down": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"left": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				}
+			}
+		},
+		"timing": {
+			"elapsedGameTimeMs": 55101.238124999974,
+			"deadlineInMs": null
+		},
+		"expected": "either_up_or_down"
+	},
+	{
+		"source": {
+			"matchId": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"seq": 305,
+			"tick": 151
+		},
+		"state": {
+			"id": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 12,
+				"height": 9,
+				"obstacleCount": 3,
+				"tickIntervalMs": null,
+				"seed": "906439f3-ad43-4d1d-8693-299e4b8de9ab"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T20:30:43.751Z",
+			"startedAt": "2026-09-19T20:30:43.768Z",
+			"endedAt": null,
+			"seq": 305,
+			"tick": 151,
+			"gameTimeMs": 55406.51395799994,
+			"score": 200,
+			"applesEaten": 17,
+			"snake": [
+				{
+					"x": 5,
+					"y": 4
+				},
+				{
+					"x": 5,
+					"y": 5
+				},
+				{
+					"x": 4,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 4
+				},
+				{
+					"x": 2,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 1,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 0
+				},
+				{
+					"x": 3,
+					"y": 0
+				},
+				{
+					"x": 4,
+					"y": 0
+				},
+				{
+					"x": 5,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 1
+				},
+				{
+					"x": 6,
+					"y": 2
+				},
+				{
+					"x": 6,
+					"y": 3
+				},
+				{
+					"x": 6,
+					"y": 4
+				},
+				{
+					"x": 6,
+					"y": 5
+				}
+			],
+			"direction": "up",
+			"obstacles": [
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 10,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				}
+			],
+			"apple": {
+				"x": 8,
+				"y": 1
+			},
+			"star": {
+				"point": {
+					"x": 11,
+					"y": 4
+				},
+				"expiresAt": 59680.173458000005
+			},
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 316.6612909999676,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "up",
+				"tick": 151,
+				"targetTick": 151,
+				"requestId": "cf631335-1d1a-45b1-8623-ef2c45173e00",
+				"observedTick": 150
+			}
+		},
+		"progress": {
+			"historyVersion": "progress-v1",
+			"historyStartTick": 0,
+			"throughTick": 151,
+			"lastAppleTick": 148,
+			"movesSinceApple": 3,
+			"positionVisits": 1,
+			"previousVisitTick": null,
+			"repeatAfterMoves": null,
+			"actions": {
+				"up": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"right": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"down": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"left": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				}
+			}
+		},
+		"timing": {
+			"elapsedGameTimeMs": 55419.30308299995,
+			"deadlineInMs": null
+		},
+		"expected": "up"
+	},
+	{
+		"source": {
+			"matchId": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"seq": 309,
+			"tick": 153
+		},
+		"state": {
+			"id": "73882ce7-46cb-44fd-95db-e36287f991a2",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 12,
+				"height": 9,
+				"obstacleCount": 3,
+				"tickIntervalMs": null,
+				"seed": "906439f3-ad43-4d1d-8693-299e4b8de9ab"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T20:30:43.751Z",
+			"startedAt": "2026-09-19T20:30:43.768Z",
+			"endedAt": null,
+			"seq": 309,
+			"tick": 153,
+			"gameTimeMs": 56122.346332999936,
+			"score": 200,
+			"applesEaten": 17,
+			"snake": [
+				{
+					"x": 5,
+					"y": 2
+				},
+				{
+					"x": 5,
+					"y": 3
+				},
+				{
+					"x": 5,
+					"y": 4
+				},
+				{
+					"x": 5,
+					"y": 5
+				},
+				{
+					"x": 4,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 5
+				},
+				{
+					"x": 3,
+					"y": 4
+				},
+				{
+					"x": 2,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 1,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 2,
+					"y": 0
+				},
+				{
+					"x": 3,
+					"y": 0
+				},
+				{
+					"x": 4,
+					"y": 0
+				},
+				{
+					"x": 5,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 0
+				},
+				{
+					"x": 6,
+					"y": 1
+				},
+				{
+					"x": 6,
+					"y": 2
+				},
+				{
+					"x": 6,
+					"y": 3
+				}
+			],
+			"direction": "up",
+			"obstacles": [
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 10,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				}
+			],
+			"apple": {
+				"x": 8,
+				"y": 1
+			},
+			"star": {
+				"point": {
+					"x": 11,
+					"y": 4
+				},
+				"expiresAt": 59680.173458000005
+			},
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 372.3331659999676,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "up",
+				"tick": 153,
+				"targetTick": 153,
+				"requestId": "972068af-b714-404e-aca2-e7012aad230a",
+				"observedTick": 152
+			}
+		},
+		"progress": {
+			"historyVersion": "progress-v1",
+			"historyStartTick": 0,
+			"throughTick": 153,
+			"lastAppleTick": 148,
+			"movesSinceApple": 5,
+			"positionVisits": 1,
+			"previousVisitTick": null,
+			"repeatAfterMoves": null,
+			"actions": {
+				"up": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"right": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"down": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				},
+				"left": {
+					"timesTaken": 0,
+					"returnsWithoutApple": 0,
+					"lastTakenTick": null
+				}
+			}
+		},
+		"timing": {
+			"elapsedGameTimeMs": 56132.526082999946,
+			"deadlineInMs": null
+		},
+		"expected": "left"
+	}
+]

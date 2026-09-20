@@ -1,0 +1,189 @@
+{
+	"id": "21595a4e-2c37-49f7-abc7-c3c1ade35897",
+	"agentName": "JEV 连续观战 · openrouter",
+	"model": "typesafe/jev-1.13",
+	"config": {
+		"layoutVersion": 2,
+		"stepMode": "response",
+		"decisionMode": "single_step",
+		"width": 16,
+		"height": 12,
+		"obstacleCount": 5,
+		"tickIntervalMs": null,
+		"seed": "08aa3637-43b8-47b9-a3be-68f7e3ed4da3"
+	},
+	"recordVersion": 3,
+	"rulesVersion": 3,
+	"status": "running",
+	"createdAt": "2026-09-19T19:43:28.724Z",
+	"startedAt": "2026-09-19T19:43:28.766Z",
+	"endedAt": null,
+	"seq": 558,
+	"tick": 275,
+	"gameTimeMs": 100503.37624999999,
+	"lastMoveGameTimeMs": 100503.37624999999,
+	"score": 350,
+	"applesEaten": 26,
+	"snake": [
+		{
+			"x": 6,
+			"y": 7
+		},
+		{
+			"x": 5,
+			"y": 7
+		},
+		{
+			"x": 5,
+			"y": 6
+		},
+		{
+			"x": 5,
+			"y": 5
+		},
+		{
+			"x": 5,
+			"y": 4
+		},
+		{
+			"x": 5,
+			"y": 3
+		},
+		{
+			"x": 4,
+			"y": 3
+		},
+		{
+			"x": 3,
+			"y": 3
+		},
+		{
+			"x": 2,
+			"y": 3
+		},
+		{
+			"x": 1,
+			"y": 3
+		},
+		{
+			"x": 0,
+			"y": 3
+		},
+		{
+			"x": 0,
+			"y": 2
+		},
+		{
+			"x": 1,
+			"y": 2
+		},
+		{
+			"x": 2,
+			"y": 2
+		},
+		{
+			"x": 3,
+			"y": 2
+		},
+		{
+			"x": 3,
+			"y": 1
+		},
+		{
+			"x": 4,
+			"y": 1
+		},
+		{
+			"x": 5,
+			"y": 1
+		},
+		{
+			"x": 6,
+			"y": 1
+		},
+		{
+			"x": 7,
+			"y": 1
+		},
+		{
+			"x": 8,
+			"y": 1
+		},
+		{
+			"x": 9,
+			"y": 1
+		},
+		{
+			"x": 10,
+			"y": 1
+		},
+		{
+			"x": 11,
+			"y": 1
+		},
+		{
+			"x": 11,
+			"y": 2
+		},
+		{
+			"x": 12,
+			"y": 2
+		},
+		{
+			"x": 12,
+			"y": 3
+		},
+		{
+			"x": 13,
+			"y": 3
+		},
+		{
+			"x": 14,
+			"y": 3
+		},
+		{
+			"x": 14,
+			"y": 4
+		}
+	],
+	"direction": "right",
+	"obstacles": [
+		{
+			"x": 6,
+			"y": 9
+		},
+		{
+			"x": 10,
+			"y": 5
+		},
+		{
+			"x": 2,
+			"y": 1
+		},
+		{
+			"x": 5,
+			"y": 8
+		},
+		{
+			"x": 6,
+			"y": 6
+		}
+	],
+	"apple": {
+		"x": 6,
+		"y": 8
+	},
+	"star": null,
+	"endReason": null,
+	"lastDecision": null,
+	"lastStepDurationMs": 368.68270799997845,
+	"lastAppliedAction": {
+		"source": "primary",
+		"stepIndex": 0,
+		"direction": "right",
+		"tick": 275,
+		"targetTick": 275,
+		"requestId": "6d8fb82e-762d-4ac9-93ec-c50f68540c3c",
+		"observedTick": 274
+	}
+}

@@ -4,10 +4,8 @@ import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import {
-	decisionBodyV3 as decisionBody,
-	sendJevRequest,
-} from "../server/jev/client.js";
+import { decisionBodyV3 as decisionBody } from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import { jevConfig } from "../server/jev/config.js";
 import { planBodyV3 as planBody } from "../server/jev/legacy-context.js";
 import {
@@ -120,7 +118,11 @@ function selectedEvidence(
 		decision.kind !== "plan"
 	) {
 		const facts = request.questions.direction.criteria[decision.choice];
-		if (typeof facts === "string" || !("immediateCollision" in facts))
+		if (
+			facts === undefined ||
+			typeof facts === "string" ||
+			!("immediateCollision" in facts)
+		)
 			throw new Error("Expected v3 action facts");
 		const danger =
 			facts.immediateCollision !== null ||

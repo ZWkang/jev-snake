@@ -4,8 +4,13 @@ export const watchCommandSchema = z
 	.object({
 		requestId: z.string().min(1),
 		enabled: z.boolean(),
+		stopCurrent: z.literal(true).optional(),
 	})
-	.strict();
+	.strict()
+	.refine((command) => !command.stopCurrent || !command.enabled, {
+		path: ["stopCurrent"],
+		message: "Stopping the current match requires disabled scheduling",
+	});
 export const watchSnapshotSchema = z
 	.object({
 		channelId: z.literal("main"),

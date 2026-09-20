@@ -20,6 +20,7 @@ import {
 	statusName,
 	stepModeName,
 } from "./api";
+import { CurrentBoardAscii } from "./CurrentBoardAscii";
 import { DecisionInput } from "./DecisionInput";
 import {
 	atTime,
@@ -395,6 +396,7 @@ export function ReplayPage(props: { matchId: string }) {
 								/>
 							</aside>
 						</div>
+						<CurrentBoardAscii state={s()} />
 						<DecisionInput
 							state={s()}
 							events={events()}

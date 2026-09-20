@@ -217,10 +217,11 @@ test("fork copies only the complete prefix, preserves history, and starts a sepa
 	expect(savedRows(f.store, f.source.id)).toEqual(original);
 });
 
-test.each([undefined, 2] as const)(
+test.each([undefined, 2, 3] as const)(
 	"layout %s restores RNG and generates the same next apple after the inherited prefix",
 	(layoutVersion) => {
 		const f = fixture({ layoutVersion });
+		expect(f.source.config.layoutVersion).toBe(layoutVersion ?? 3);
 		f.start();
 		const initialRng = f.store.get(f.source.id).rngState;
 		for (const direction of routeToApple(f.store.get(f.source.id)))

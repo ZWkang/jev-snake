@@ -8,6 +8,21 @@ import {
 	planRequestV4Schema,
 } from "./context-v4-schema.js";
 import { decisionRequestV5Schema } from "./context-v5-schema.js";
+import { decisionRequestV6Schema } from "./context-v6-schema.js";
+import { decisionRequestV7Schema } from "./context-v7-schema.js";
+import { decisionRequestV8Schema } from "./context-v8-schema.js";
+import { decisionRequestV9Schema } from "./context-v9-schema.js";
+import { decisionRequestV10Schema } from "./context-v10-schema.js";
+import { decisionRequestV11Schema } from "./context-v11-schema.js";
+import { decisionRequestV12Schema } from "./context-v12-schema.js";
+import { decisionRequestV13Schema } from "./context-v13-schema.js";
+import { decisionRequestV14Schema } from "./context-v14-schema.js";
+import { decisionRequestV15Schema } from "./context-v15-schema.js";
+import {
+	isStagnationStopReason,
+	stagnationStopReasons,
+	type StagnationEvidence,
+} from "./stagnation.js";
 import { decisionModes, directions, planChoices, stepModes } from "./types.js";
 import { witnessArchiveSchema } from "./witness-schema.js";
 
@@ -164,16 +179,36 @@ function contextVersion(value: unknown): unknown {
 		? state.contextVersion
 		: undefined;
 }
-// Select the shape before parsing. A malformed v3 request never reaches a legacy parser.
+// Select the shape before parsing. A malformed versioned request never reaches a legacy parser.
 export const decisionRequestSchema = z.unknown().transform((value, context) => {
 	const result = (
-		contextVersion(value) === "action-outcomes-v5"
-			? decisionRequestV5Schema
-			: contextVersion(value) === "action-facts-v4"
-				? decisionRequestV4Schema
-				: contextVersion(value) === "action-facts-v3"
-					? decisionRequestV3Schema
-					: legacyDecisionRequestSchema
+		contextVersion(value) === "growth-space-v15"
+			? decisionRequestV15Schema
+			: contextVersion(value) === "dynamic-space-v14"
+				? decisionRequestV14Schema
+				: contextVersion(value) === "legal-space-v13"
+					? decisionRequestV13Schema
+					: contextVersion(value) === "non-reverse-v12"
+						? decisionRequestV12Schema
+						: contextVersion(value) === "model-planning-v11"
+							? decisionRequestV11Schema
+							: contextVersion(value) === "post-apple-v10"
+								? decisionRequestV10Schema
+								: contextVersion(value) === "bounded-search-v9"
+									? decisionRequestV9Schema
+									: contextVersion(value) === "global-view-v8"
+										? decisionRequestV8Schema
+										: contextVersion(value) === "local-moves-v7"
+											? decisionRequestV7Schema
+											: contextVersion(value) === "board-state-v6"
+												? decisionRequestV6Schema
+												: contextVersion(value) === "action-outcomes-v5"
+													? decisionRequestV5Schema
+													: contextVersion(value) === "action-facts-v4"
+														? decisionRequestV4Schema
+														: contextVersion(value) === "action-facts-v3"
+															? decisionRequestV3Schema
+															: legacyDecisionRequestSchema
 	).safeParse(value);
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) context.addIssue({ ...issue });
@@ -193,7 +228,7 @@ export const planRequestSchema = z.unknown().transform((value, context) => {
 });
 const fixedConfigSchema = z
 	.object({
-		layoutVersion: z.literal(2).optional(),
+		layoutVersion: z.union([z.literal(2), z.literal(3)]).optional(),
 		stepMode: z.literal("fixed").optional(),
 		decisionMode: z.enum(decisionModes).optional(),
 		width: z.number().int().min(7).default(24),
@@ -222,6 +257,7 @@ export const legacyCreateSchema = z
 	.strict();
 // Creation is response-only; historical configuration parsing stays unchanged.
 export const newConfigSchema = responseConfigSchema.extend({
+	layoutVersion: z.union([z.literal(2), z.literal(3)]).default(3),
 	stepMode: z.literal("response").default("response"),
 	decisionMode: z.literal("single_step").default("single_step"),
 });
@@ -232,12 +268,15 @@ export const forkSchema = createSchema
 	.omit({ config: true })
 	.extend({ sourceSeq: integer })
 	.strict();
-export const decisionSchema = z
+const decisionEnvelopeSchema = z
 	.object({
 		provider: z.enum(["typesafe", "openrouter"]).optional(),
 		model: z.string().min(1),
 		choice: z.enum(directions),
-		probabilities: z.record(z.enum(directions), z.number().min(0).max(1)),
+		probabilities: z.partialRecord(
+			z.enum(directions),
+			z.number().min(0).max(1),
+		),
 		confidence: z.number().min(0).max(1),
 		requestMs: z.number().nonnegative(),
 		inferenceMs: z.number().nonnegative().optional(),
@@ -248,7 +287,38 @@ export const decisionSchema = z
 		request: decisionRequestSchema.optional(),
 	})
 	.strict();
-export const planDecisionSchema = decisionSchema
+export const decisionSchema = decisionEnvelopeSchema.superRefine(
+	(value, context) => {
+		const request = value.request;
+		const candidates =
+			request?.state.contextVersion === "non-reverse-v12" ||
+			request?.state.contextVersion === "legal-space-v13" ||
+			request?.state.contextVersion === "dynamic-space-v14" ||
+			request?.state.contextVersion === "growth-space-v15"
+				? Object.keys(request.questions.direction.criteria)
+				: [...directions];
+		const keys = Object.keys(value.probabilities);
+		if (
+			keys.length !== candidates.length ||
+			candidates.some(
+				(direction) => !Object.hasOwn(value.probabilities, direction),
+			)
+		)
+			context.addIssue({
+				code: "custom",
+				path: ["probabilities"],
+				message:
+					"Probabilities must contain exactly the choices from this request",
+			});
+		if (!candidates.includes(value.choice))
+			context.addIssue({
+				code: "custom",
+				path: ["choice"],
+				message: "The selected direction must be one of this request's choices",
+			});
+	},
+);
+export const planDecisionSchema = decisionEnvelopeSchema
 	.extend({
 		kind: z.literal("plan"),
 		choice: z.enum(planChoices),
@@ -260,6 +330,36 @@ const base = {
 	protocolVersion: z.union([z.literal(1), z.literal(2)]),
 	requestId: z.string().min(1),
 };
+export const stagnationEvidenceSchema: z.ZodType<StagnationEvidence> = z
+	.object({
+		reason: z.enum(stagnationStopReasons),
+		observedTick: integer,
+		movesSinceApple: integer,
+		positionVisits: integer.min(1),
+		maxPositionVisits: integer.min(2),
+		maxMovesWithoutApple: integer.min(1),
+	})
+	.strict()
+	.superRefine((value, context) => {
+		if (
+			value.reason === "stagnation_loop" &&
+			value.positionVisits < value.maxPositionVisits
+		)
+			context.addIssue({
+				code: "custom",
+				path: ["positionVisits"],
+				message: "Repeated position visits must reach the recorded limit",
+			});
+		if (
+			value.reason === "stagnation_no_apple" &&
+			value.movesSinceApple < value.maxMovesWithoutApple
+		)
+			context.addIssue({
+				code: "custom",
+				path: ["movesSinceApple"],
+				message: "Moves without an apple must reach the recorded limit",
+			});
+	});
 export const controlSchema = z.discriminatedUnion("type", [
 	z.object({ ...base, type: z.literal("start") }).strict(),
 	z
@@ -267,8 +367,25 @@ export const controlSchema = z.discriminatedUnion("type", [
 			...base,
 			type: z.literal("stop"),
 			reason: z.string().min(1).default("controller_stop"),
+			guard: stagnationEvidenceSchema.optional(),
 		})
-		.strict(),
+		.strict()
+		.superRefine((value, context) => {
+			if (isStagnationStopReason(value.reason)) {
+				if (!value.guard || value.guard.reason !== value.reason)
+					context.addIssue({
+						code: "custom",
+						path: ["guard"],
+						message: "A stagnation stop requires evidence for the same reason",
+					});
+			} else if (value.guard) {
+				context.addIssue({
+					code: "custom",
+					path: ["guard"],
+					message: "Stagnation evidence belongs only to a stagnation stop",
+				});
+			}
+		}),
 	z
 		.object({
 			...base,

@@ -3,23 +3,24 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "concurrently -k -n game,web \"npm:dev:server\" \"npm:dev:web\"",
+		"dev": "bun run --parallel dev:server dev:web",
 		"generate-routes": "tsr generate",
-		"build": "npm run build:server && vite build",
-		"start": "node .output/server/index.mjs",
+		"build": "bun run build:server && vite build",
+		"start": "bun .output/server/index.mjs",
 		"preview": "vite preview",
+		"serve": "bun run --parallel start:server preview",
 		"format": "oxfmt --write src server shared scripts tests .vscode package.json tsconfig.json tsr.config.json ui.config.json vercel.json vite.config.ts vitest.config.ts .oxfmtrc.json .oxlintrc.json",
 		"format:check": "oxfmt --check src server shared scripts tests .vscode package.json tsconfig.json tsr.config.json ui.config.json vercel.json vite.config.ts vitest.config.ts .oxfmtrc.json .oxlintrc.json",
 		"lint": "oxlint src server shared scripts tests vite.config.ts vitest.config.ts",
-		"check": "npm run format:check && npm run lint",
+		"check": "bun run format:check && bun run lint",
 		"dev:web": "vite dev --port 3000",
-		"dev:server": "tsx watch server/index.ts",
+		"dev:server": "bun --watch server/index.ts",
 		"build:server": "tsc -p server/tsconfig.json",
-		"start:server": "node --env-file=.env .server-build/server/index.js",
+		"start:server": "bun --env-file=.env .server-build/server/index.js",
 		"test": "vitest run",
 		"test:snake": "vitest run",
 		"typecheck": "tsc --noEmit && tsc -p server/tsconfig.json --noEmit",
-		"jev": "tsx scripts/run-jev.ts"
+		"jev": "bun scripts/run-jev.ts"
 	},
 	"dependencies": {
 		"@fontsource/inter": "^5.1.1",
@@ -52,19 +53,15 @@
 		"@types/better-sqlite3": "^9.6.0",
 		"@types/node": "^26.6.2",
 		"@types/ws": "^8.18.1",
-		"concurrently": "^10.0.5",
 		"oxfmt": "0.68.0",
 		"oxlint": "1.83.0",
-		"tsx": "^4.23.13",
-		"typescript": "^6.0.2",
+		"typescript": "^7.0.2",
 		"vite": "^8.0.0",
 		"vite-plugin-solid": "^2.11.12",
 		"vitest": "^5.0.1"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild",
-			"lightningcss"
-		]
-	}
+	"engines": {
+		"bun": ">=1.4.2"
+	},
+	"packageManager": "bun@1.4.2"
 }

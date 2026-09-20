@@ -2,6 +2,7 @@ import { Link } from "@tanstack/solid-router";
 import { Show } from "solid-js";
 import { LiveMatch } from "./LiveMatch";
 import { OwnerControl } from "./OwnerControl";
+import { RoundLoading } from "./RoundLoading";
 import { Problem, Shell } from "./Scene";
 import { channelLabel, createWatchChannel } from "./watchChannel";
 
@@ -28,12 +29,26 @@ export function ContinuousWatchPage(props: { admin?: boolean }) {
 				data-phase={channel.state()?.phase ?? "loading"}
 				role="status"
 			>
-				<strong>
-					{channelLabel(
-						channel.state(),
-						channel.phase() === "live" ? channel.remaining() : null,
-					)}
-				</strong>
+				<Show
+					when={
+						channel.state()?.phase === "starting" &&
+						(channel.state()?.currentMatchId || !displayed())
+					}
+					fallback={
+						<strong>
+							{channelLabel(
+								channel.state(),
+								channel.phase() === "live" ? channel.remaining() : null,
+							)}
+						</strong>
+					}
+				>
+					<RoundLoading
+						phase={channel.state()?.phase}
+						remaining={channel.remaining()}
+						connected={channel.phase() === "live"}
+					/>
+				</Show>
 				<span>
 					{channel.phase() === "live"
 						? "频道已同步"
@@ -71,7 +86,18 @@ export function ContinuousWatchPage(props: { admin?: boolean }) {
 					</div>
 				}
 			>
-				{(id) => <LiveMatch matchId={id} />}
+				{(id) => (
+					<LiveMatch
+						matchId={id}
+						endContent={
+							<RoundLoading
+								phase={channel.state()?.phase}
+								remaining={channel.remaining()}
+								connected={channel.phase() === "live"}
+							/>
+						}
+					/>
+				)}
 			</Show>
 		</Shell>
 	);

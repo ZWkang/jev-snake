@@ -131,7 +131,7 @@ test("owner intent runs two actual engine rounds without viewers, then drains wi
 	const second = f.start();
 	expect(second).not.toBe(first);
 	expect(f.jobs.map((job) => job.options.state.config.layoutVersion)).toEqual([
-		2, 2,
+		3, 3,
 	]);
 	expect(f.jobs[1].options.state.config.seed).not.toBe(
 		f.jobs[0].options.state.config.seed,
@@ -390,4 +390,97 @@ test("shutdown cancels scheduling, cleans active work and preserves enabled inte
 	await vi.advanceTimersByTimeAsync(10000);
 	expect(f.jobs).toHaveLength(1);
 	expect(f.jobs[0].aborts).toBe(1);
+});
+
+test.each(["running", "draining"] as const)(
+	"an explicit immediate stop interrupts a %s round without advancing or scheduling, and remains idempotent",
+	async (phase) => {
+		const f = fixture();
+		f.command(true, "original-enable");
+		await vi.advanceTimersByTimeAsync(0);
+		const id = f.start();
+		if (phase === "draining") f.command(false, "ordinary-stop");
+		const before = publicState(f.store.get(id));
+		const generation = f.channel.store.read().generation;
+		const input = {
+			requestId: "immediate-stop",
+			enabled: false,
+			stopCurrent: true,
+		};
+		const result = f.channel.command(input);
+		expect(result.state).toMatchObject({
+			enabled: false,
+			phase: "stopped",
+			currentMatchId: null,
+			lastMatchId: id,
+			nextStartAt: null,
+			error: null,
+		});
+		expect(f.channel.store.read().generation).toBe(generation + 1);
+		expect(f.store.get(id)).toMatchObject({
+			status: "interrupted",
+			endReason: "controller_stop",
+			tick: before.tick,
+			snake: before.snake,
+			score: before.score,
+		});
+		const stoppedSeq = f.store.get(id).seq;
+		expect(f.jobs[0].aborts).toBe(1);
+		expect(f.channel.command(input).receipt).toEqual(result.receipt);
+		expect(f.store.get(id).seq).toBe(stoppedSeq);
+		expect(f.jobs[0].aborts).toBe(1);
+		expect(() => f.command(false, input.requestId)).toThrow(
+			"different content",
+		);
+		expect(f.command(true, "original-enable").state.phase).toBe("stopped");
+		await vi.advanceTimersByTimeAsync(20000);
+		expect(f.jobs).toHaveLength(1);
+		expect(f.channel.snapshot().phase).toBe("stopped");
+		f.command(true, "explicit-new-round");
+		await vi.advanceTimersByTimeAsync(0);
+		expect(f.jobs).toHaveLength(2);
+		expect(f.jobs[1].options.state.id).not.toBe(id);
+	},
+);
+
+test("immediate stop after a natural terminal event preserves the terminal result and rejects late completion scheduling", async () => {
+	const f = fixture();
+	f.command(true);
+	await vi.advanceTimersByTimeAsync(0);
+	const id = f.start();
+	finishMoves(f.service, f.store, id);
+	const terminal = publicState(f.store.get(id));
+	expect(["gameover", "won"]).toContain(terminal.status);
+	expect(f.channel.snapshot().phase).toBe("running");
+	f.channel.command({
+		requestId: "stop-after-result",
+		enabled: false,
+		stopCurrent: true,
+	});
+	expect(publicState(f.store.get(id))).toEqual(terminal);
+	await vi.advanceTimersByTimeAsync(20000);
+	expect(f.channel.snapshot()).toMatchObject({
+		phase: "stopped",
+		lastMatchId: id,
+		error: null,
+	});
+	expect(f.jobs).toHaveLength(1);
+});
+
+test("immediate stop followed by enable waits for the retired runner and starts only one new round", async () => {
+	const f = fixture();
+	f.command(true);
+	await vi.advanceTimersByTimeAsync(0);
+	const id = f.start();
+	f.channel.command({
+		requestId: "stop-and-replace",
+		enabled: false,
+		stopCurrent: true,
+	});
+	f.command(true);
+	expect(f.jobs).toHaveLength(1);
+	await vi.advanceTimersByTimeAsync(1);
+	expect(f.jobs).toHaveLength(2);
+	expect(f.jobs[1].options.state.id).not.toBe(id);
+	expect(f.store.get(id).endReason).toBe("controller_stop");
 });

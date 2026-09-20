@@ -1,7 +1,8 @@
 import { expect, test, vi } from "vitest";
 import { inspectMove } from "../server/game/engine.js";
+import { decisionBodyV5 } from "../server/jev/analysis-context.js";
 import { continuationDeathProof } from "../server/jev/branch-death.js";
-import { askJev } from "../server/jev/client.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import {
 	advanceGeometry,
 	analyzeAction,
@@ -217,7 +218,7 @@ test("known second-step facts carry the same certificate and growth stays unknow
 	expect(trapInstructions(previous, true)).not.toContain('"move":"second:up_');
 });
 
-test("a model choice is not replaced even when its option carries a fatal certificate", async () => {
+test("offline v5 transport preserves a model choice whose option carries a fatal certificate", async () => {
 	const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(
 		Response.json({
 			model: "test-only-model-choice",
@@ -231,7 +232,11 @@ test("a model choice is not replaced even when its option carries a fatal certif
 			},
 		}),
 	);
-	const decision = await askJev("test-only-credential", edgeState(), { fetch });
+	const { decision } = await sendJevRequest(
+		"test-only-credential",
+		decisionBodyV5(edgeState()),
+		{ fetch },
+	);
 	const body = JSON.parse(String(fetch.mock.calls[0][1]?.body));
 	expect(Object.keys(body.questions.direction.criteria)).toEqual([
 		...directions,

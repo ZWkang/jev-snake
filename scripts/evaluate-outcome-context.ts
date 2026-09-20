@@ -5,10 +5,10 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import {
-	buildDecisionContext,
-	sendJevRequest,
+	buildDecisionContextV5 as buildDecisionContext,
 	type DecisionTiming,
-} from "../server/jev/client.js";
+} from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import { jevConfig } from "../server/jev/config.js";
 import type { SurvivalOutcome } from "../shared/snake/action-outcomes.js";
 import type { DecisionRequestV5 } from "../shared/snake/outcome-context.js";

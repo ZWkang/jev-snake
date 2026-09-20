@@ -6,9 +6,11 @@ import { join, resolve } from "node:path";
 import { afterEach, expect, test } from "vitest";
 import { JEV_ENDPOINT } from "../server/jev/client.js";
 import { startServer } from "../server/start.js";
+import { inspectMove } from "../shared/snake/move-rules.js";
 import {
+	directions,
 	publicState,
-	type DecisionRequestV3,
+	type DecisionRequestV15,
 	type Direction,
 	type PublicState,
 } from "../shared/snake/types.js";
@@ -69,7 +71,7 @@ async function fixture(twoStep = false) {
 		});
 		for (let i = 0; i < 12; i++) {
 			const context = game.service.decisionContext(source.id);
-			const direction: Direction = (["right", "down", "left", "up"] as const)[
+			const direction: Direction = (["left", "down", "right", "up"] as const)[
 				i % 4
 			];
 			const receipt = game.service.command(source.id, {
@@ -128,7 +130,11 @@ async function fixture(twoStep = false) {
 				body: JSON.stringify(body),
 			});
 		},
-		async run(args: string[], mode = "normal") {
+		async run(
+			args: string[],
+			mode = "normal",
+			extraEnv: Record<string, string> = {},
+		) {
 			const hook = join(dir, "transport.mjs");
 			writeFileSync(
 				hook,
@@ -140,13 +146,23 @@ globalThis.fetch = async (input, init) => {
     const body = JSON.parse(init.body);
     appendFileSync(${JSON.stringify(join(dir, "bodies.jsonl"))}, init.body + "\\n");
     const choice = body.state.timing.observedTick === 11 ? "up" : "right";
-    return Response.json({model:"test-only-fork-response",answers:{direction:{type:"choice",choice,probabilities:Object.fromEntries(["up","right","down","left"].map(d=>[d,d===choice?1:0])),confidence:1}}});
+    if (!(choice in body.questions.direction.criteria)) throw new Error("Test fixture chose an unoffered direction");
+    return Response.json({model:"test-only-fork-response",answers:{direction:{type:"choice",choice,probabilities:Object.fromEntries(Object.keys(body.questions.direction.criteria).map(d=>[d,d===choice?1:0])),confidence:1}}});
   }
   if (!url.startsWith(${JSON.stringify(`${root}/`)})) throw new Error("Unexpected test network destination");
   if (url.endsWith("/fork")) appendFileSync(${JSON.stringify(join(dir, "fork-request.json"))}, init.body);
   if (${JSON.stringify(mode)} === "old-health" && url.endsWith("/api/health")) return Response.json({supportedProtocolVersions:[1]});
   if (${JSON.stringify(mode)} === "unsupported-fork" && url.endsWith("/fork")) return Response.json({error:{code:"not_found",message:"Historical fork API is unavailable"}}, {status:404});
   const response = await originalFetch(input, init);
+  if (url.endsWith("/decision-context") && response.ok) {
+    const context = await response.clone().json();
+    if (context.state.tick === 15) {
+      // Four real fork moves suffice to verify continued history and execution.
+      // Stop the controller before the old fixture's intentional wall collision.
+      process.kill(process.pid, "SIGINT");
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+  }
   if (url === ${JSON.stringify(`${root}/api/matches/${source.id}`)} && ${JSON.stringify(mode)} === "missing-source") {
     const body = await response.json(); delete body.config.width;
     return Response.json(body, {status:response.status});
@@ -161,8 +177,7 @@ globalThis.fetch = async (input, init) => {
 			const child = spawn(
 				process.execPath,
 				[
-					"--import",
-					"tsx",
+					"--no-env-file",
 					"--import",
 					hook,
 					resolve("scripts/run-jev.ts"),
@@ -187,6 +202,7 @@ globalThis.fetch = async (input, init) => {
 						SNAKE_OBSTACLES: "700",
 						SNAKE_SEED: "must-not-change-fork",
 						SNAKE_TICK_MS: "50000",
+						...extraEnv,
 					},
 					stdio: ["ignore", "pipe", "pipe"],
 				},
@@ -204,7 +220,7 @@ globalThis.fetch = async (input, init) => {
 			const [code] = await once(child, "close");
 			return { code, output };
 		},
-		bodies(): DecisionRequestV3[] {
+		bodies(): DecisionRequestV15[] {
 			return readFileSync(join(dir, "bodies.jsonl"), "utf8")
 				.trim()
 				.split("\n")
@@ -341,14 +357,13 @@ test("fork CLI requires a paired source and sequence and rejects explicit create
 	f.assertSourceUnchanged();
 });
 
-test("fork runner continues through real HTTP, WS and SQLite from historical tick and accumulated progress", async () => {
+test("with spending protection explicitly disabled, fork runner continues from historical progress", async () => {
 	const f = await fixture();
-	const result = await f.run([
-		"--fork-match",
-		f.source.id,
-		"--fork-seq",
-		String(f.target.seq),
-	]);
+	const result = await f.run(
+		["--fork-match", f.source.id, "--fork-seq", String(f.target.seq)],
+		"normal",
+		{ JEV_STAGNATION_GUARD: "false" },
+	);
 	expect(result.code, result.output).toBe(0);
 	const summary = f.game.store
 		.list()
@@ -361,17 +376,52 @@ test("fork runner continues through real HTTP, WS and SQLite from historical tic
 	expect(forkRequest.controlToken).not.toBe(f.sourceToken);
 	expect(fork.config).toEqual(f.source.config);
 	expect(fork).toMatchObject({
-		status: "gameover",
-		endReason: "wall",
-		tick: 16,
+		status: "interrupted",
+		endReason: "controller_stop",
+		tick: 15,
 		agentName: "Fork runner transport test",
 		model: "jev-1.13.0",
 	});
 	const bodies = f.bodies();
 	expect(bodies.map((body) => body.state.timing.observedTick)).toEqual([
-		11, 12, 13, 14, 15,
+		11, 12, 13, 14,
 	]);
-	expect(bodies[0].state.player.head).toEqual(f.target.state.snake[0]);
+	expect(bodies[0].state.contextVersion).toBe("growth-space-v15");
+	for (const body of bodies) {
+		expect(body.state.contextVersion).toBe("growth-space-v15");
+		const geometry = {
+			config: body.state.board,
+			snake: body.state.player.bodyHeadToTail,
+			direction: body.state.player.direction,
+			obstacles: body.state.board.obstacles,
+			apple: body.state.food.apple,
+		};
+		expect(Object.keys(body.questions.direction.criteria)).toEqual(
+			directions.filter(
+				(direction) =>
+					inspectMove(geometry, direction).immediateCollision === null,
+			),
+		);
+		expect(Object.keys(body.state).sort()).toEqual([
+			"analysisLimits",
+			"board",
+			"contextVersion",
+			"dynamicFacts",
+			"dynamicSemantics",
+			"excludedMoves",
+			"factsSemantics",
+			"food",
+			"moveFacts",
+			"player",
+			"progress",
+			"rules",
+			"timing",
+		]);
+		for (const criterion of Object.values(body.questions.direction.criteria))
+			expect(typeof criterion).toBe("string");
+	}
+	expect(bodies[0].state.player.bodyHeadToTail).toEqual(f.target.state.snake);
+	expect(bodies[0].state.board.obstacles).toEqual(f.target.state.obstacles);
 	expect(bodies[0].state.progress).toMatchObject({
 		historyStartTick: 0,
 		throughTick: 11,
@@ -390,6 +440,9 @@ test("fork runner continues through real HTTP, WS and SQLite from historical tic
 	expect(newActions).toHaveLength(bodies.length);
 	for (const [index, event] of newActions.entries()) {
 		expect(event.state.lastDecision?.request).toEqual(bodies[index]);
+		expect(Object.keys(event.state.lastDecision!.probabilities)).toEqual(
+			Object.keys(bodies[index].questions.direction.criteria),
+		);
 		expect(event.data.targetTick).toBe(12 + index);
 	}
 	expect(result.output).toContain('"sourceTick":11');

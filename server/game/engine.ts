@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
+import { inspectMove } from "../../shared/snake/move-rules.js";
 import type {
-	ActionFact,
 	Direction,
 	GameConfig,
 	MatchState,
@@ -9,10 +9,11 @@ import type {
 import {
 	directions,
 	isResponseMode,
-	opposite,
 	vectors,
 } from "../../shared/snake/types.js";
 import { GameError } from "../errors.js";
+
+export { inspectMove } from "../../shared/snake/move-rules.js";
 
 const key = (p: Point) => `${p.x},${p.y}`;
 export const equal = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
@@ -51,6 +52,38 @@ function connected(config: GameConfig, obstacles: Point[]) {
 		}
 	}
 	return visited.size === config.width * config.height - obstacles.length;
+}
+function balancedObstacleQuota(
+	s: MatchState,
+	candidates: Point[],
+): [number, number] {
+	const total = s.config.width * s.config.height;
+	const remaining = total - s.config.obstacleCount;
+	const boardColors = [Math.ceil(total / 2), Math.floor(total / 2)];
+	const available = [0, 0];
+	for (const point of candidates) available[(point.x + point.y) % 2]++;
+	const quotas: [number, number][] = [];
+	for (const evenCells of new Set([
+		Math.floor(remaining / 2),
+		Math.ceil(remaining / 2),
+	])) {
+		const quota: [number, number] = [
+			boardColors[0] - evenCells,
+			boardColors[1] - (remaining - evenCells),
+		];
+		if (quota.every((count, color) => count >= 0 && count <= available[color]))
+			quotas.push(quota);
+	}
+	if (!quotas.length)
+		throw new GameError(
+			"invalid_map",
+			"Cannot satisfy obstacle count, checkerboard balance and spawn protection",
+		);
+	// Every snake body alternates colors. This necessary balance removes some
+	// impossible boards; it does not prove that a board can be completed.
+	return quotas.length === 1
+		? quotas[0]
+		: quotas[Math.floor(random(s) * quotas.length)];
 }
 function free(s: MatchState, includeStar = false): Point[] {
 	const occupied = new Set(
@@ -123,7 +156,7 @@ export function createState(
 		endReason: null,
 		lastDecision: null,
 	};
-	if (config.layoutVersion === 2) {
+	if (config.layoutVersion === 2 || config.layoutVersion === 3) {
 		// Sample headings equally, then sample a head position with room for the
 		// four-cell body behind it and three clear cells ahead of it.
 		const headings = directions.filter((direction) =>
@@ -171,15 +204,25 @@ export function createState(
 		const j = Math.floor(random(s) * (i + 1));
 		[candidates[i], candidates[j]] = [candidates[j], candidates[i]];
 	}
+	const quota =
+		config.layoutVersion === 3 ? balancedObstacleQuota(s, candidates) : null;
+	const obstacleColors = [0, 0];
 	for (const candidate of candidates) {
 		if (s.obstacles.length === config.obstacleCount) break;
+		const color = (candidate.x + candidate.y) % 2;
+		if (quota && obstacleColors[color] === quota[color]) continue;
 		const next = [...s.obstacles, candidate];
-		if (connected(config, next)) s.obstacles = next;
+		if (connected(config, next)) {
+			s.obstacles = next;
+			obstacleColors[color]++;
+		}
 	}
 	if (s.obstacles.length !== config.obstacleCount)
 		throw new GameError(
 			"invalid_map",
-			"Cannot satisfy obstacle count and connectivity",
+			config.layoutVersion === 3
+				? "Cannot satisfy obstacle count, checkerboard balance and connectivity"
+				: "Cannot satisfy obstacle count and connectivity",
 		);
 	placeApple(s);
 	return s;
@@ -190,31 +233,6 @@ export function expireStar(s: MatchState, at: number) {
 		return true;
 	}
 	return false;
-}
-// Shared by live movement and context analysis so body/tail rules stay identical.
-export function inspectMove(
-	s: Pick<MatchState, "config" | "snake" | "direction" | "obstacles" | "apple">,
-	direction: Direction,
-): Pick<ActionFact, "target" | "eatsApple" | "immediateCollision"> {
-	const from = s.snake[0];
-	const v = vectors[direction];
-	const target = { x: from.x + v.x, y: from.y + v.y };
-	const growing = !!s.apple && equal(target, s.apple);
-	const body = growing ? s.snake : s.snake.slice(0, -1);
-	const immediateCollision =
-		direction === opposite[s.direction]
-			? "reverse"
-			: target.x < 0 ||
-				  target.y < 0 ||
-				  target.x >= s.config.width ||
-				  target.y >= s.config.height
-				? "wall"
-				: s.obstacles.some((p) => equal(p, target))
-					? "obstacle"
-					: body.some((p) => equal(p, target))
-						? "body"
-						: null;
-	return { target, eatsApple: growing, immediateCollision };
 }
 export function move(
 	s: MatchState,

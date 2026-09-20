@@ -1,4 +1,5 @@
 import type { JevProvider } from "../../shared/snake/types.js";
+import { parseStagnationSettings } from "./stagnation.js";
 
 export const JEV_PROVIDERS = {
 	typesafe: {
@@ -16,6 +17,11 @@ export const JEV_PROVIDERS = {
 export function jevConfig(
 	env: Record<string, string | undefined> = process.env,
 ) {
+	if (
+		env.JEV_DYNAMIC_ANALYSIS !== undefined &&
+		!["true", "false"].includes(env.JEV_DYNAMIC_ANALYSIS)
+	)
+		throw new Error("JEV_DYNAMIC_ANALYSIS must be true or false");
 	const provider = env.JEV_PROVIDER ?? "typesafe";
 	if (provider !== "typesafe" && provider !== "openrouter")
 		throw new Error("JEV_PROVIDER must be typesafe or openrouter");
@@ -25,5 +31,11 @@ export function jevConfig(
 		provider: provider as JevProvider,
 		model: env.JEV_MODEL || config.model,
 		apiKey: env[config.keyEnv] ?? "",
+		...(env.JEV_DYNAMIC_ANALYSIS === "false" ? { dynamicAnalysis: false } : {}),
+		...(env.JEV_STAGNATION_GUARD !== undefined ||
+		env.JEV_STAGNATION_MAX_VISITS !== undefined ||
+		env.JEV_STAGNATION_MAX_NO_APPLE_MOVES !== undefined
+			? { stagnationGuard: parseStagnationSettings(env) }
+			: {}),
 	};
 }

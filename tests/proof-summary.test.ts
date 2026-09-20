@@ -1,9 +1,9 @@
 import { expect, test } from "vitest";
+import { decisionBodyV4 as decisionBody } from "../server/jev/analysis-context.js";
 import {
 	continuationDeathProof,
 	type ContinuationDeathProof,
 } from "../server/jev/branch-death.js";
-import { decisionBodyV4 as decisionBody } from "../server/jev/client.js";
 import { advanceGeometry } from "../server/jev/context-v3.js";
 import {
 	summarizeContinuationProof,

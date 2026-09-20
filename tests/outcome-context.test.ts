@@ -1,10 +1,10 @@
 import { expect, test, vi } from "vitest";
 import {
-	askJev,
-	buildDecisionContext,
+	buildDecisionContextV5 as buildDecisionContext,
 	buildDecisionContextV4,
 	decisionBodyV3,
-} from "../server/jev/client.js";
+} from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import {
 	decisionRequestSchema,
 	decisionSchema,
@@ -158,7 +158,7 @@ test("winning and historical bodies remain distinct and unmodified in presentati
 	expect(view.json).not.toContain("witnessContinuity");
 });
 
-test("JEV still owns a losing choice; provider receives v5 only and the archive remains separate", async () => {
+test("offline v5 transport preserves a losing choice and keeps the archive separate", async () => {
 	const fetch = vi.fn<typeof globalThis.fetch>(async () =>
 		Response.json({
 			model: "test-model",
@@ -172,8 +172,10 @@ test("JEV still owns a losing choice; provider receives v5 only and the archive 
 			},
 		}),
 	);
-	const decision = await askJev("test-credential", checkpoint(large), {
+	const built = buildDecisionContext(checkpoint(large));
+	const { decision } = await sendJevRequest("test-credential", built.request, {
 		fetch,
+		evidence: built.evidence,
 	});
 	const body = JSON.parse(String(fetch.mock.calls[0][1]?.body));
 	expect(body.questions.direction.criteria.up.survival.status).toBe(

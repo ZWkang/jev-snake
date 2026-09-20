@@ -11,9 +11,25 @@ export const randomBoardSizes = [
 	{ width: 24, height: 18 },
 ] as const;
 
+export const watchBoardSizes = [
+	{ width: 8, height: 6 },
+	{ width: 8, height: 8 },
+	{ width: 10, height: 8 },
+	{ width: 12, height: 9 },
+	{ width: 14, height: 10 },
+	{ width: 16, height: 12 },
+] as const;
+
+export function watchGameConfig(
+	env: Record<string, string | undefined>,
+): ResponseGameConfig {
+	return gameConfig(env, {}, watchBoardSizes);
+}
+
 export function gameConfig(
 	env: Record<string, string | undefined>,
 	values: Record<string, string | undefined> = {},
+	boardSizes: readonly { width: number; height: number }[] = randomBoardSizes,
 ): ResponseGameConfig {
 	const stepMode = values["step-mode"] ?? env.SNAKE_STEP_MODE ?? "response";
 	if (stepMode !== "response")
@@ -37,11 +53,11 @@ export function gameConfig(
 			.update(`snake-board-size-v1:${seed}`)
 			.digest()
 			.readUInt32BE(0) / 0x100000000;
-	const size = randomBoardSizes[Math.floor(sample * randomBoardSizes.length)];
+	const size = boardSizes[Math.floor(sample * boardSizes.length)];
 	const width = Number(values.width ?? env.SNAKE_WIDTH ?? size.width);
 	const height = Number(values.height ?? env.SNAKE_HEIGHT ?? size.height);
 	return newConfigSchema.parse({
-		layoutVersion: 2,
+		layoutVersion: 3,
 		stepMode,
 		decisionMode,
 		width,

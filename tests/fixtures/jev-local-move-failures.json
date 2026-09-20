@@ -1,0 +1,374 @@
+[
+	{
+		"source": {
+			"matchId": "e05fe026-141f-44a7-84c2-934d189e7818",
+			"seq": 3,
+			"tick": 1,
+			"choice": "down"
+		},
+		"state": {
+			"id": "e05fe026-141f-44a7-84c2-934d189e7818",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 12,
+				"height": 9,
+				"obstacleCount": 3,
+				"tickIntervalMs": null,
+				"seed": "bf7f2a8e-5986-4338-8630-5c87f55dce70"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T20:06:06.967Z",
+			"startedAt": "2026-09-19T20:06:07.000Z",
+			"endedAt": null,
+			"seq": 3,
+			"tick": 1,
+			"gameTimeMs": 1020.1012499999997,
+			"score": 0,
+			"applesEaten": 0,
+			"snake": [
+				{
+					"x": 7,
+					"y": 5
+				},
+				{
+					"x": 6,
+					"y": 5
+				},
+				{
+					"x": 6,
+					"y": 6
+				},
+				{
+					"x": 6,
+					"y": 7
+				}
+			],
+			"direction": "right",
+			"obstacles": [
+				{
+					"x": 9,
+					"y": 3
+				},
+				{
+					"x": 7,
+					"y": 6
+				},
+				{
+					"x": 5,
+					"y": 3
+				}
+			],
+			"apple": {
+				"x": 7,
+				"y": 8
+			},
+			"star": null,
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 1020.1012499999997,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "right",
+				"tick": 1,
+				"targetTick": 1,
+				"requestId": "b8c95abd-0ee0-44e5-8c00-aef89c71cf6f",
+				"observedTick": 0
+			}
+		}
+	},
+	{
+		"source": {
+			"matchId": "21595a4e-2c37-49f7-abc7-c3c1ade35897",
+			"seq": 563,
+			"tick": 276,
+			"choice": "down"
+		},
+		"state": {
+			"id": "21595a4e-2c37-49f7-abc7-c3c1ade35897",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 16,
+				"height": 12,
+				"obstacleCount": 5,
+				"tickIntervalMs": null,
+				"seed": "08aa3637-43b8-47b9-a3be-68f7e3ed4da3"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T19:43:28.724Z",
+			"startedAt": "2026-09-19T19:43:28.766Z",
+			"endedAt": null,
+			"seq": 563,
+			"tick": 276,
+			"gameTimeMs": 101961.27545899998,
+			"score": 360,
+			"applesEaten": 27,
+			"snake": [
+				{
+					"x": 6,
+					"y": 8
+				},
+				{
+					"x": 6,
+					"y": 7
+				},
+				{
+					"x": 5,
+					"y": 7
+				},
+				{
+					"x": 5,
+					"y": 6
+				},
+				{
+					"x": 5,
+					"y": 5
+				},
+				{
+					"x": 5,
+					"y": 4
+				},
+				{
+					"x": 5,
+					"y": 3
+				},
+				{
+					"x": 4,
+					"y": 3
+				},
+				{
+					"x": 3,
+					"y": 3
+				},
+				{
+					"x": 2,
+					"y": 3
+				},
+				{
+					"x": 1,
+					"y": 3
+				},
+				{
+					"x": 0,
+					"y": 3
+				},
+				{
+					"x": 0,
+					"y": 2
+				},
+				{
+					"x": 1,
+					"y": 2
+				},
+				{
+					"x": 2,
+					"y": 2
+				},
+				{
+					"x": 3,
+					"y": 2
+				},
+				{
+					"x": 3,
+					"y": 1
+				},
+				{
+					"x": 4,
+					"y": 1
+				},
+				{
+					"x": 5,
+					"y": 1
+				},
+				{
+					"x": 6,
+					"y": 1
+				},
+				{
+					"x": 7,
+					"y": 1
+				},
+				{
+					"x": 8,
+					"y": 1
+				},
+				{
+					"x": 9,
+					"y": 1
+				},
+				{
+					"x": 10,
+					"y": 1
+				},
+				{
+					"x": 11,
+					"y": 1
+				},
+				{
+					"x": 11,
+					"y": 2
+				},
+				{
+					"x": 12,
+					"y": 2
+				},
+				{
+					"x": 12,
+					"y": 3
+				},
+				{
+					"x": 13,
+					"y": 3
+				},
+				{
+					"x": 14,
+					"y": 3
+				},
+				{
+					"x": 14,
+					"y": 4
+				}
+			],
+			"direction": "down",
+			"obstacles": [
+				{
+					"x": 6,
+					"y": 9
+				},
+				{
+					"x": 10,
+					"y": 5
+				},
+				{
+					"x": 2,
+					"y": 1
+				},
+				{
+					"x": 5,
+					"y": 8
+				},
+				{
+					"x": 6,
+					"y": 6
+				}
+			],
+			"apple": {
+				"x": 14,
+				"y": 2
+			},
+			"star": null,
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 1457.8992089999956,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "down",
+				"tick": 276,
+				"targetTick": 276,
+				"requestId": "40cd20db-7c23-4f97-a74b-7098683942a2",
+				"observedTick": 275
+			}
+		}
+	},
+	{
+		"source": {
+			"matchId": "dd76f7f6-27ae-4640-b6d9-db7fe4daa73a",
+			"seq": 31,
+			"tick": 15,
+			"choice": "left"
+		},
+		"state": {
+			"id": "dd76f7f6-27ae-4640-b6d9-db7fe4daa73a",
+			"agentName": "JEV 连续观战 · openrouter",
+			"model": "typesafe/jev-1.13",
+			"config": {
+				"layoutVersion": 2,
+				"stepMode": "response",
+				"decisionMode": "single_step",
+				"width": 12,
+				"height": 9,
+				"obstacleCount": 3,
+				"tickIntervalMs": null,
+				"seed": "96c73d22-28de-4762-bb4a-aeced9095223"
+			},
+			"recordVersion": 3,
+			"rulesVersion": 3,
+			"status": "running",
+			"createdAt": "2026-09-19T20:06:13.494Z",
+			"startedAt": "2026-09-19T20:06:13.506Z",
+			"endedAt": null,
+			"seq": 31,
+			"tick": 15,
+			"gameTimeMs": 5908.250375,
+			"score": 10,
+			"applesEaten": 1,
+			"snake": [
+				{
+					"x": 5,
+					"y": 4
+				},
+				{
+					"x": 4,
+					"y": 4
+				},
+				{
+					"x": 3,
+					"y": 4
+				},
+				{
+					"x": 3,
+					"y": 3
+				},
+				{
+					"x": 3,
+					"y": 2
+				}
+			],
+			"direction": "right",
+			"obstacles": [
+				{
+					"x": 5,
+					"y": 5
+				},
+				{
+					"x": 6,
+					"y": 4
+				},
+				{
+					"x": 1,
+					"y": 6
+				}
+			],
+			"apple": {
+				"x": 4,
+				"y": 3
+			},
+			"star": null,
+			"endReason": null,
+			"lastDecision": null,
+			"lastStepDurationMs": 344.7723330000008,
+			"lastAppliedAction": {
+				"source": "primary",
+				"stepIndex": 0,
+				"direction": "right",
+				"tick": 15,
+				"targetTick": 15,
+				"requestId": "fb7dbf79-020d-47ab-80a1-0ee022c44b4e",
+				"observedTick": 14
+			}
+		}
+	}
+]

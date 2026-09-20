@@ -4,22 +4,37 @@ import {
 	createSignal,
 	createUniqueId,
 	Index,
+	type JSX,
 	onCleanup,
 	onMount,
 	Show,
 } from "solid-js";
 import type { Point, PublicState } from "../../../shared/snake/types";
-import { isResponseMode } from "../../../shared/snake/types";
 import { directionName, reasonName, statusName } from "./api";
 import { snakeColors } from "./appearance";
+import {
+	canInterpolateSnakeMove,
+	snakeColorBands,
+	snakeGeometry,
+} from "./snakeGeometry";
+import { motionDuration, SnakeMotion } from "./snakeMotion";
 
 export function SnakeBoard(props: {
 	state: PublicState;
 	animate?: boolean;
 	playbackRate?: number;
+	endContent?: JSX.Element;
 }) {
 	const id = createUniqueId();
-	const [positions, setPositions] = createSignal<Point[]>(props.state.snake);
+	const motion = new SnakeMotion(props.state.snake);
+	const [geometry, setGeometry] = createSignal(
+		snakeGeometry(props.state.snake),
+	);
+	const directionAngle = (direction: PublicState["direction"]) =>
+		({ right: 0, down: 90, left: 180, up: 270 })[direction];
+	let orientation = directionAngle(props.state.direction);
+	const [heading, setHeading] = createSignal(orientation);
+	const [turnDuration, setTurnDuration] = createSignal(0);
 	const [reduced, setReduced] = createSignal(false);
 	const [assetError, setAssetError] = createSignal(false);
 	const [feedback, setFeedback] = createSignal(0);
@@ -33,52 +48,83 @@ export function SnakeBoard(props: {
 		m.addEventListener("change", change);
 		onCleanup(() => m.removeEventListener("change", change));
 	});
+	function stopAnimation() {
+		if (raf) cancelAnimationFrame(raf);
+		raf = 0;
+	}
+	function face(direction: PublicState["direction"], milliseconds = 0) {
+		const target = directionAngle(direction);
+		orientation =
+			milliseconds > 0
+				? orientation +
+					((((target - orientation + 540) % 360) + 360) % 360) -
+					180
+				: target;
+		setTurnDuration(Math.min(140, milliseconds));
+		setHeading(orientation);
+	}
+	function snap(state: PublicState) {
+		stopAnimation();
+		motion.snap(state.snake);
+		setGeometry(motion.sample(performance.now()));
+		face(state.direction);
+	}
+	const draw = (now: number) => {
+		raf = 0;
+		setGeometry(motion.sample(now));
+		if (motion.isAnimating) raf = requestAnimationFrame(draw);
+	};
 	createEffect(() => {
-		const s = props.state;
+		const state = props.state;
 		const animate = props.animate !== false && !reduced();
 		const old = previous;
-		previous = s;
+		previous = state;
 		if (
-			old &&
-			old.id === s.id &&
+			old?.id === state.id &&
 			animate &&
-			s.tick === old.tick + 1 &&
-			s.score > old.score
+			state.tick === old.tick + 1 &&
+			state.score > old.score
 		) {
 			clearTimeout(feedbackTimer);
-			setFeedback(s.score - old.score);
+			setFeedback(state.score - old.score);
 			feedbackTimer = setTimeout(() => setFeedback(0), 450);
-		} else if (!animate || old?.id !== s.id || s.tick < (old?.tick ?? 0)) {
+		} else if (
+			!animate ||
+			old?.id !== state.id ||
+			state.tick < (old?.tick ?? 0)
+		) {
 			clearTimeout(feedbackTimer);
 			setFeedback(0);
 		}
-		if (old?.id === s.id && old.tick === s.tick && animate) return;
-		if (raf) cancelAnimationFrame(raf);
-		if (
-			!old ||
-			old.id !== s.id ||
-			!animate ||
-			isResponseMode(s.config) ||
-			s.tick !== old.tick + 1 ||
-			s.status === "interrupted"
-		) {
-			setPositions(s.snake);
+		// Turning animation off, seeking or receiving a terminal snapshot must stop
+		// an in-flight tween even when the committed tick has not changed.
+		if (!old || old.id !== state.id || !animate || state.status !== "running") {
+			snap(state);
 			return;
 		}
-		const start = performance.now();
-		const from = old.snake;
-		const ms = (s.config.tickIntervalMs / (props.playbackRate ?? 1)) * 0.8;
-		const draw = (now: number) => {
-			const t = Math.min(1, (now - start) / ms);
-			setPositions(
-				s.snake.map((point, i) => {
-					const p = from[i] ?? point;
-					return { x: p.x + (point.x - p.x) * t, y: p.y + (point.y - p.y) * t };
-				}),
-			);
-			if (t < 1) raf = requestAnimationFrame(draw);
-		};
-		raf = requestAnimationFrame(draw);
+		if (
+			state.tick === old.tick &&
+			state.snake.length === old.snake.length &&
+			state.snake.every(
+				(point, index) =>
+					point.x === old.snake[index].x && point.y === old.snake[index].y,
+			)
+		)
+			return;
+		if (
+			state.tick !== old.tick + 1 ||
+			!canInterpolateSnakeMove(old.snake, state.snake)
+		) {
+			snap(state);
+			return;
+		}
+		stopAnimation();
+		const now = performance.now();
+		const duration = motionDuration(state, props.playbackRate ?? 1);
+		motion.move(old.snake, state.snake, now, duration);
+		setGeometry(motion.sample(now));
+		face(state.direction, duration);
+		if (motion.isAnimating) raf = requestAnimationFrame(draw);
 	});
 	onCleanup(() => {
 		if (raf) cancelAnimationFrame(raf);
@@ -87,8 +133,9 @@ export function SnakeBoard(props: {
 	const width = () => props.state.config.width * 32;
 	const height = () => props.state.config.height * 32;
 	const colors = createMemo(() => snakeColors(props.state.config));
-	const angle = () =>
-		({ right: 0, down: 90, left: 180, up: 270 })[props.state.direction];
+	const bands = createMemo(() =>
+		colors().length > 1 ? snakeColorBands(geometry()) : [],
+	);
 	function Reward(rewardProps: { point: Point; star: boolean }) {
 		return (
 			<g
@@ -135,6 +182,27 @@ export function SnakeBoard(props: {
 				}}
 			>
 				<defs>
+					<Index each={bands()}>
+						{(band, index) => (
+							<linearGradient
+								id={`${id}-body-${index}`}
+								gradientUnits="userSpaceOnUse"
+								x1={band().head.x}
+								y1={band().head.y}
+								x2={band().tail.x}
+								y2={band().tail.y}
+							>
+								<stop
+									offset="0"
+									stop-color={colors()[index % colors().length]}
+								/>
+								<stop
+									offset="1"
+									stop-color={colors()[(index + 1) % colors().length]}
+								/>
+							</linearGradient>
+						)}
+					</Index>
 					<pattern
 						id={`${id}-grid`}
 						width="32"
@@ -186,64 +254,68 @@ export function SnakeBoard(props: {
 						</g>
 					)}
 				</Index>
-				<Index each={positions()}>
-					{(p, i) => (
-						<g
-							data-kind="snake"
-							transform={`translate(${p().x * 32} ${p().y * 32})`}
-						>
-							<rect
-								x="1.5"
-								y="2.5"
-								width="29"
-								height="29"
-								rx={i === 0 ? "10" : "7"}
-								fill="#171717"
-							/>
-							<rect
-								x="1.5"
-								y="1"
-								width="29"
-								height="29"
-								rx={i === 0 ? "10" : "7"}
-								fill={colors()[i % colors().length]}
-								stroke="#171717"
-								stroke-width="2.5"
-							/>
+				<g
+					data-kind="snake"
+					fill="none"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path
+						class="snake-body-outline"
+						d={geometry().path}
+						stroke="#171717"
+						stroke-width="28"
+					/>
+					<path
+						class="snake-body-fill"
+						d={geometry().path}
+						stroke={colors()[0]}
+						stroke-width="24"
+					/>
+					<Index each={bands()}>
+						{(band, index) => (
 							<path
-								d="M7 10Q7 6 15 6"
-								stroke="#fff8dc"
-								stroke-width="3"
-								stroke-linecap="round"
-								fill="none"
+								class="snake-body-color"
+								d={band().path}
+								stroke={`url(#${id}-body-${index})`}
+								stroke-width="24"
 							/>
-							<Show when={i === 0}>
-								<g transform={`rotate(${angle()} 16 16)`}>
-									<ellipse
-										cx="23"
-										cy="10"
-										rx="5"
-										ry="6"
-										fill="white"
-										stroke="#171717"
-										stroke-width="1.5"
-									/>
-									<ellipse
-										cx="23"
-										cy="23"
-										rx="5"
-										ry="6"
-										fill="white"
-										stroke="#171717"
-										stroke-width="1.5"
-									/>
-									<circle cx="25" cy="10" r="2.2" fill="#171717" />
-									<circle cx="25" cy="23" r="2.2" fill="#171717" />
-								</g>
-							</Show>
-						</g>
-					)}
-				</Index>
+						)}
+					</Index>
+				</g>
+				<g
+					data-kind="snake-head"
+					transform={`translate(${geometry().head.x} ${geometry().head.y})`}
+				>
+					<g
+						class="snake-face"
+						style={{
+							transform: `rotate(${heading()}deg)`,
+							"--snake-turn-duration": `${turnDuration()}ms`,
+						}}
+					>
+						<ellipse
+							cx="4"
+							cy="-5.5"
+							rx="3.6"
+							ry="4.5"
+							fill="#fffef7"
+							stroke="#171717"
+							stroke-width="1.2"
+						/>
+						<ellipse
+							cx="4"
+							cy="5.5"
+							rx="3.6"
+							ry="4.5"
+							fill="#fffef7"
+							stroke="#171717"
+							stroke-width="1.2"
+						/>
+						<circle cx="5.8" cy="-5.5" r="1.6" fill="#171717" />
+						<circle cx="5.8" cy="5.5" r="1.6" fill="#171717" />
+					</g>
+				</g>
 				<Show when={props.state.apple}>
 					{(p) => <Reward point={p()} star={false} />}
 				</Show>
@@ -296,6 +368,7 @@ export function SnakeBoard(props: {
 					<p>
 						{props.state.score} 分 · {props.state.tick} 步
 					</p>
+					{props.endContent}
 				</div>
 			</Show>
 			<Show when={assetError()}>

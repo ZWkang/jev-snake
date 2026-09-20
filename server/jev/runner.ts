@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import WebSocket from "ws";
+import type { StagnationEvidence } from "../../shared/snake/stagnation.js";
 import {
 	isResponseMode,
 	type DecisionContext,
@@ -11,6 +12,7 @@ import {
 import { askJev } from "./client.js";
 import type { jevConfig } from "./config.js";
 import { gameClient } from "./game-client.js";
+import { evaluateStagnation } from "./stagnation.js";
 
 export type RunJevOptions = {
 	root: string;
@@ -42,11 +44,13 @@ export async function runJevMatch(
 		{ resolve: (r: Receipt) => void; reject: (error: Error) => void }
 	>();
 	let inference: AbortController | null = null;
-	let activeRequest: {
-		observedTick: number;
-		targetTick: number;
-		started: number;
-	} | null = null;
+	const inFlight: {
+		request: {
+			observedTick: number;
+			targetTick: number;
+			started: number;
+		} | null;
+	} = { request: null };
 	let connectionError: Error | null = null;
 	function observe(state: PublicState) {
 		if (state.seq < latest.seq) return;
@@ -126,7 +130,7 @@ export async function runJevMatch(
 	}
 	let stopping = false;
 	let stopTask: Promise<void> | undefined;
-	function stop(reason: string): Promise<void> {
+	function stop(reason: string, guard?: StagnationEvidence): Promise<void> {
 		if (stopTask) return stopTask;
 		stopping = true;
 		inference?.abort(new DOMException(reason, "AbortError"));
@@ -134,16 +138,36 @@ export async function runJevMatch(
 			if (
 				socket.readyState === WebSocket.OPEN &&
 				(latest.status === "running" || latest.status === "ready")
-			)
-				await command({ type: "stop", reason });
+			) {
+				const receipt = await command({
+					type: "stop",
+					reason,
+					...(guard ? { guard } : {}),
+				});
+				if (guard && receipt.status !== "applied")
+					throw new Error(
+						`Spending protection stop was rejected: ${receipt.code ?? receipt.status}`,
+					);
+			}
 		})();
 		return stopTask;
 	}
 	const onAbort = () => {
+		const cancellation = options.signal?.reason;
+		if (
+			cancellation instanceof Error &&
+			"matchStopped" in cancellation &&
+			cancellation.matchStopped === latest.id
+		) {
+			// The owner already committed this match's terminal state. A second
+			// stop can race its WS event and create a spurious rejection record.
+			stopping = true;
+			inference?.abort(cancellation);
+			stopTask ??= Promise.resolve();
+			return;
+		}
 		const reason =
-			options.signal?.reason instanceof Error
-				? options.signal.reason.message
-				: "controller_stop";
+			cancellation instanceof Error ? cancellation.message : "controller_stop";
 		void stop(reason).catch(connectionFailed);
 	};
 	options.signal?.addEventListener("abort", onAbort, { once: true });
@@ -198,25 +222,56 @@ export async function runJevMatch(
 				throw new Error(
 					"Game server progress history does not match observed tick",
 				);
-			inference = new AbortController();
-			activeRequest = {
-				observedTick: context.state.tick,
-				targetTick: context.targetTick,
-				started: performance.now(),
-			};
-			log(
-				JSON.stringify({
-					type: "model_request_started",
-					provider: jev.provider,
-					model: jev.model,
-					observedTick: context.state.tick,
-					targetTick: context.targetTick,
-					movesSinceApple: context.progress.movesSinceApple,
-					positionVisits: context.progress.positionVisits,
-					repeatAfterMoves: context.progress.repeatAfterMoves,
-				}),
+			const guard = evaluateStagnation(
+				context.state,
+				context.progress,
+				jev.stagnationGuard,
 			);
+			if (guard) {
+				log(
+					JSON.stringify({
+						type: "stagnation_guard_triggered",
+						matchId: latest.id,
+						...guard,
+					}),
+				);
+				await stop(guard.reason, guard);
+				const stoppedState = await request<PublicState>(
+					`/api/matches/${latest.id}`,
+					controlToken,
+				);
+				observe(stoppedState);
+				if (
+					stoppedState.status !== "interrupted" ||
+					stoppedState.endReason !== guard.reason
+				)
+					throw new Error(
+						"Spending protection did not persist the expected interruption",
+					);
+				break;
+			}
+			inference = new AbortController();
 			const decision = await askJev(jev.apiKey, context.state, {
+				dynamicAnalysis: jev.dynamicAnalysis,
+				onRequestStarted: () => {
+					inFlight.request = {
+						observedTick: context.state.tick,
+						targetTick: context.targetTick,
+						started: performance.now(),
+					};
+					log(
+						JSON.stringify({
+							type: "model_request_started",
+							provider: jev.provider,
+							model: jev.model,
+							observedTick: context.state.tick,
+							targetTick: context.targetTick,
+							movesSinceApple: context.progress.movesSinceApple,
+							positionVisits: context.progress.positionVisits,
+							repeatAfterMoves: context.progress.repeatAfterMoves,
+						}),
+					);
+				},
 				signal: inference.signal,
 				provider: jev.provider,
 				model: jev.model,
@@ -226,6 +281,8 @@ export async function runJevMatch(
 					deadlineInMs: context.deadlineInMs,
 				},
 			});
+			if (stopping || options.signal?.aborted || latest.status !== "running")
+				break;
 			const receipt = await command({
 				type: "action",
 				observedSeq: context.observedSeq,
@@ -250,7 +307,7 @@ export async function runJevMatch(
 				}),
 			);
 			inference = null;
-			activeRequest = null;
+			inFlight.request = null;
 			if (
 				receipt.status === "applied" ||
 				(receipt.status === "rejected" && receipt.code === "stale_state")
@@ -267,7 +324,7 @@ export async function runJevMatch(
 				error === inference.signal.reason &&
 				(stopping ||
 					(latest.status !== "running" && latest.status !== "ready")));
-		if (activeRequest) {
+		if (inFlight.request) {
 			const failure = error instanceof Error ? error : new Error(String(error));
 			const cause = failure.cause as NodeJS.ErrnoException | undefined;
 			reportError(
@@ -276,9 +333,9 @@ export async function runJevMatch(
 						? "model_request_cancelled"
 						: "model_request_failed",
 					provider: jev.provider,
-					observedTick: activeRequest.observedTick,
-					targetTick: activeRequest.targetTick,
-					elapsedMs: Math.round(performance.now() - activeRequest.started),
+					observedTick: inFlight.request.observedTick,
+					targetTick: inFlight.request.targetTick,
+					elapsedMs: Math.round(performance.now() - inFlight.request.started),
 					reason: failure.message.replaceAll(jev.apiKey, "[redacted]"),
 					code: cause?.code,
 				}),

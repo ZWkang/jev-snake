@@ -1,20 +1,20 @@
 import { expect, test, vi } from "vitest";
-import { createState, move } from "../server/game/engine.js";
-import {
-	askJev,
-	decisionBodyV4,
-	JEV_ENDPOINT,
-	JEV_MODEL,
-} from "../server/jev/client.js";
+import { createState, move, inspectMove } from "../server/game/engine.js";
+import { decisionBodyV4 } from "../server/jev/analysis-context.js";
+import { askJev, JEV_ENDPOINT, JEV_MODEL } from "../server/jev/client.js";
 import { JEV_PROVIDERS, jevConfig } from "../server/jev/config.js";
-import { analyzeActions } from "../server/jev/context-v3.js";
 import { actionFacts } from "../server/jev/context.js";
 import { planBody } from "../server/jev/legacy-context.js";
 import {
 	decisionRequestSchema,
 	planRequestSchema,
 } from "../shared/snake/schema.js";
-import { directions, publicState } from "../shared/snake/types.js";
+import {
+	directions,
+	opposite,
+	publicState,
+	type Direction,
+} from "../shared/snake/types.js";
 import { deadEndReplay, nearComplete } from "./context-fixture.js";
 
 const state = publicState(
@@ -27,27 +27,52 @@ const state = publicState(
 			height: 18,
 			obstacleCount: 0,
 			seed: "test",
-			tickIntervalMs: 125,
+			stepMode: "response",
+			tickIntervalMs: null,
 		},
 		"now",
 	),
 );
+const legacyState = {
+	...state,
+	config: { ...state.config, stepMode: "fixed" as const, tickIntervalMs: 125 },
+};
+
 const answer = {
 	model: JEV_MODEL,
 	answers: {
 		direction: {
 			type: "choice",
 			choice: "up",
-			probabilities: { up: 0.7, right: 0.1, down: 0.1, left: 0.1 },
+			probabilities: { up: 0.7, right: 0.2, down: 0.1, left: 0 } as Partial<
+				Record<Direction, number>
+			>,
 			confidence: 0.8,
 		},
 	},
 	usage: { input_tokens: 123 },
 };
+
+function responseFor(init: RequestInit | undefined, payload = answer) {
+	const request = JSON.parse(init!.body as string);
+	const response = structuredClone(payload);
+	response.answers.direction.probabilities = Object.fromEntries(
+		Object.keys(request.questions.direction.criteria).map((direction) => {
+			const probability =
+				payload.answers.direction.probabilities[direction as Direction];
+			if (probability === undefined)
+				throw new Error(`Missing test probability for ${direction}`);
+			return [direction, probability];
+		}),
+	);
+	return response;
+}
 test("uses the real Decisions contract and preserves probabilities", async () => {
 	const transport = vi
 		.fn<typeof fetch>()
-		.mockResolvedValue(Response.json(answer));
+		.mockImplementation(async (_input, init) =>
+			Response.json(responseFor(init)),
+		);
 	const d = await askJev("unit-test-credential", state, { fetch: transport });
 	const [url, init] = transport.mock.calls[0];
 	expect(url).toBe(JEV_ENDPOINT);
@@ -56,29 +81,55 @@ test("uses the real Decisions contract and preserves probabilities", async () =>
 	expect(body.questions.direction.type).toBe("choice");
 	expect(body).not.toHaveProperty("messages");
 	expect(body.state.player).toEqual({
-		head: state.snake[0],
+		bodyHeadToTail: state.snake,
 		direction: state.direction,
-		length: state.snake.length,
 		score: state.score,
+		applesEaten: state.applesEaten,
 	});
-	expect(body.state.board).toEqual({ width: 24, height: 18, obstacleCount: 0 });
-	expect(body.state).not.toHaveProperty("actionFacts");
-	expect(body.state.player).not.toHaveProperty("bodyHeadToTail");
-	expect(body.state.board).not.toHaveProperty("obstacles");
-	expect(body.state.contextVersion).toBe("action-outcomes-v5");
-	expect(body.questions.direction.criteria.left.survival.collision).toBe(
-		"reverse",
+	expect(body.state.board).toMatchObject({
+		width: 24,
+		height: 18,
+		obstacles: [],
+	});
+	expect(Object.keys(body.state.board).sort()).toEqual([
+		"ascii",
+		"height",
+		"obstacles",
+		"width",
+	]);
+	expect(body.state.contextVersion).toBe("growth-space-v15");
+	expect(Object.keys(body.state).sort()).toEqual([
+		"analysisLimits",
+		"board",
+		"contextVersion",
+		"dynamicFacts",
+		"dynamicSemantics",
+		"excludedMoves",
+		"factsSemantics",
+		"food",
+		"moveFacts",
+		"player",
+		"rules",
+		"timing",
+	]);
+	expect(Object.keys(body.questions.direction.criteria)).toEqual(
+		directions.filter(
+			(direction) => inspectMove(state, direction).immediateCollision === null,
+		),
 	);
-	expect(body.questions.direction.criteria.up.space).toEqual(
-		analyzeActions(state).up.space,
-	);
-	expect(body.questions.direction.criteria.up).toHaveProperty("summary");
+	for (const value of Object.values(body.questions.direction.criteria))
+		expect(typeof value).toBe("string");
+	expect(d).not.toHaveProperty("evidence");
 	expect(body.state.timing).toMatchObject({
 		stateIsProjected: false,
 		observedTick: state.tick,
 		targetTick: state.tick + 1,
 	});
 	expect(d.probabilities.up).toBe(0.7);
+	expect(Object.keys(d.probabilities)).toEqual(
+		Object.keys(body.questions.direction.criteria),
+	);
+	expect(d.probabilities).not.toHaveProperty(opposite[state.direction]);
 	expect(d.inputTokens).toBe(123);
 	expect(d.request).toEqual(body);
 	expect(d.contextBuildMs).toBeGreaterThanOrEqual(0);
@@ -173,7 +224,11 @@ test("missing key, upstream errors and invalid choices fail explicitly", async (
 	invalid.answers.direction.choice = "diagonal";
 	await expect(
 		askJev("unit-test-credential", state, {
-			fetch: vi.fn<typeof fetch>().mockResolvedValue(Response.json(invalid)),
+			fetch: vi
+				.fn<typeof fetch>()
+				.mockImplementation(async (_input, init) =>
+					Response.json(responseFor(init, invalid)),
+				),
 		}),
 	).rejects.toThrow("Invalid JEV");
 });
@@ -194,7 +249,9 @@ test("provider selection keeps endpoints and credentials separate without automa
 	expect(() => jevConfig({ JEV_PROVIDER: "unknown" })).toThrow("JEV_PROVIDER");
 	const transport = vi
 		.fn<typeof fetch>()
-		.mockResolvedValue(Response.json(answer));
+		.mockImplementation(async (_input, init) =>
+			Response.json(responseFor(init)),
+		);
 	const result = await askJev("openrouter-test-key", state, {
 		provider: "openrouter",
 		fetch: transport,
@@ -209,8 +266,8 @@ test("provider selection keeps endpoints and credentials separate without automa
 });
 
 test.each([
-	{ up: 0.26, right: 0.68, down: 0.05, left: 0 },
-	{ up: 0.3, right: 0.7, down: 0.01, left: 0 },
+	{ up: 0.26, right: 0.68, down: 0.05 },
+	{ up: 0.3, right: 0.7, down: 0.01 },
 ])(
 	"probability totals do not block or alter a valid decision: %j",
 	async (probabilities) => {
@@ -220,7 +277,11 @@ test.each([
 		const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
 		try {
 			const decision = await askJev("unit-test-key", state, {
-				fetch: vi.fn<typeof fetch>().mockResolvedValue(Response.json(response)),
+				fetch: vi
+					.fn<typeof fetch>()
+					.mockImplementation(async (_input, init) =>
+						Response.json(responseFor(init, response)),
+					),
 			});
 			expect(decision.choice).toBe("right");
 			expect(decision.probabilities).toEqual(probabilities);
@@ -237,11 +298,11 @@ test.each([
 );
 
 test("legacy plan bodies remain readable offline without a plan transport", () => {
-	const before = structuredClone(state);
-	const request = planBody(state);
+	const before = structuredClone(legacyState);
+	const request = planBody(legacyState);
 	expect(planRequestSchema.parse(request)).toEqual(request);
 	expect(Object.keys(request.questions.plan.criteria)).toHaveLength(16);
-	expect(state).toEqual(before);
+	expect(legacyState).toEqual(before);
 });
 
 test("response requests describe one real move with observed elapsed time and no fixed deadline", async () => {
@@ -257,7 +318,9 @@ test("response requests describe one real move with observed elapsed time and no
 	const before = structuredClone(responseState);
 	const transport = vi
 		.fn<typeof fetch>()
-		.mockResolvedValue(Response.json(answer));
+		.mockImplementation(async (_input, init) =>
+			Response.json(responseFor(init)),
+		);
 	const result = await askJev("response-test-key", responseState, {
 		fetch: transport,
 		timing: { elapsedGameTimeMs: 2470, deadlineInMs: null },
@@ -272,7 +335,7 @@ test("response requests describe one real move with observed elapsed time and no
 		tickIntervalMs: null,
 		deadlineInMs: null,
 	});
-	expect(body.state.rules.objective).toContain("waits for your response");
+	expect(body.state.rules.mechanics).toContain("waits for your response");
 	expect(body.state.rules.objective).not.toContain("keeps moving");
 	expect(result.request).toEqual(body);
 	expect(responseState).toEqual(before);
@@ -354,7 +417,7 @@ test("historical v4 request facts come from the observed corridor and share one 
 });
 
 test("plans state growth uncertainty and board completion without invented second facts", () => {
-	const growing = structuredClone(state);
+	const growing = structuredClone(legacyState);
 	growing.apple = { x: growing.snake[0].x + 1, y: growing.snake[0].y };
 	const request = planBody(growing);
 	expect(request.questions.plan.criteria.right_down).toEqual({
@@ -378,10 +441,12 @@ test("plans state growth uncertainty and board completion without invented secon
 });
 
 test("UTF-8 bytes count the transmitted serialized request and build time excludes transport", async () => {
-	const transport = vi.fn<typeof fetch>().mockImplementation(async () => {
-		await new Promise((resolve) => setTimeout(resolve, 40));
-		return Response.json(answer);
-	});
+	const transport = vi
+		.fn<typeof fetch>()
+		.mockImplementation(async (_input, init) => {
+			await new Promise((resolve) => setTimeout(resolve, 40));
+			return Response.json(responseFor(init));
+		});
 	const result = await askJev("unit-test-secret", state, {
 		fetch: transport,
 		model: "jev-测试",
@@ -392,4 +457,17 @@ test("UTF-8 bytes count the transmitted serialized request and build time exclud
 	expect(result.requestMs).toBeGreaterThanOrEqual(35);
 	expect(result.contextBuildMs).toBeGreaterThanOrEqual(0);
 	expect(JSON.stringify(result.request)).toBe(body);
+});
+
+test("dynamic analysis is enabled by default and only an explicit false disables it", () => {
+	expect(jevConfig({}).dynamicAnalysis).toBeUndefined();
+	expect(
+		jevConfig({ JEV_DYNAMIC_ANALYSIS: "true" }).dynamicAnalysis,
+	).toBeUndefined();
+	expect(jevConfig({ JEV_DYNAMIC_ANALYSIS: "false" }).dynamicAnalysis).toBe(
+		false,
+	);
+	expect(() => jevConfig({ JEV_DYNAMIC_ANALYSIS: "0" })).toThrow(
+		"JEV_DYNAMIC_ANALYSIS must be true or false",
+	);
 });

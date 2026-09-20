@@ -67,6 +67,32 @@ export function decisionForPosition(
 			}
 		: decision;
 }
+
+// The accepted event keeps both the pre-move board and this request selected.
+// Its observedSeq can still refer to the preceding action's move event.
+export function decisionObservationFrame(
+	event: MatchEvent | undefined,
+	currentTick: number,
+): number | undefined {
+	if (event?.type !== "action_accepted") return undefined;
+	const decision = event.state.lastDecision;
+	const timing = decision?.request?.state.timing;
+	if (
+		!decision ||
+		decision.kind === "plan" ||
+		decision.requestId !== event.data.requestId ||
+		!timing ||
+		timing.stateIsProjected ||
+		timing.stepMode !== "response" ||
+		timing.tickIntervalMs !== null ||
+		timing.targetTick !== timing.observedTick + 1 ||
+		event.tick !== timing.observedTick ||
+		event.state.tick !== timing.observedTick ||
+		currentTick === timing.observedTick
+	)
+		return undefined;
+	return event.seq;
+}
 export function decisionStatistics(events: MatchEvent[]) {
 	const calls = new Set(
 		events.filter(isDecisionEvent).map((e) => e.data.requestId),

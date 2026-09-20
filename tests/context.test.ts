@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { move, stateHash } from "../server/game/engine.js";
-import { decisionBody } from "../server/jev/client.js";
+import { decisionBodyV5 as decisionBody } from "../server/jev/analysis-context.js";
 import { actionFacts, secondStepFacts } from "../server/jev/context.js";
 import { planBody } from "../server/jev/legacy-context.js";
 import { allControlSchema, planRequestSchema } from "../shared/snake/schema.js";

@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { expect, test, vi } from "vitest";
 import { inspectMove } from "../server/game/engine.js";
-import { askJev, decisionBody } from "../server/jev/client.js";
+import { decisionBodyV5 as decisionBody } from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import {
 	advanceGeometry,
 	analyzeAction,
@@ -99,7 +100,7 @@ test("history is optional for old standalone inputs, but cannot describe a diffe
 	expect(planRequestSchema.parse(plan)).toEqual(plan);
 });
 
-test("even when history shows a repeated departure, the runner preserves JEV's returned direction", async () => {
+test("offline v5 transport preserves JEV's returned direction when history shows a repeated departure", async () => {
 	const { state, progress } = repeated();
 	const transport = vi.fn<typeof fetch>().mockResolvedValue(
 		Response.json({
@@ -114,8 +115,8 @@ test("even when history shows a repeated departure, the runner preserves JEV's r
 			},
 		}),
 	);
-	const decision = await askJev("test-only", state, {
-		progress,
+	const request = decisionBody(state, undefined, undefined, progress);
+	const { decision } = await sendJevRequest("test-only", request, {
 		fetch: transport,
 	});
 	expect(decision.choice).toBe("right");

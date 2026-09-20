@@ -1,4 +1,5 @@
 import { createSignal, onMount, Show } from "solid-js";
+import { isStagnationStopReason } from "../../../shared/snake/stagnation";
 import type {
 	OwnerSession,
 	WatchCommand,
@@ -65,9 +66,17 @@ export function OwnerControl(props: {
 			),
 		);
 	}
-	async function command(enabled: boolean) {
-		if (!unconfirmed || unconfirmed.enabled !== enabled)
-			unconfirmed = { requestId: crypto.randomUUID(), enabled };
+	async function command(enabled: boolean, stopCurrent = false) {
+		if (
+			!unconfirmed ||
+			unconfirmed.enabled !== enabled ||
+			unconfirmed.stopCurrent !== (stopCurrent ? true : undefined)
+		)
+			unconfirmed = {
+				requestId: crypto.randomUUID(),
+				enabled,
+				...(stopCurrent ? { stopCurrent: true } : {}),
+			};
 		const input = unconfirmed;
 		await action(async () => {
 			const result = await request<WatchCommandResult>(
@@ -116,7 +125,14 @@ export function OwnerControl(props: {
 					</form>
 				}
 			>
-				<p>停止连续开局后，本局会继续进行，结束后不再开启下一局。</p>
+				<Show when={isStagnationStopReason(props.state?.error?.code ?? null)}>
+					<p class="decision-input-note">
+						费用保护已暂停本局和连续开局。点击“恢复连续观战”会开启新局并重新产生模型调用费用。
+					</p>
+				</Show>
+				<p>
+					停止连续开局后，本局会继续进行，结束后不再开启下一局。立即停止本局会马上中断当前对局，并停止连续开局。
+				</p>
 				<div class="owner-actions">
 					<button
 						class="snake-button yellow small"
@@ -137,6 +153,14 @@ export function OwnerControl(props: {
 						onClick={() => void command(false)}
 					>
 						停止连续开局
+					</button>
+					<button
+						class="snake-button small"
+						type="button"
+						disabled={pending() || !props.state?.currentMatchId}
+						onClick={() => void command(false, true)}
+					>
+						立即停止本局
 					</button>
 					<button
 						class="text-button"

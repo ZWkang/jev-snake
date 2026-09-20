@@ -3,9 +3,23 @@ import type { MatchEvent, PublicState } from "../../../shared/snake/types";
 import { Select } from "../../components/ui/select";
 import { ActionOutcomes } from "./ActionOutcomes";
 import { choiceName, directionName, reasonName, stepStatusName } from "./api";
-import { presentDecisionContext } from "./contextPresentation";
+import { BoardStateInput } from "./BoardStateInput";
+import {
+	presentDecisionContext,
+	savedDirectionOptions,
+} from "./contextPresentation";
+import { DynamicSpaceInput } from "./DynamicSpaceInput";
+import { GrowthSpaceInput } from "./GrowthSpaceInput";
+import { ImmediateMovesInput } from "./ImmediateMovesInput";
+import { LegalSpaceInput } from "./LegalSpaceInput";
+import { LocalSearchInput } from "./LocalSearchInput";
+import { ObservedSpaceInput } from "./ObservedSpaceInput";
 import { OpportunityEvidence } from "./OpportunityEvidence";
-import { decisionForPosition, isDecisionEvent } from "./replay";
+import {
+	decisionForPosition,
+	decisionObservationFrame,
+	isDecisionEvent,
+} from "./replay";
 
 export function DecisionInput(props: {
 	state: PublicState;
@@ -19,6 +33,13 @@ export function DecisionInput(props: {
 	const event = createMemo(() =>
 		decisions().find((row) => row.data.requestId === decision()?.requestId),
 	);
+	const observationFrame = createMemo(() =>
+		decisionObservationFrame(event(), props.state.tick),
+	);
+	const showDecisionFrame = () => {
+		const seq = observationFrame();
+		return seq === undefined ? undefined : () => props.onSelect(seq);
+	};
 	const request = () => decision()?.request;
 	const presentation = createMemo(() =>
 		presentDecisionContext(request(), decision()),
@@ -55,7 +76,7 @@ export function DecisionInput(props: {
 			<div class="decision-input-heading">
 				<div>
 					<p class="page-context">模型当时看到了什么</p>
-					<h2>决策输入</h2>
+					<h2>历史决策输入</h2>
 				</div>
 				<Show when={request()}>
 					<button
@@ -149,11 +170,14 @@ export function DecisionInput(props: {
 												? "预判蛇头（旧记录）"
 												: "观察蛇头"}
 										</dt>
-										<dd>
-											({input().state.player.head.x},{" "}
-											{input().state.player.head.y}) ·{" "}
-											{directionName(input().state.player.direction)}
-										</dd>
+										<Show when={presentation().head}>
+											{(head) => (
+												<dd>
+													({head().x}, {head().y}) ·{" "}
+													{directionName(input().state.player.direction)}
+												</dd>
+											)}
+										</Show>
 									</div>
 									<div>
 										<dt>请求模型</dt>
@@ -197,6 +221,51 @@ export function DecisionInput(props: {
 					</Show>
 					<p class="decision-input-note">{presentation().semantics}</p>
 					<p class="decision-input-note">{presentation().probabilityNote}</p>
+					<Show when={presentation().boardRequest}>
+						{(input) => (
+							<BoardStateInput
+								request={input()}
+								currentTick={props.state.tick}
+								onShowDecisionFrame={showDecisionFrame()}
+							/>
+						)}
+					</Show>
+					<Show when={presentation().modelPlanningRequest}>
+						{(input) => (
+							<section aria-label="模型独立决策问题">
+								<h3>模型独立决策</h3>
+								<p>{input().questions.direction.instructions}</p>
+								<dl class="decision-input-facts">
+									<For each={savedDirectionOptions(input())}>
+										{(option) => (
+											<div>
+												<dt>{directionName(option.direction)}</dt>
+												<dd>{option.meaning}</dd>
+											</div>
+										)}
+									</For>
+								</dl>
+							</section>
+						)}
+					</Show>
+					<Show when={presentation().immediateRequest}>
+						{(input) => <ImmediateMovesInput request={input()} />}
+					</Show>
+					<Show when={presentation().legalSpaceRequest}>
+						{(input) => <LegalSpaceInput request={input()} />}
+					</Show>
+					<Show when={presentation().dynamicSpaceRequest}>
+						{(input) => <DynamicSpaceInput request={input()} />}
+					</Show>
+					<Show when={presentation().growthSpaceRequest}>
+						{(input) => <GrowthSpaceInput request={input()} />}
+					</Show>
+					<Show when={presentation().observedRequest}>
+						{(input) => <ObservedSpaceInput request={input()} />}
+					</Show>
+					<Show when={presentation().localSearchRequest}>
+						{(input) => <LocalSearchInput request={input()} />}
+					</Show>
 					<Show when={supportedRequest()}>
 						{(input) => (
 							<ActionOutcomes

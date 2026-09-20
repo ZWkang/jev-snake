@@ -1,9 +1,7 @@
 import { expect, test } from "vitest";
 import { inspectMove, move } from "../server/game/engine.js";
-import {
-	askJev,
-	decisionBodyV3 as decisionBody,
-} from "../server/jev/client.js";
+import { decisionBodyV3 as decisionBody } from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import { advanceGeometry, staticSpace } from "../server/jev/context-v3.js";
 import { forcedPath } from "../server/jev/context.js";
 import { planBodyV3 as planBody } from "../server/jev/legacy-context.js";
@@ -179,10 +177,10 @@ test("historical v3 modes transmit proof in their existing instructions without 
 	);
 });
 
-test("the provider still owns the final choice even when it disregards proven danger", async () => {
+test("offline v3 transport preserves the provider choice even when it disregards proven danger", async () => {
 	const s = publicState(branchedTrapReplay());
 	let sent: unknown;
-	const decision = await askJev("test-secret", s, {
+	const { decision } = await sendJevRequest("test-secret", decisionBody(s), {
 		fetch: async (_url, init) => {
 			sent = JSON.parse(init?.body as string);
 			return Response.json({

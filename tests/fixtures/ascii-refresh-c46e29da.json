@@ -1,0 +1,242 @@
+[
+	{
+		"sourceMatchId": "c46e29da-45e7-4c65-863e-66f6cac1a3dd",
+		"sourceSeq": 121,
+		"config": {
+			"layoutVersion": 3,
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 8,
+			"height": 8,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "e7265c8d-78c9-41df-8917-2430ff2ede98"
+		},
+		"tick": 60,
+		"gameTimeMs": 21342.513665999984,
+		"snake": [
+			{
+				"x": 6,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 6
+			},
+			{
+				"x": 7,
+				"y": 5
+			},
+			{
+				"x": 7,
+				"y": 4
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			},
+			{
+				"x": 1,
+				"y": 4
+			},
+			{
+				"x": 0,
+				"y": 4
+			}
+		],
+		"direction": "left",
+		"obstacles": [
+			{
+				"x": 1,
+				"y": 6
+			}
+		],
+		"apple": {
+			"x": 0,
+			"y": 2
+		},
+		"star": null,
+		"score": 110,
+		"applesEaten": 8
+	},
+	{
+		"sourceMatchId": "c46e29da-45e7-4c65-863e-66f6cac1a3dd",
+		"sourceSeq": 123,
+		"config": {
+			"layoutVersion": 3,
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 8,
+			"height": 8,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "e7265c8d-78c9-41df-8917-2430ff2ede98"
+		},
+		"tick": 61,
+		"gameTimeMs": 21700.508040999994,
+		"snake": [
+			{
+				"x": 6,
+				"y": 6
+			},
+			{
+				"x": 6,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 6
+			},
+			{
+				"x": 7,
+				"y": 5
+			},
+			{
+				"x": 7,
+				"y": 4
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			},
+			{
+				"x": 1,
+				"y": 4
+			}
+		],
+		"direction": "up",
+		"obstacles": [
+			{
+				"x": 1,
+				"y": 6
+			}
+		],
+		"apple": {
+			"x": 0,
+			"y": 2
+		},
+		"star": null,
+		"score": 110,
+		"applesEaten": 8
+	},
+	{
+		"sourceMatchId": "c46e29da-45e7-4c65-863e-66f6cac1a3dd",
+		"sourceSeq": 125,
+		"config": {
+			"layoutVersion": 3,
+			"stepMode": "response",
+			"decisionMode": "single_step",
+			"width": 8,
+			"height": 8,
+			"obstacleCount": 1,
+			"tickIntervalMs": null,
+			"seed": "e7265c8d-78c9-41df-8917-2430ff2ede98"
+		},
+		"tick": 62,
+		"gameTimeMs": 22192.164290999994,
+		"snake": [
+			{
+				"x": 6,
+				"y": 5
+			},
+			{
+				"x": 6,
+				"y": 6
+			},
+			{
+				"x": 6,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 7
+			},
+			{
+				"x": 7,
+				"y": 6
+			},
+			{
+				"x": 7,
+				"y": 5
+			},
+			{
+				"x": 7,
+				"y": 4
+			},
+			{
+				"x": 6,
+				"y": 4
+			},
+			{
+				"x": 5,
+				"y": 4
+			},
+			{
+				"x": 4,
+				"y": 4
+			},
+			{
+				"x": 3,
+				"y": 4
+			},
+			{
+				"x": 2,
+				"y": 4
+			}
+		],
+		"direction": "up",
+		"obstacles": [
+			{
+				"x": 1,
+				"y": 6
+			}
+		],
+		"apple": {
+			"x": 0,
+			"y": 2
+		},
+		"star": null,
+		"score": 110,
+		"applesEaten": 8
+	}
+]

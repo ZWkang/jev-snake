@@ -14,7 +14,6 @@ import type {
 	ActionSummaryV4,
 	PairSummaryV4,
 } from "../../shared/snake/witness-context.js";
-import { createDeathAnalyzer } from "./branch-death.js";
 import {
 	JEV_MODEL,
 	type DecisionTiming,
@@ -22,7 +21,8 @@ import {
 	contextState,
 	progressInstructions,
 	positiveSemantics,
-} from "./client.js";
+} from "./analysis-context.js";
+import { createDeathAnalyzer } from "./branch-death.js";
 import {
 	analyzeActions,
 	analyzeSecondActions,

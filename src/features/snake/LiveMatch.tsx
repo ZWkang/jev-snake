@@ -1,5 +1,12 @@
 import { Link } from "@tanstack/solid-router";
-import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import {
+	createEffect,
+	createSignal,
+	type JSX,
+	onCleanup,
+	onMount,
+	Show,
+} from "solid-js";
 import type {
 	EventPage,
 	MatchEvent,
@@ -24,7 +31,10 @@ import {
 import { SnakeBoard } from "./SnakeBoard";
 import { type ElapsedSample, elapsedAt } from "./timing";
 
-export function LiveMatch(props: { matchId: string }) {
+export function LiveMatch(props: {
+	matchId: string;
+	endContent?: JSX.Element;
+}) {
 	const [mounted, setMounted] = createSignal(false);
 	onMount(() => setMounted(true));
 	const [state, setState] = createSignal<PublicState>();
@@ -59,6 +69,7 @@ export function LiveMatch(props: { matchId: string }) {
 		let socket: WebSocket | undefined;
 		let reconnect: ReturnType<typeof setTimeout> | undefined;
 		let cursor = -1;
+		let catchupThrough = -1;
 		let fatal = false;
 		let finished = false;
 		setError("");
@@ -94,7 +105,8 @@ export function LiveMatch(props: { matchId: string }) {
 					};
 					if (packet.type === "subscribed") {
 						sampleElapsed(packet.elapsedGameTimeMs);
-						if ((packet.latestSeq ?? cursor) <= cursor) setPhase("live");
+						catchupThrough = packet.latestSeq ?? cursor;
+						setPhase(cursor >= catchupThrough ? "live" : "syncing");
 						return;
 					}
 					if (packet.type === "error" || packet.type === "service_error")
@@ -106,7 +118,9 @@ export function LiveMatch(props: { matchId: string }) {
 					if (event.seq !== cursor + 1)
 						throw new Error("事件序列缺失，请重新同步");
 					cursor = event.seq;
-					finished = ["gameover", "won"].includes(event.state.status);
+					finished =
+						cursor >= catchupThrough &&
+						["gameover", "won"].includes(event.state.status);
 					setState(event.state);
 					sampleElapsed(
 						event.state.status === "running"
@@ -114,7 +128,7 @@ export function LiveMatch(props: { matchId: string }) {
 							: event.gameTimeMs,
 					);
 					setRecent((events) => [...events, event].slice(-8));
-					setPhase("live");
+					setPhase(cursor >= catchupThrough ? "live" : "syncing");
 					setError("");
 					if (finished) socket?.close();
 				} catch (e) {
@@ -218,7 +232,11 @@ export function LiveMatch(props: { matchId: string }) {
 						<div class="game-layout">
 							<section class="board-section">
 								<MatchInfo state={s()} />
-								<SnakeBoard state={s()} animate={phase() === "live"} />
+								<SnakeBoard
+									state={s()}
+									animate={phase() === "live"}
+									endContent={props.endContent}
+								/>
 								<Show
 									when={
 										isResponseMode(s().config) &&

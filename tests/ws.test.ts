@@ -190,9 +190,9 @@ test("health declares only v1 and authenticated v2 commands cannot execute", asy
 	});
 	const wsBase = `${base.replace("http", "ws")}/ws/matches/${created.id}`;
 	const unauthorized = new WebSocket(`${wsBase}/control`);
-	const [req, denied] = await once(unauthorized, "unexpected-response");
+	const [, denied] = await once(unauthorized, "unexpected-response");
 	expect(denied.statusCode).toBe(401);
-	req.destroy();
+	unauthorized.terminate();
 	const controller = await connect(`${wsBase}/control`, token);
 	controller.socket.send(
 		JSON.stringify({ protocolVersion: 2, type: "start", requestId: "retired" }),

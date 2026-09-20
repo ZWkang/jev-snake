@@ -15,7 +15,7 @@ import type {
 	PublicState,
 	Receipt,
 } from "../shared/snake/types.js";
-import { publicState } from "../shared/snake/types.js";
+import { publicState, vectors } from "../shared/snake/types.js";
 import { loadLegacy } from "./legacy-fixture.js";
 
 const disposers: (() => void | Promise<void>)[] = [];
@@ -77,7 +77,7 @@ function fixture(config: Record<string, unknown> = {}) {
 function action(
 	context: DecisionContext,
 	requestId: string,
-	direction: Direction = "right",
+	direction: Direction = context.state.direction,
 ) {
 	return {
 		protocolVersion: 1,
@@ -233,7 +233,10 @@ test("star expiry precedes a simultaneous response, invalidates its context and 
 test("a response collision is exactly one committed movement attempt with the real elapsed interval", () => {
 	const f = fixture();
 	const ready = f.read();
-	ready.obstacles = [{ x: ready.snake[0].x + 1, y: ready.snake[0].y }];
+	const vector = vectors[ready.direction];
+	ready.obstacles = [
+		{ x: ready.snake[0].x + vector.x, y: ready.snake[0].y + vector.y },
+	];
 	f.store.commit(ready, []);
 	f.start();
 	const command = action(f.context(), "collision");
@@ -477,7 +480,7 @@ test("real HTTP/WS response mode expires rewards during silence and persists imm
 	expect(context.deadlineInMs).toBeNull();
 	expect(context.elapsedGameTimeMs).toBeGreaterThanOrEqual(400);
 	const resumed = await connect(`${wsBase}/control`, token);
-	const command = action(context, "ws-move", "up");
+	const command = action(context, "ws-move");
 	resumed.socket.send(JSON.stringify(command));
 	const ack = await resumed.waitFor(
 		(message) => message.receipt?.requestId === command.requestId,
@@ -488,7 +491,7 @@ test("real HTTP/WS response mode expires rewards during silence and persists imm
 	);
 	expect(game.store.get(created.id)).toMatchObject({
 		tick: 1,
-		direction: "up",
+		direction: command.direction,
 	});
 	const moved = await watcher.waitFor(
 		(message) => message.event?.data.actionStatus === "applied",

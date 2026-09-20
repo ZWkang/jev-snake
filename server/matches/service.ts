@@ -166,6 +166,16 @@ export class MatchService {
 		if (existing) {
 			const hashes = [creationHash(candidate)];
 			if (legacy.success) hashes.push(creationHash(legacy.data));
+			if (
+				parsed.success &&
+				legacy.success &&
+				legacy.data.config.layoutVersion === undefined
+			) {
+				// Before layout v3 became the new-creation default, response inputs
+				// still received decision-mode defaults but no layout version.
+				const { layoutVersion: _layoutVersion, ...config } = parsed.data.config;
+				hashes.push(creationHash({ ...parsed.data, config }));
+			}
 			if (!hashes.includes(existing.create_hash))
 				throw new GameError(
 					"request_id_conflict",
@@ -499,12 +509,19 @@ export class MatchService {
 			} else if (command.type === "stop") {
 				if (s.status !== "ready" && s.status !== "running")
 					throw new GameError("match_ended", "Match already ended", 409);
+				if (command.guard && command.guard.observedTick !== s.tick)
+					throw new GameError(
+						"stale_state",
+						"Stagnation evidence does not match the current observed tick",
+						409,
+					);
 				s.status = "interrupted";
 				s.endReason = command.reason;
 				s.endedAt = new Date().toISOString();
 				this.cancel(s, events, writes, command.reason);
 				const e = this.event(s, events, "interrupted", {
 					reason: command.reason,
+					...(command.guard ? { guard: command.guard } : {}),
 				});
 				receipt = {
 					requestId: command.requestId,

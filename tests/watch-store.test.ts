@@ -29,6 +29,21 @@ test("channel schema rejects contradictory phases and secret fields", () => {
 	expect(
 		watchCommandSchema.safeParse({ requestId: "one", toggle: true }).success,
 	).toBe(false);
+	expect(
+		watchCommandSchema.parse({ requestId: "old", enabled: false }),
+	).toEqual({ requestId: "old", enabled: false });
+	expect(
+		watchCommandSchema.parse({
+			requestId: "stop-now",
+			enabled: false,
+			stopCurrent: true,
+		}),
+	).toEqual({ requestId: "stop-now", enabled: false, stopCurrent: true });
+	for (const invalid of [
+		{ requestId: "conflict", enabled: true, stopCurrent: true },
+		{ requestId: "false-flag", enabled: false, stopCurrent: false },
+	])
+		expect(watchCommandSchema.safeParse(invalid).success).toBe(false);
 });
 
 test("v1 migration preserves old single, plan and response JSON and runs once", () => {

@@ -1,0 +1,3080 @@
+{
+	"description": "Frozen escape_then_food requests from the real API evaluation. observation.lastDecision is null because these tests rebuild geometry, timing and supplied progress only; expectedRequest is preserved exactly as evaluated. These are request-contract fixtures, not assertions that the model chooses a safe move.",
+	"cases": [
+		{
+			"id": "left-obstacle",
+			"observation": {
+				"id": "f4642429-3b40-4a7f-89ae-74556e1a17cb",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "9a827ffe-f341-4331-a82b-7d52d22dc87d"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:50:33.819Z",
+				"startedAt": "2026-09-20T07:50:33.824Z",
+				"endedAt": null,
+				"seq": 37,
+				"tick": 18,
+				"gameTimeMs": 7445.845124999993,
+				"score": 20,
+				"applesEaten": 2,
+				"snake": [
+					{
+						"x": 5,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 2
+					},
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 3
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 4,
+						"y": 1
+					}
+				],
+				"apple": {
+					"x": 1,
+					"y": 7
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 408.39400000000023,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "left",
+					"tick": 18,
+					"targetTick": 18,
+					"requestId": "d440f62e-c8da-4b9e-ba0b-7faf833786af",
+					"observedTick": 17
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 4,
+								"y": 1
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . # H B B\n  2 . . . . . . . B\n  3 . . . . . . T B\n  4 . . . . . . . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . A . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 5,
+								"y": 1
+							},
+							{
+								"x": 6,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 2
+							},
+							{
+								"x": 7,
+								"y": 3
+							},
+							{
+								"x": 6,
+								"y": 3
+							}
+						],
+						"direction": "left",
+						"score": 20,
+						"applesEaten": 2
+					},
+					"food": {
+						"apple": {
+							"x": 1,
+							"y": 7
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 18,
+						"targetTick": 19,
+						"gameTimeMs": 7464.6662079999805,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 18,
+						"lastAppleTick": 11,
+						"movesSinceApple": 7,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . # H B B\n  2 . . . . . . . B\n  3 . . . . . . T B\n  4 . . . . . . . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . A . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (5,0) = .\ndown: observed cell (5,2) = .\nleft: observed cell (4,1) = #\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "f4642429-3b40-4a7f-89ae-74556e1a17cb",
+				"observedSeq": 37,
+				"decisionSeq": 38,
+				"observedTick": 18,
+				"targetTick": 19,
+				"recordedChoice": "left",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "obstacle"
+			}
+		},
+		{
+			"id": "up-obstacle",
+			"observation": {
+				"id": "44a5a8ba-06dc-41e6-b20a-80a07f9839f0",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "81158487-ef07-418d-be7b-91e64026d808"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:50:46.624Z",
+				"startedAt": "2026-09-20T07:50:46.627Z",
+				"endedAt": null,
+				"seq": 3,
+				"tick": 1,
+				"gameTimeMs": 879.1947090000031,
+				"score": 0,
+				"applesEaten": 0,
+				"snake": [
+					{
+						"x": 4,
+						"y": 6
+					},
+					{
+						"x": 4,
+						"y": 7
+					},
+					{
+						"x": 3,
+						"y": 7
+					},
+					{
+						"x": 2,
+						"y": 7
+					}
+				],
+				"direction": "up",
+				"obstacles": [
+					{
+						"x": 4,
+						"y": 5
+					}
+				],
+				"apple": {
+					"x": 3,
+					"y": 1
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 879.1947090000031,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "up",
+					"tick": 1,
+					"targetTick": 1,
+					"requestId": "be2540cd-1643-4197-8c27-5f2e1e84d7ee",
+					"observedTick": 0
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 4,
+								"y": 5
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . A . . . .\n  2 . . . . . . . .\n  3 . . . . . . . .\n  4 . . . . . . . .\n  5 . . . . # . . .\n  6 . . . . H . . .\n  7 . . T B B . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 4,
+								"y": 6
+							},
+							{
+								"x": 4,
+								"y": 7
+							},
+							{
+								"x": 3,
+								"y": 7
+							},
+							{
+								"x": 2,
+								"y": 7
+							}
+						],
+						"direction": "up",
+						"score": 0,
+						"applesEaten": 0
+					},
+					"food": {
+						"apple": {
+							"x": 3,
+							"y": 1
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 1,
+						"targetTick": 2,
+						"gameTimeMs": 887.4651249999879,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 1,
+						"lastAppleTick": 0,
+						"movesSinceApple": 1,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . A . . . .\n  2 . . . . . . . .\n  3 . . . . . . . .\n  4 . . . . . . . .\n  5 . . . . # . . .\n  6 . . . . H . . .\n  7 . . T B B . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (4,5) = #\nright: observed cell (5,6) = .\nleft: observed cell (3,6) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "44a5a8ba-06dc-41e6-b20a-80a07f9839f0",
+				"observedSeq": 3,
+				"decisionSeq": 4,
+				"observedTick": 1,
+				"targetTick": 2,
+				"recordedChoice": "up",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "obstacle"
+			}
+		},
+		{
+			"id": "down-obstacle",
+			"observation": {
+				"id": "e614d6a3-08ae-409d-97f3-59f6538e0040",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 10,
+					"height": 8,
+					"obstacleCount": 2,
+					"tickIntervalMs": null,
+					"seed": "e4d2d114-4c3f-40f5-9a8b-203b74f21655"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:50:52.853Z",
+				"startedAt": "2026-09-20T07:50:52.865Z",
+				"endedAt": null,
+				"seq": 55,
+				"tick": 27,
+				"gameTimeMs": 12396.274207999988,
+				"score": 50,
+				"applesEaten": 5,
+				"snake": [
+					{
+						"x": 6,
+						"y": 2
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 0
+					},
+					{
+						"x": 7,
+						"y": 0
+					},
+					{
+						"x": 8,
+						"y": 0
+					},
+					{
+						"x": 9,
+						"y": 0
+					},
+					{
+						"x": 9,
+						"y": 1
+					},
+					{
+						"x": 9,
+						"y": 2
+					},
+					{
+						"x": 8,
+						"y": 2
+					}
+				],
+				"direction": "down",
+				"obstacles": [
+					{
+						"x": 6,
+						"y": 3
+					},
+					{
+						"x": 1,
+						"y": 5
+					}
+				],
+				"apple": {
+					"x": 9,
+					"y": 5
+				},
+				"star": {
+					"point": {
+						"x": 1,
+						"y": 4
+					},
+					"expiresAt": 18681.445542
+				},
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 313.6571249999979,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "down",
+					"tick": 27,
+					"targetTick": 27,
+					"requestId": "a4714e64-6cb4-469b-af4f-d0b23dd5e227",
+					"observedTick": 26
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 10,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 6,
+								"y": 3
+							},
+							{
+								"x": 1,
+								"y": 5
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7 8 9\n  0 . . . . . . B B B B\n  1 . . . . . . B . . B\n  2 . . . . . . H . T B\n  3 . . . . . . # . . .\n  4 . * . . . . . . . .\n  5 . # . . . . . . . A\n  6 . . . . . . . . . .\n  7 . . . . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 6,
+								"y": 2
+							},
+							{
+								"x": 6,
+								"y": 1
+							},
+							{
+								"x": 6,
+								"y": 0
+							},
+							{
+								"x": 7,
+								"y": 0
+							},
+							{
+								"x": 8,
+								"y": 0
+							},
+							{
+								"x": 9,
+								"y": 0
+							},
+							{
+								"x": 9,
+								"y": 1
+							},
+							{
+								"x": 9,
+								"y": 2
+							},
+							{
+								"x": 8,
+								"y": 2
+							}
+						],
+						"direction": "down",
+						"score": 50,
+						"applesEaten": 5
+					},
+					"food": {
+						"apple": {
+							"x": 9,
+							"y": 5
+						},
+						"star": {
+							"point": {
+								"x": 1,
+								"y": 4
+							},
+							"expiresAt": 18681.445542
+						}
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 27,
+						"targetTick": 28,
+						"gameTimeMs": 12409.398291999998,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 27,
+						"lastAppleTick": 22,
+						"movesSinceApple": 5,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7 8 9\n  0 . . . . . . B B B B\n  1 . . . . . . B . . B\n  2 . . . . . . H . T B\n  3 . . . . . . # . . .\n  4 . * . . . . . . . .\n  5 . # . . . . . . . A\n  6 . . . . . . . . . .\n  7 . . . . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nright: observed cell (7,2) = .\ndown: observed cell (6,3) = #\nleft: observed cell (5,2) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "e614d6a3-08ae-409d-97f3-59f6538e0040",
+				"observedSeq": 55,
+				"decisionSeq": 56,
+				"observedTick": 27,
+				"targetTick": 28,
+				"recordedChoice": "down",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "obstacle"
+			}
+		},
+		{
+			"id": "body-only-right",
+			"observation": {
+				"id": "bf2e14c7-9ce2-4f6d-ab96-d7d442c38969",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 6,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "ac443fd9-43e1-4a8c-abd2-8b5b451335f8"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:47:36.431Z",
+				"startedAt": "2026-09-20T07:47:36.437Z",
+				"endedAt": null,
+				"seq": 152,
+				"tick": 74,
+				"gameTimeMs": 27350.778542000666,
+				"score": 110,
+				"applesEaten": 8,
+				"snake": [
+					{
+						"x": 4,
+						"y": 2
+					},
+					{
+						"x": 4,
+						"y": 1
+					},
+					{
+						"x": 5,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 2
+					},
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 3
+					},
+					{
+						"x": 5,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 2,
+						"y": 3
+					}
+				],
+				"direction": "down",
+				"obstacles": [
+					{
+						"x": 3,
+						"y": 2
+					}
+				],
+				"apple": {
+					"x": 4,
+					"y": 4
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 352.520625000001,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "down",
+					"tick": 74,
+					"targetTick": 74,
+					"requestId": "bcaa72f5-0bde-47f3-af8b-73752d3549aa",
+					"observedTick": 73
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 6,
+						"obstacles": [
+							{
+								"x": 3,
+								"y": 2
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . B B B B\n  2 . . . # H . . B\n  3 . . T B B B B B\n  4 . . . . A . . .\n  5 . . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 4,
+								"y": 2
+							},
+							{
+								"x": 4,
+								"y": 1
+							},
+							{
+								"x": 5,
+								"y": 1
+							},
+							{
+								"x": 6,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 2
+							},
+							{
+								"x": 7,
+								"y": 3
+							},
+							{
+								"x": 6,
+								"y": 3
+							},
+							{
+								"x": 5,
+								"y": 3
+							},
+							{
+								"x": 4,
+								"y": 3
+							},
+							{
+								"x": 3,
+								"y": 3
+							},
+							{
+								"x": 2,
+								"y": 3
+							}
+						],
+						"direction": "down",
+						"score": 110,
+						"applesEaten": 8
+					},
+					"food": {
+						"apple": {
+							"x": 4,
+							"y": 4
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 74,
+						"targetTick": 75,
+						"gameTimeMs": 27356.330917000665,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 74,
+						"lastAppleTick": 63,
+						"movesSinceApple": 11,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . B B B B\n  2 . . . # H . . B\n  3 . . T B B B B B\n  4 . . . . A . . .\n  5 . . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nright: observed cell (5,2) = .\ndown: observed cell (4,3) = B\nleft: observed cell (3,2) = #\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "bf2e14c7-9ce2-4f6d-ab96-d7d442c38969",
+				"observedSeq": 152,
+				"decisionSeq": 153,
+				"observedTick": 74,
+				"targetTick": 75,
+				"recordedChoice": "down",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "self"
+			}
+		},
+		{
+			"id": "body-only-down",
+			"observation": {
+				"id": "86392683-a5ee-4b5b-a8ca-235dfcdad1b4",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 6,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "09a4d34d-519f-45f7-9141-7bae4e3a10c1"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:48:49.104Z",
+				"startedAt": "2026-09-20T07:48:49.123Z",
+				"endedAt": null,
+				"seq": 29,
+				"tick": 14,
+				"gameTimeMs": 5275.088457999998,
+				"score": 30,
+				"applesEaten": 3,
+				"snake": [
+					{
+						"x": 5,
+						"y": 4
+					},
+					{
+						"x": 4,
+						"y": 4
+					},
+					{
+						"x": 3,
+						"y": 4
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 5,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 3
+					}
+				],
+				"direction": "right",
+				"obstacles": [
+					{
+						"x": 6,
+						"y": 4
+					}
+				],
+				"apple": {
+					"x": 0,
+					"y": 5
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 299.4847079999963,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "right",
+					"tick": 14,
+					"targetTick": 14,
+					"requestId": "56d4159e-8b7b-45b7-9c19-51ffe412046e",
+					"observedTick": 13
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 6,
+						"obstacles": [
+							{
+								"x": 6,
+								"y": 4
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . .\n  2 . . . . . . . .\n  3 . . . B B B T .\n  4 . . . B B H # .\n  5 A . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 5,
+								"y": 4
+							},
+							{
+								"x": 4,
+								"y": 4
+							},
+							{
+								"x": 3,
+								"y": 4
+							},
+							{
+								"x": 3,
+								"y": 3
+							},
+							{
+								"x": 4,
+								"y": 3
+							},
+							{
+								"x": 5,
+								"y": 3
+							},
+							{
+								"x": 6,
+								"y": 3
+							}
+						],
+						"direction": "right",
+						"score": 30,
+						"applesEaten": 3
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 5
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 14,
+						"targetTick": 15,
+						"gameTimeMs": 5286.801625,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 14,
+						"lastAppleTick": 14,
+						"movesSinceApple": 0,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . .\n  2 . . . . . . . .\n  3 . . . B B B T .\n  4 . . . B B H # .\n  5 A . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (5,3) = B\nright: observed cell (6,4) = #\ndown: observed cell (5,5) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "86392683-a5ee-4b5b-a8ca-235dfcdad1b4",
+				"observedSeq": 29,
+				"decisionSeq": 30,
+				"observedTick": 14,
+				"targetTick": 15,
+				"recordedChoice": "up",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "self"
+			}
+		},
+		{
+			"id": "body-only-left",
+			"observation": {
+				"id": "2b0dc13e-0571-4203-8133-d8c5cfda830e",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "ea296bd7-e4d9-4044-a8c2-a8fe7698618a"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:48:59.796Z",
+				"startedAt": "2026-09-20T07:48:59.871Z",
+				"endedAt": null,
+				"seq": 141,
+				"tick": 70,
+				"gameTimeMs": 23518.214584,
+				"score": 100,
+				"applesEaten": 7,
+				"snake": [
+					{
+						"x": 6,
+						"y": 7
+					},
+					{
+						"x": 7,
+						"y": 7
+					},
+					{
+						"x": 7,
+						"y": 6
+					},
+					{
+						"x": 6,
+						"y": 6
+					},
+					{
+						"x": 5,
+						"y": 6
+					},
+					{
+						"x": 5,
+						"y": 5
+					},
+					{
+						"x": 4,
+						"y": 5
+					},
+					{
+						"x": 3,
+						"y": 5
+					},
+					{
+						"x": 2,
+						"y": 5
+					},
+					{
+						"x": 1,
+						"y": 5
+					},
+					{
+						"x": 1,
+						"y": 4
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 6,
+						"y": 5
+					}
+				],
+				"apple": {
+					"x": 7,
+					"y": 2
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 261.3248750000057,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "left",
+					"tick": 70,
+					"targetTick": 70,
+					"requestId": "6c37435a-1cc6-495a-ab95-3be1575b21ad",
+					"observedTick": 69
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 6,
+								"y": 5
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . .\n  2 . . . . . . . A\n  3 . . . . . . . .\n  4 . T . . . . . .\n  5 . B B B B B # .\n  6 . . . . . B B B\n  7 . . . . . . H B"
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 6,
+								"y": 7
+							},
+							{
+								"x": 7,
+								"y": 7
+							},
+							{
+								"x": 7,
+								"y": 6
+							},
+							{
+								"x": 6,
+								"y": 6
+							},
+							{
+								"x": 5,
+								"y": 6
+							},
+							{
+								"x": 5,
+								"y": 5
+							},
+							{
+								"x": 4,
+								"y": 5
+							},
+							{
+								"x": 3,
+								"y": 5
+							},
+							{
+								"x": 2,
+								"y": 5
+							},
+							{
+								"x": 1,
+								"y": 5
+							},
+							{
+								"x": 1,
+								"y": 4
+							}
+						],
+						"direction": "left",
+						"score": 100,
+						"applesEaten": 7
+					},
+					"food": {
+						"apple": {
+							"x": 7,
+							"y": 2
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 70,
+						"targetTick": 71,
+						"gameTimeMs": 23530.40858399999,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 70,
+						"lastAppleTick": 63,
+						"movesSinceApple": 7,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . .\n  2 . . . . . . . A\n  3 . . . . . . . .\n  4 . T . . . . . .\n  5 . B B B B B # .\n  6 . . . . . B B B\n  7 . . . . . . H B\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (6,6) = B\ndown: observed cell (6,8) = outside board\nleft: observed cell (5,7) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "2b0dc13e-0571-4203-8133-d8c5cfda830e",
+				"observedSeq": 141,
+				"decisionSeq": 142,
+				"observedTick": 70,
+				"targetTick": 71,
+				"recordedChoice": "up",
+				"recordedOutcome": "gameover",
+				"recordedCollision": "self"
+			}
+		},
+		{
+			"id": "successful-early",
+			"observation": {
+				"id": "f4642429-3b40-4a7f-89ae-74556e1a17cb",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "9a827ffe-f341-4331-a82b-7d52d22dc87d"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:50:33.819Z",
+				"startedAt": "2026-09-20T07:50:33.824Z",
+				"endedAt": null,
+				"seq": 7,
+				"tick": 3,
+				"gameTimeMs": 1812.8776249999937,
+				"score": 0,
+				"applesEaten": 0,
+				"snake": [
+					{
+						"x": 3,
+						"y": 4
+					},
+					{
+						"x": 4,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 3
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 4,
+						"y": 1
+					}
+				],
+				"apple": {
+					"x": 0,
+					"y": 4
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 369.04883400001563,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "left",
+					"tick": 3,
+					"targetTick": 3,
+					"requestId": "a707bd9f-ed84-4e31-ae32-76a941243454",
+					"observedTick": 2
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 4,
+								"y": 1
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . # . . .\n  2 . . . . . . . .\n  3 . . . . . T . .\n  4 A . . H B B . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 3,
+								"y": 4
+							},
+							{
+								"x": 4,
+								"y": 4
+							},
+							{
+								"x": 5,
+								"y": 4
+							},
+							{
+								"x": 5,
+								"y": 3
+							}
+						],
+						"direction": "left",
+						"score": 0,
+						"applesEaten": 0
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 4
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 3,
+						"targetTick": 4,
+						"gameTimeMs": 1824.4194159999897,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 3,
+						"lastAppleTick": 0,
+						"movesSinceApple": 3,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . # . . .\n  2 . . . . . . . .\n  3 . . . . . T . .\n  4 A . . H B B . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (3,3) = .\ndown: observed cell (3,5) = .\nleft: observed cell (2,4) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "f4642429-3b40-4a7f-89ae-74556e1a17cb",
+				"observedSeq": 7,
+				"decisionSeq": 8,
+				"observedTick": 3,
+				"targetTick": 4,
+				"recordedChoice": "left",
+				"recordedOutcome": "move",
+				"recordedCollision": null
+			}
+		},
+		{
+			"id": "successful-late",
+			"observation": {
+				"id": "bf2e14c7-9ce2-4f6d-ab96-d7d442c38969",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 6,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "ac443fd9-43e1-4a8c-abd2-8b5b451335f8"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T07:47:36.431Z",
+				"startedAt": "2026-09-20T07:47:36.437Z",
+				"endedAt": null,
+				"seq": 124,
+				"tick": 60,
+				"gameTimeMs": 21951.458584000666,
+				"score": 100,
+				"applesEaten": 7,
+				"snake": [
+					{
+						"x": 1,
+						"y": 5
+					},
+					{
+						"x": 2,
+						"y": 5
+					},
+					{
+						"x": 3,
+						"y": 5
+					},
+					{
+						"x": 4,
+						"y": 5
+					},
+					{
+						"x": 5,
+						"y": 5
+					},
+					{
+						"x": 6,
+						"y": 5
+					},
+					{
+						"x": 7,
+						"y": 5
+					},
+					{
+						"x": 7,
+						"y": 4
+					},
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 7,
+						"y": 2
+					},
+					{
+						"x": 7,
+						"y": 1
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 3,
+						"y": 2
+					}
+				],
+				"apple": {
+					"x": 2,
+					"y": 3
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 521.3378750000011,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "left",
+					"tick": 60,
+					"targetTick": 60,
+					"requestId": "55fbe096-639c-4d9a-b2fa-00c78badcae4",
+					"observedTick": 59
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 6,
+						"obstacles": [
+							{
+								"x": 3,
+								"y": 2
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . T\n  2 . . . # . . . B\n  3 . . A . . . . B\n  4 . . . . . . . B\n  5 . H B B B B B B"
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 1,
+								"y": 5
+							},
+							{
+								"x": 2,
+								"y": 5
+							},
+							{
+								"x": 3,
+								"y": 5
+							},
+							{
+								"x": 4,
+								"y": 5
+							},
+							{
+								"x": 5,
+								"y": 5
+							},
+							{
+								"x": 6,
+								"y": 5
+							},
+							{
+								"x": 7,
+								"y": 5
+							},
+							{
+								"x": 7,
+								"y": 4
+							},
+							{
+								"x": 7,
+								"y": 3
+							},
+							{
+								"x": 7,
+								"y": 2
+							},
+							{
+								"x": 7,
+								"y": 1
+							}
+						],
+						"direction": "left",
+						"score": 100,
+						"applesEaten": 7
+					},
+					"food": {
+						"apple": {
+							"x": 2,
+							"y": 3
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 60,
+						"targetTick": 61,
+						"gameTimeMs": 22033.426375000665,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 60,
+						"lastAppleTick": 54,
+						"movesSinceApple": 6,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 . . . . . . . T\n  2 . . . # . . . B\n  3 . . A . . . . B\n  4 . . . . . . . B\n  5 . H B B B B B B\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (1,4) = .\ndown: observed cell (1,6) = outside board\nleft: observed cell (0,5) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "bf2e14c7-9ce2-4f6d-ab96-d7d442c38969",
+				"observedSeq": 124,
+				"decisionSeq": 125,
+				"observedTick": 60,
+				"targetTick": 61,
+				"recordedChoice": "up",
+				"recordedOutcome": "move",
+				"recordedCollision": null
+			}
+		},
+		{
+			"id": "abandoned-apple-route",
+			"observation": {
+				"id": "ba27f7c2-71ab-4e97-a7ef-e519ab6e1846",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "cf47e2e5-a775-46bd-8d67-da40cc50e896"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T08:03:03.635Z",
+				"startedAt": "2026-09-20T08:03:03.643Z",
+				"endedAt": null,
+				"seq": 1336,
+				"tick": 666,
+				"gameTimeMs": 242695.29625000004,
+				"score": 20,
+				"applesEaten": 2,
+				"snake": [
+					{
+						"x": 3,
+						"y": 1
+					},
+					{
+						"x": 3,
+						"y": 2
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 4
+					}
+				],
+				"direction": "up",
+				"obstacles": [
+					{
+						"x": 2,
+						"y": 1
+					}
+				],
+				"apple": {
+					"x": 0,
+					"y": 0
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 293.27787499999977,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "up",
+					"tick": 666,
+					"targetTick": 666,
+					"requestId": "b4d4901a-9904-436c-8937-dfa2f42d0f15",
+					"observedTick": 665
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 2,
+								"y": 1
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 A . . . . . . .\n  1 . . # H . . . .\n  2 . . . B . . . .\n  3 . . . B B . . .\n  4 . . . . B T . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 3,
+								"y": 1
+							},
+							{
+								"x": 3,
+								"y": 2
+							},
+							{
+								"x": 3,
+								"y": 3
+							},
+							{
+								"x": 4,
+								"y": 3
+							},
+							{
+								"x": 4,
+								"y": 4
+							},
+							{
+								"x": 5,
+								"y": 4
+							}
+						],
+						"direction": "up",
+						"score": 20,
+						"applesEaten": 2
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 0
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 666,
+						"targetTick": 667,
+						"gameTimeMs": 242702.55141700004,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 666,
+						"lastAppleTick": 28,
+						"movesSinceApple": 638,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 A . . . . . . .\n  1 . . # H . . . .\n  2 . . . B . . . .\n  3 . . . B B . . .\n  4 . . . . B T . .\n  5 . . . . . . . .\n  6 . . . . . . . .\n  7 . . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (3,0) = .\nright: observed cell (4,1) = .\nleft: observed cell (2,1) = #\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "ba27f7c2-71ab-4e97-a7ef-e519ab6e1846",
+				"observedSeq": 1336,
+				"decisionSeq": 1337,
+				"observedTick": 666
+			}
+		},
+		{
+			"id": "59bd483a-tick122",
+			"observation": {
+				"id": "59bd483a-ccaf-4668-a64b-6a1573f294cc",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "19c27390-d452-4205-99ea-3d350fae23c9"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T08:26:48.921Z",
+				"startedAt": "2026-09-20T08:26:48.936Z",
+				"endedAt": null,
+				"seq": 247,
+				"tick": 122,
+				"gameTimeMs": 42189.339166,
+				"score": 230,
+				"applesEaten": 20,
+				"snake": [
+					{
+						"x": 1,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 4
+					},
+					{
+						"x": 0,
+						"y": 5
+					},
+					{
+						"x": 0,
+						"y": 6
+					},
+					{
+						"x": 1,
+						"y": 6
+					},
+					{
+						"x": 2,
+						"y": 6
+					},
+					{
+						"x": 2,
+						"y": 5
+					},
+					{
+						"x": 2,
+						"y": 4
+					},
+					{
+						"x": 2,
+						"y": 3
+					},
+					{
+						"x": 2,
+						"y": 2
+					},
+					{
+						"x": 2,
+						"y": 1
+					},
+					{
+						"x": 3,
+						"y": 1
+					},
+					{
+						"x": 4,
+						"y": 1
+					},
+					{
+						"x": 5,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 1
+					},
+					{
+						"x": 7,
+						"y": 0
+					},
+					{
+						"x": 6,
+						"y": 0
+					},
+					{
+						"x": 5,
+						"y": 0
+					},
+					{
+						"x": 4,
+						"y": 0
+					},
+					{
+						"x": 3,
+						"y": 0
+					},
+					{
+						"x": 2,
+						"y": 0
+					},
+					{
+						"x": 1,
+						"y": 0
+					}
+				],
+				"direction": "right",
+				"obstacles": [
+					{
+						"x": 6,
+						"y": 5
+					}
+				],
+				"apple": {
+					"x": 5,
+					"y": 4
+				},
+				"star": {
+					"point": {
+						"x": 6,
+						"y": 7
+					},
+					"expiresAt": 49820.637790999994
+				},
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 368.7013750000042,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "right",
+					"tick": 122,
+					"targetTick": 122,
+					"requestId": "be39f855-7f62-46b2-9606-2330c664e950",
+					"observedTick": 121
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 6,
+								"y": 5
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . T B B B B B B\n  1 . . B B B B B B\n  2 . . B . . . . .\n  3 B H B . . . . .\n  4 B . B . . A . .\n  5 B . B . . . # .\n  6 B B B . . . . .\n  7 . . . . . . * ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 1,
+								"y": 3
+							},
+							{
+								"x": 0,
+								"y": 3
+							},
+							{
+								"x": 0,
+								"y": 4
+							},
+							{
+								"x": 0,
+								"y": 5
+							},
+							{
+								"x": 0,
+								"y": 6
+							},
+							{
+								"x": 1,
+								"y": 6
+							},
+							{
+								"x": 2,
+								"y": 6
+							},
+							{
+								"x": 2,
+								"y": 5
+							},
+							{
+								"x": 2,
+								"y": 4
+							},
+							{
+								"x": 2,
+								"y": 3
+							},
+							{
+								"x": 2,
+								"y": 2
+							},
+							{
+								"x": 2,
+								"y": 1
+							},
+							{
+								"x": 3,
+								"y": 1
+							},
+							{
+								"x": 4,
+								"y": 1
+							},
+							{
+								"x": 5,
+								"y": 1
+							},
+							{
+								"x": 6,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 1
+							},
+							{
+								"x": 7,
+								"y": 0
+							},
+							{
+								"x": 6,
+								"y": 0
+							},
+							{
+								"x": 5,
+								"y": 0
+							},
+							{
+								"x": 4,
+								"y": 0
+							},
+							{
+								"x": 3,
+								"y": 0
+							},
+							{
+								"x": 2,
+								"y": 0
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"direction": "right",
+						"score": 230,
+						"applesEaten": 20
+					},
+					"food": {
+						"apple": {
+							"x": 5,
+							"y": 4
+						},
+						"star": {
+							"point": {
+								"x": 6,
+								"y": 7
+							},
+							"expiresAt": 49820.637790999994
+						}
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 122,
+						"targetTick": 123,
+						"gameTimeMs": 42200.09116599999,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 122,
+						"lastAppleTick": 121,
+						"movesSinceApple": 1,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . T B B B B B B\n  1 . . B B B B B B\n  2 . . B . . . . .\n  3 B H B . . . . .\n  4 B . B . . A . .\n  5 B . B . . . # .\n  6 B B B . . . . .\n  7 . . . . . . * .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (1,2) = .\nright: observed cell (2,3) = B\ndown: observed cell (1,4) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "59bd483a-ccaf-4668-a64b-6a1573f294cc",
+				"observedTick": 122,
+				"targetTick": 123,
+				"observedSeq": 247,
+				"decisionSeq": 248
+			}
+		},
+		{
+			"id": "0ed29447-tick86",
+			"observation": {
+				"id": "0ed29447-9a29-4384-88b3-f74b06704bf7",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 6,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "d86c14e8-6dc1-44fa-a4db-b667dd7d4873"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T08:26:10.817Z",
+				"startedAt": "2026-09-20T08:26:10.831Z",
+				"endedAt": null,
+				"seq": 175,
+				"tick": 86,
+				"gameTimeMs": 32168.951584000002,
+				"score": 170,
+				"applesEaten": 14,
+				"snake": [
+					{
+						"x": 7,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 3
+					},
+					{
+						"x": 6,
+						"y": 2
+					},
+					{
+						"x": 6,
+						"y": 1
+					},
+					{
+						"x": 6,
+						"y": 0
+					},
+					{
+						"x": 5,
+						"y": 0
+					},
+					{
+						"x": 4,
+						"y": 0
+					},
+					{
+						"x": 3,
+						"y": 0
+					},
+					{
+						"x": 2,
+						"y": 0
+					},
+					{
+						"x": 1,
+						"y": 0
+					},
+					{
+						"x": 0,
+						"y": 0
+					},
+					{
+						"x": 0,
+						"y": 1
+					},
+					{
+						"x": 1,
+						"y": 1
+					},
+					{
+						"x": 1,
+						"y": 2
+					},
+					{
+						"x": 1,
+						"y": 3
+					},
+					{
+						"x": 2,
+						"y": 3
+					},
+					{
+						"x": 3,
+						"y": 3
+					},
+					{
+						"x": 4,
+						"y": 3
+					}
+				],
+				"direction": "right",
+				"obstacles": [
+					{
+						"x": 5,
+						"y": 2
+					}
+				],
+				"apple": {
+					"x": 4,
+					"y": 2
+				},
+				"star": null,
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 408.1759999999995,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "right",
+					"tick": 86,
+					"targetTick": 86,
+					"requestId": "b30f0f95-9115-4508-a91e-e88443c9614d",
+					"observedTick": 85
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 6,
+						"obstacles": [
+							{
+								"x": 5,
+								"y": 2
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 B B B B B B B .\n  1 B B . . . . B .\n  2 . B . . A # B .\n  3 . B B B T . B H\n  4 . . . . . . . .\n  5 . . . . . . . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 7,
+								"y": 3
+							},
+							{
+								"x": 6,
+								"y": 3
+							},
+							{
+								"x": 6,
+								"y": 2
+							},
+							{
+								"x": 6,
+								"y": 1
+							},
+							{
+								"x": 6,
+								"y": 0
+							},
+							{
+								"x": 5,
+								"y": 0
+							},
+							{
+								"x": 4,
+								"y": 0
+							},
+							{
+								"x": 3,
+								"y": 0
+							},
+							{
+								"x": 2,
+								"y": 0
+							},
+							{
+								"x": 1,
+								"y": 0
+							},
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 2
+							},
+							{
+								"x": 1,
+								"y": 3
+							},
+							{
+								"x": 2,
+								"y": 3
+							},
+							{
+								"x": 3,
+								"y": 3
+							},
+							{
+								"x": 4,
+								"y": 3
+							}
+						],
+						"direction": "right",
+						"score": 170,
+						"applesEaten": 14
+					},
+					"food": {
+						"apple": {
+							"x": 4,
+							"y": 2
+						},
+						"star": null
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 86,
+						"targetTick": 87,
+						"gameTimeMs": 32179.860875,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 86,
+						"lastAppleTick": 86,
+						"movesSinceApple": 0,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 B B B B B B B .\n  1 B B . . . . B .\n  2 . B . . A # B .\n  3 . B B B T . B H\n  4 . . . . . . . .\n  5 . . . . . . . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (7,2) = .\nright: observed cell (8,3) = outside board\ndown: observed cell (7,4) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"right": {
+								"meaning": "Move one cell toward x+1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "0ed29447-9a29-4384-88b3-f74b06704bf7",
+				"observedTick": 86,
+				"targetTick": 87,
+				"observedSeq": 175,
+				"decisionSeq": 176
+			}
+		},
+		{
+			"id": "3a0268ae-tick120",
+			"observation": {
+				"id": "3a0268ae-b76a-419d-ac3d-f5493f51df1a",
+				"agentName": "JEV 连续观战 · openrouter",
+				"model": "typesafe/jev-1.13",
+				"config": {
+					"layoutVersion": 3,
+					"stepMode": "response",
+					"decisionMode": "single_step",
+					"width": 8,
+					"height": 8,
+					"obstacleCount": 1,
+					"tickIntervalMs": null,
+					"seed": "69553002-6b2d-4bda-a524-4259d6f2e6b1"
+				},
+				"recordVersion": 3,
+				"rulesVersion": 3,
+				"status": "running",
+				"createdAt": "2026-09-20T08:23:26.294Z",
+				"startedAt": "2026-09-20T08:23:26.306Z",
+				"endedAt": null,
+				"seq": 246,
+				"tick": 120,
+				"gameTimeMs": 44403.56604100006,
+				"score": 200,
+				"applesEaten": 17,
+				"snake": [
+					{
+						"x": 2,
+						"y": 4
+					},
+					{
+						"x": 3,
+						"y": 4
+					},
+					{
+						"x": 4,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 4
+					},
+					{
+						"x": 5,
+						"y": 5
+					},
+					{
+						"x": 5,
+						"y": 6
+					},
+					{
+						"x": 5,
+						"y": 7
+					},
+					{
+						"x": 4,
+						"y": 7
+					},
+					{
+						"x": 4,
+						"y": 6
+					},
+					{
+						"x": 3,
+						"y": 6
+					},
+					{
+						"x": 2,
+						"y": 6
+					},
+					{
+						"x": 1,
+						"y": 6
+					},
+					{
+						"x": 0,
+						"y": 6
+					},
+					{
+						"x": 0,
+						"y": 5
+					},
+					{
+						"x": 0,
+						"y": 4
+					},
+					{
+						"x": 0,
+						"y": 3
+					},
+					{
+						"x": 0,
+						"y": 2
+					},
+					{
+						"x": 1,
+						"y": 2
+					},
+					{
+						"x": 1,
+						"y": 1
+					},
+					{
+						"x": 2,
+						"y": 1
+					},
+					{
+						"x": 3,
+						"y": 1
+					}
+				],
+				"direction": "left",
+				"obstacles": [
+					{
+						"x": 1,
+						"y": 3
+					}
+				],
+				"apple": {
+					"x": 0,
+					"y": 1
+				},
+				"star": {
+					"point": {
+						"x": 6,
+						"y": 5
+					},
+					"expiresAt": 49742.85983200006
+				},
+				"endReason": null,
+				"lastDecision": null,
+				"lastStepDurationMs": 374.39483399999153,
+				"lastAppliedAction": {
+					"source": "primary",
+					"stepIndex": 0,
+					"direction": "left",
+					"tick": 120,
+					"targetTick": 120,
+					"requestId": "629dd04f-c629-4082-8aa3-6440911c5fe1",
+					"observedTick": 119
+				}
+			},
+			"expectedRequest": {
+				"model": "typesafe/jev-1.13",
+				"state": {
+					"contextVersion": "non-reverse-v12",
+					"rules": {
+						"objective": "Grow the snake to fill every traversable cell while collecting rewards. Decide your own route and strategy from the complete observed board and actual history.",
+						"applePoints": 10,
+						"starPoints": 30,
+						"coordinates": "Coordinates are zero-based: x increases right, y increases down. The board spans x=0..width-1 and y=0..height-1. bodyHeadToTail lists every occupied snake cell in order, with the head first and the tail last.",
+						"mechanics": "The snake waits for your response, then moves exactly one cell in the chosen absolute direction. Direct reversal is illegal. Hitting the boundary, an obstacle or the body ends the game. The tail vacates its current cell on a move that does not eat an apple, so that vacating tail cell may be entered. Eating an apple grows the body by one cell and gives 10 points; the tail does not vacate. A new apple then appears in an unoccupied cell; its position is unknown until the next observation. A star gives 30 points without growth and expires at food.star.expiresAt in the same game-time milliseconds as timing.gameTimeMs. Filling every non-obstacle cell wins. Past repetition records actual movement and does not prescribe your next move. Apple spawning excludes the current star cell; if the star occupies the only free cell, it is removed to make room for the apple."
+					},
+					"board": {
+						"width": 8,
+						"height": 8,
+						"obstacles": [
+							{
+								"x": 1,
+								"y": 3
+							}
+						],
+						"ascii": {
+							"legend": "Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.",
+							"map": "y\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 A B B T . . . .\n  2 B B . . . . . .\n  3 B # . . . . . .\n  4 B . H B B B . .\n  5 B . . . . B * .\n  6 B B B B B B . .\n  7 . . . . B B . ."
+						}
+					},
+					"player": {
+						"bodyHeadToTail": [
+							{
+								"x": 2,
+								"y": 4
+							},
+							{
+								"x": 3,
+								"y": 4
+							},
+							{
+								"x": 4,
+								"y": 4
+							},
+							{
+								"x": 5,
+								"y": 4
+							},
+							{
+								"x": 5,
+								"y": 5
+							},
+							{
+								"x": 5,
+								"y": 6
+							},
+							{
+								"x": 5,
+								"y": 7
+							},
+							{
+								"x": 4,
+								"y": 7
+							},
+							{
+								"x": 4,
+								"y": 6
+							},
+							{
+								"x": 3,
+								"y": 6
+							},
+							{
+								"x": 2,
+								"y": 6
+							},
+							{
+								"x": 1,
+								"y": 6
+							},
+							{
+								"x": 0,
+								"y": 6
+							},
+							{
+								"x": 0,
+								"y": 5
+							},
+							{
+								"x": 0,
+								"y": 4
+							},
+							{
+								"x": 0,
+								"y": 3
+							},
+							{
+								"x": 0,
+								"y": 2
+							},
+							{
+								"x": 1,
+								"y": 2
+							},
+							{
+								"x": 1,
+								"y": 1
+							},
+							{
+								"x": 2,
+								"y": 1
+							},
+							{
+								"x": 3,
+								"y": 1
+							}
+						],
+						"direction": "left",
+						"score": 200,
+						"applesEaten": 17
+					},
+					"food": {
+						"apple": {
+							"x": 0,
+							"y": 1
+						},
+						"star": {
+							"point": {
+								"x": 6,
+								"y": 5
+							},
+							"expiresAt": 49742.85983200006
+						}
+					},
+					"timing": {
+						"stateIsProjected": false,
+						"stepMode": "response",
+						"observedTick": 120,
+						"targetTick": 121,
+						"gameTimeMs": 44415.42599900006,
+						"tickIntervalMs": null,
+						"deadlineInMs": null
+					},
+					"progress": {
+						"historyVersion": "progress-v1",
+						"historyStartTick": 0,
+						"throughTick": 120,
+						"lastAppleTick": 117,
+						"movesSinceApple": 3,
+						"positionVisits": 1,
+						"previousVisitTick": null,
+						"repeatAfterMoves": null,
+						"actions": {
+							"up": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"right": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"down": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							},
+							"left": {
+								"timesTaken": 0,
+								"returnsWithoutApple": 0,
+								"lastTakenTick": null
+							}
+						}
+					},
+					"strategyGuide": "1. Food routes and growth: use shortest-path reasoning such as BFS or A* as a way to think about reaching food, but do not equate the shortest route with the best move. Consider body movement along the route and the grown body at arrival. If one approach would trap the head, consider other approaches or delay eating.\n2. Moving body and tail: occupied body cells can become free as the snake moves. The tail vacates on a non-apple move and stays on an apple move. A corridor blocked now may open later; judge whether you can keep moving until it opens instead of treating the body as permanently frozen.\n3. Space and escape: consider connected free regions, narrow exits and whether the head can still approach the tail after growth. A large empty area, a path to the tail or one immediate exit is only a clue, not a guarantee of safety; your own body can close the exit.\n4. Deliberate detours: when a direct food approach would trap you, consider following the tail or taking a longer route to let space open. Keep looking for food progress. Repeated returns to the same full position without eating indicate stagnation; survival by circling is not board completion.\n5. Conditional cycle strategy: on a board with a usable Hamiltonian cycle, maintaining the snake's order along that cycle can preserve movement. A shortcut must preserve body order and room for growth. Do not assume a covering cycle exists on a board with obstacles, and do not force this strategy when its conditions are absent.\n6. Endgame and uncertainty: as the board fills, consider the remaining empty cells and how growth changes the head-tail order. Future apples may appear in different valid cells; a continuation that wins for one favorable spawn is not guaranteed to win for every spawn. Do not invent a future food position.\n7. Reassess using real history: judge the three offered directions from the current observation and choose exactly one next move. Use committed movements and repeated visits as evidence of what actually happened. An earlier direction is not a commitment to an entire route. Not finding a route immediately does not prove impossibility, and an unexamined continuation is not proof of safety."
+				},
+				"questions": {
+					"direction": {
+						"type": "choice",
+						"instructions": "This is a Snake game. Choose the next absolute direction.\n\nCurrent board:\ny\\x 0 1 2 3 4 5 6 7\n  0 . . . . . . . .\n  1 A B B T . . . .\n  2 B B . . . . . .\n  3 B # . . . . . .\n  4 B . H B B B . .\n  5 B . . . . B * .\n  6 B B B B B B . .\n  7 . . . . B B . .\n\nLegend: Columns are x (rightward), rows are y (downward), both zero-based. # = obstacle; . = empty; H = snake head; B = snake body; T = snake tail; A = apple; * = star. Snake order is listed in player.bodyHeadToTail.\n\nColumns are x and rows are y. Row labels, column labels and spaces are not cells. Directions do not rotate with the snake's heading. A move advances exactly one cell.\n\nCrossing the boundary or entering # or B ends the game immediately. T vacates when the move does not eat an apple; it stays when the snake grows by eating A. An offered direction is not necessarily free of collisions.\n\nObserved neighboring cells, copied from this same board before moving:\nup: observed cell (2,3) = .\ndown: observed cell (2,5) = .\nleft: observed cell (1,4) = .\n\nLocate H. Read the cells directly adjacent to H: left and right are the neighboring symbols in the same row; up and down are the symbols in the same column of the neighboring rows. Only these adjacent cells are destinations for this move. Food beyond an adjacent blocking cell cannot be reached by this move.\n\nApply these priorities in order. 1. Avoid an immediate collision. 2. Avoid a forced corridor or enclosed pocket that runs out of cells before the moving tail can open it. Trace the corridor from the candidate cell, not just the adjacent cell. 3. Prefer a connected region with continuing exits and a way to approach the moving tail; mentally account for the body shift and growth when eating. 4. Pursue A through those viable regions. Moving temporarily away from A is correct when necessary to preserve an escape route. A nearby apple does not justify losing every exit. Select exactly one offered direction.",
+						"criteria": {
+							"up": {
+								"meaning": "Move one cell toward y-1."
+							},
+							"down": {
+								"meaning": "Move one cell toward y+1."
+							},
+							"left": {
+								"meaning": "Move one cell toward x-1."
+							}
+						}
+					}
+				}
+			},
+			"source": {
+				"matchId": "3a0268ae-b76a-419d-ac3d-f5493f51df1a",
+				"observedTick": 120,
+				"targetTick": 121,
+				"observedSeq": 246,
+				"decisionSeq": 247
+			}
+		}
+	]
+}

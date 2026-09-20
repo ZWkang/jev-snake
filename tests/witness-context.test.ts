@@ -1,10 +1,10 @@
 import { expect, test, vi } from "vitest";
 import { move } from "../server/game/engine.js";
 import {
-	askJev,
 	buildDecisionContextV4 as buildDecisionContext,
 	decisionBodyV3,
-} from "../server/jev/client.js";
+} from "../server/jev/analysis-context.js";
+import { sendJevRequest } from "../server/jev/client.js";
 import { buildPlanContext, planBodyV3 } from "../server/jev/legacy-context.js";
 import {
 	witnessContinuity,
@@ -120,7 +120,7 @@ test("continuity only reports actual compatible geometry, never advances moves o
 	expect(witnessContinuity(publicState(state))).toEqual([]);
 });
 
-test("real transport preserves a losing model choice and saves evidence separately from exact HTTP body", async () => {
+test("offline v4 transport preserves a losing model choice and saves evidence separately from exact HTTP body", async () => {
 	const state = publicState(baseState());
 	let sent = "";
 	const transport = vi.fn<typeof fetch>(async (_url, init) => {
@@ -137,7 +137,11 @@ test("real transport preserves a losing model choice and saves evidence separate
 			},
 		});
 	});
-	const decision = await askJev("test-key", state, { fetch: transport });
+	const built = buildDecisionContext(state);
+	const { decision } = await sendJevRequest("test-key", built.request, {
+		fetch: transport,
+		evidence: built.evidence,
+	});
 	expect(decision.choice).toBe("left");
 	expect(decision.request).toEqual(JSON.parse(sent));
 	expect(JSON.parse(sent)).not.toHaveProperty("evidence");

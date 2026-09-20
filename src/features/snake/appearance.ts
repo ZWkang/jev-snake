@@ -42,7 +42,7 @@ const palettes = [...solidPalettes, ...tonalPalettes, ...mixedPalettes];
 export function snakeColors(
 	config: Pick<GameConfig, "seed" | "layoutVersion">,
 ) {
-	if (config.layoutVersion !== 2) return classic;
+	if (config.layoutVersion !== 2 && config.layoutVersion !== 3) return classic;
 	let hash = 2166136261;
 	for (const character of `snake-colors:${config.seed}`)
 		hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);

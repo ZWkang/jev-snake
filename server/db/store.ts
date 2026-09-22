@@ -7,6 +7,7 @@ import type {
 	Receipt,
 } from "../../shared/snake/types.js";
 import { summary, supportedRecord } from "../../shared/snake/types.js";
+import { migrateCommunity } from "../community/migration.js";
 import { GameError } from "../errors.js";
 import { migrateWatch } from "../watch/store.js";
 
@@ -24,7 +25,7 @@ export class Store {
 			this.db.pragma("journal_mode = WAL");
 			this.db.pragma("synchronous = FULL");
 			const version = this.db.pragma("user_version", { simple: true });
-			if (version !== 0 && version !== 1 && version !== 2)
+			if (version !== 0 && version !== 1 && version !== 2 && version !== 3)
 				throw new Error(
 					`Unsupported database schema version: ${String(version)}`,
 				);
@@ -42,6 +43,8 @@ export class Store {
 					);
 				})();
 			if (version === 0 || version === 1) migrateWatch(this.db);
+			if (version === 0 || version === 1 || version === 2)
+				migrateCommunity(this.db);
 		} catch (error) {
 			this.db.close();
 			throw error;

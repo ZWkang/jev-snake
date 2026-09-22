@@ -343,7 +343,7 @@ test("response requests describe one real move with observed elapsed time and no
 	expect(transport).toHaveBeenCalledOnce();
 });
 
-test("response API failures and explicit cancellation retain their original errors", async () => {
+test("response API failures retain safe status and explicit cancellation retains its identity", async () => {
 	const responseState = structuredClone(state);
 	responseState.config = {
 		...responseState.config,
@@ -359,7 +359,7 @@ test("response API failures and explicit cancellation retain their original erro
 					new Response("upstream secret failed", { status: 503 }),
 				),
 		}),
-	).rejects.toThrow("upstream [redacted] failed");
+	).rejects.toThrow("HTTP 503");
 	const controller = new AbortController();
 	const transport = vi.fn<typeof fetch>().mockImplementation(
 		(_url, init) =>

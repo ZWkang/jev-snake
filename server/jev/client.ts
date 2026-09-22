@@ -15,6 +15,11 @@ import {
 } from "./board-context.js";
 import { JEV_PROVIDERS, type ActiveJevProvider } from "./config.js";
 import type { GrowthRouteMemory } from "./growth-route-memory.js";
+import {
+	ProviderError,
+	providerHttpError,
+	networkError,
+} from "./transport-error.js";
 export {
 	buildDecisionContext,
 	decisionBody,
@@ -118,42 +123,46 @@ export async function sendJevRequest(
 	options.signal?.throwIfAborted();
 	const started = performance.now();
 	options.onRequestStarted?.();
-	const response = await (options.fetch ?? fetch)(config.endpoint, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${apiKey}`,
-			"Content-Type": "application/json",
-		},
-		body,
-		signal: options.signal,
-	});
-	if (!response.ok)
-		throw new Error(
-			provider +
-				" API returned HTTP " +
-				response.status +
-				": " +
-				(await response.text()).replaceAll(apiKey, "[redacted]"),
-		);
-	const rawResponse: unknown = await response.json();
+	let response: Response;
+	try {
+		response = await (options.fetch ?? fetch)(config.endpoint, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${apiKey}`,
+				"Content-Type": "application/json",
+			},
+			body,
+			signal: options.signal,
+		});
+	} catch (error) {
+		if (options.signal?.aborted && error === options.signal.reason) throw error;
+		throw networkError(provider, error);
+	}
+	let rawResponse: unknown;
+	try {
+		rawResponse = await response.json();
+	} catch (error) {
+		if (options.signal?.aborted && error === options.signal.reason) throw error;
+		if (!response.ok) throw providerHttpError(provider, response, null);
+		throw new ProviderError(provider, "invalid_response", response.status);
+	}
+	if (!response.ok) throw providerHttpError(provider, response, rawResponse);
 	const parsed = schema.safeParse(rawResponse);
 	if (!parsed.success)
-		throw new Error(`Invalid JEV decision response: ${parsed.error.message}`);
+		throw new ProviderError(provider, "invalid_response", response.status);
+	if (parsed.data.model.includes(apiKey))
+		throw new ProviderError(provider, "invalid_response", response.status);
 	const answer = parsed.data.answers.direction;
 	const offered = Object.keys(
 		request.questions.direction.criteria,
 	) as (typeof directions)[number][];
 	if (!offered.includes(answer.choice))
-		throw new Error(
-			"Invalid JEV decision response: chosen direction was not offered in this request",
-		);
+		throw new ProviderError(provider, "unoffered_choice", response.status);
 	if (
 		Object.keys(answer.probabilities).length !== offered.length ||
 		offered.some((direction) => answer.probabilities[direction] === undefined)
 	)
-		throw new Error(
-			"Invalid JEV decision response: probabilities must cover exactly the offered directions",
-		);
+		throw new ProviderError(provider, "invalid_probabilities", response.status);
 	const sum = offered.reduce(
 		(total, direction) => total + answer.probabilities[direction]!,
 		0,

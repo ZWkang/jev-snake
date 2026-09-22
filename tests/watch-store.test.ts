@@ -12,6 +12,7 @@ import {
 	watchCommandSchema,
 	watchSnapshotSchema,
 } from "../shared/snake/watch.js";
+import { removeCommunityFixtureTables } from "./community-fixture";
 
 test("channel schema rejects contradictory phases and secret fields", () => {
 	const s = initialWatchState(0);
@@ -69,6 +70,7 @@ test("v1 migration preserves old single, plan and response JSON and runs once", 
 			events = original.db
 				.prepare("SELECT * FROM match_events ORDER BY match_id,seq")
 				.all();
+		removeCommunityFixtureTables(original.db);
 		original.db.exec(
 			"DROP TABLE watch_commands; DROP TABLE watch_rounds; DROP TABLE watch_channels; PRAGMA user_version=1;",
 		);
@@ -76,7 +78,7 @@ test("v1 migration preserves old single, plan and response JSON and runs once", 
 		original.close();
 		for (let i = 0; i < 2; i++) {
 			const upgraded = new Store(file);
-			expect(upgraded.db.pragma("user_version", { simple: true })).toBe(2);
+			expect(upgraded.db.pragma("user_version", { simple: true })).toBe(3);
 			expect(
 				upgraded.db.prepare("SELECT * FROM matches ORDER BY id").all(),
 			).toEqual(states);

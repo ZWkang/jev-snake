@@ -9,6 +9,10 @@ import {
 	type PublicState,
 	type Receipt,
 } from "../../shared/snake/types.js";
+import type {
+	CredentialCall,
+	WatchCredentialSource,
+} from "../credentials/pool.js";
 import { askJev } from "./client.js";
 import type { jevConfig } from "./config.js";
 import { gameClient } from "./game-client.js";
@@ -20,6 +24,7 @@ export type RunJevOptions = {
 	state: PublicState;
 	controlToken: string;
 	jev: ReturnType<typeof jevConfig>;
+	credentials?: WatchCredentialSource;
 	signal?: AbortSignal;
 	log?: (message: string) => void;
 	error?: (message: string) => void;
@@ -111,8 +116,10 @@ export async function runJevMatch(
 		});
 		options.signal?.addEventListener("abort", abortOpen, { once: true });
 	});
-	function command(data: Record<string, unknown>): Promise<Receipt> {
-		const requestId = randomUUID();
+	function command(
+		data: Record<string, unknown>,
+		requestId = randomUUID(),
+	): Promise<Receipt> {
 		return new Promise((resolve, reject) => {
 			if (connectionError) {
 				reject(connectionError);
@@ -252,48 +259,102 @@ export async function runJevMatch(
 					);
 				break;
 			}
+			options.signal?.throwIfAborted();
 			inference = new AbortController();
-			const decision = await askJev(jev.apiKey, context.state, {
-				dynamicAnalysis: jev.dynamicAnalysis,
-				routeMemory,
-				onRequestStarted: () => {
-					inFlight.request = {
-						observedTick: context.state.tick,
-						targetTick: context.targetTick,
-						started: performance.now(),
-					};
-					log(
-						JSON.stringify({
-							type: "model_request_started",
-							provider: jev.provider,
-							model: jev.model,
-							observedTick: context.state.tick,
-							targetTick: context.targetTick,
-							movesSinceApple: context.progress.movesSinceApple,
-							positionVisits: context.progress.positionVisits,
-							repeatAfterMoves: context.progress.repeatAfterMoves,
-						}),
-					);
-				},
-				signal: inference.signal,
-				provider: jev.provider,
-				model: jev.model,
-				progress: context.progress,
-				timing: {
-					elapsedGameTimeMs: context.elapsedGameTimeMs,
-					deadlineInMs: context.deadlineInMs,
-				},
-			});
-			if (stopping || options.signal?.aborted || latest.status !== "running")
-				break;
-			const receipt = await command({
-				type: "action",
+			const actionRequestId = randomUUID();
+			let credentialCall: CredentialCall | undefined;
+			credentialCall = options.credentials?.begin({
 				observedSeq: context.observedSeq,
 				targetTick: context.targetTick,
-				expectedStateHash: context.expectedStateHash,
-				direction: decision.choice,
-				decision,
+				actionRequestId,
 			});
+			let decision: Awaited<ReturnType<typeof askJev>>;
+			try {
+				decision = await askJev(
+					credentialCall ? credentialCall.apiKey : jev.apiKey,
+					context.state,
+					{
+						dynamicAnalysis: jev.dynamicAnalysis,
+						routeMemory,
+						onRequestStarted: () => {
+							if (credentialCall) options.credentials!.started(credentialCall);
+							inFlight.request = {
+								observedTick: context.state.tick,
+								targetTick: context.targetTick,
+								started: performance.now(),
+							};
+							log(
+								JSON.stringify({
+									type: "model_request_started",
+									provider: jev.provider,
+									model: jev.model,
+									observedTick: context.state.tick,
+									targetTick: context.targetTick,
+									movesSinceApple: context.progress.movesSinceApple,
+									positionVisits: context.progress.positionVisits,
+									repeatAfterMoves: context.progress.repeatAfterMoves,
+								}),
+							);
+						},
+						signal: inference.signal,
+						provider: jev.provider,
+						model: jev.model,
+						progress: context.progress,
+						timing: {
+							elapsedGameTimeMs: context.elapsedGameTimeMs,
+							deadlineInMs: context.deadlineInMs,
+						},
+					},
+				);
+			} catch (error) {
+				if (credentialCall && options.credentials) {
+					const cancelled =
+						inference.signal.aborted && error === inference.signal.reason;
+					const rotate = options.credentials.failed(
+						credentialCall,
+						error,
+						cancelled,
+					);
+					if (
+						rotate &&
+						!stopping &&
+						!options.signal?.aborted &&
+						latest.status === "running"
+					) {
+						reportError(
+							JSON.stringify({
+								type: "model_request_failed",
+								provider: jev.provider,
+								observedTick: context.state.tick,
+								targetTick: context.targetTick,
+								reason:
+									error instanceof Error ? error.message : "credential_error",
+								credentialRotation: true,
+							}),
+						);
+						inference = null;
+						inFlight.request = null;
+						continue;
+					}
+				}
+				throw error;
+			}
+			if (credentialCall)
+				options.credentials!.succeeded(credentialCall, decision);
+			if (stopping || options.signal?.aborted || latest.status !== "running")
+				break;
+			const receipt = await command(
+				{
+					type: "action",
+					observedSeq: context.observedSeq,
+					targetTick: context.targetTick,
+					expectedStateHash: context.expectedStateHash,
+					direction: decision.choice,
+					decision,
+				},
+				actionRequestId,
+			);
+			if (credentialCall) options.credentials!.applied(credentialCall, receipt);
 			log(
 				JSON.stringify({
 					observedTick: context.state.tick,

@@ -7,7 +7,8 @@ import { GameError } from "../errors.js";
 import type { WatchChannel } from "./channel.js";
 import type { OwnerSessions } from "./owner.js";
 
-const cookie = "snake_watch_owner";
+export const ownerCookie = "snake_watch_owner";
+const cookie = ownerCookie;
 const cookiePath = "/api/watch-admin";
 const loginSchema = z.object({ password: z.string().min(1) }).strict();
 

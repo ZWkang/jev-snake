@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { resolve } from "node:path";
+import { communitySettings } from "./community/config.js";
 import { jevConfig } from "./jev/config.js";
 import { watchGameConfig } from "./jev/game-config.js";
 import { startServer } from "./start.js";
@@ -15,6 +16,7 @@ if (!Number.isInteger(port) || port < 0 || port > 65535)
 	throw new Error("GAME_PORT must be a valid TCP port");
 const jev = jevConfig();
 const game = startServer({
+	community: communitySettings(process.env),
 	path: resolve(path),
 	adminToken,
 	port,

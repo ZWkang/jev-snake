@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/solid-router";
+import { CommunityActions } from "../features/community/CommunityActions";
 
 export default function Header() {
 	return (
@@ -32,8 +33,16 @@ export default function Header() {
 				>
 					历史对局
 				</Link>
+				<Link
+					to="/feedback"
+					class="snake-nav-link"
+					activeProps={{ class: "is-active" }}
+				>
+					反馈
+				</Link>
 			</nav>
-			<span class="visitor-label">游客只读</span>
+			<CommunityActions />
+			<span class="visitor-label">免登录观战</span>
 		</header>
 	);
 }

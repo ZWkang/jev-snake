@@ -14,6 +14,7 @@ import {
 	type WatchReceipt,
 	type WatchSnapshot,
 } from "../../shared/snake/watch.js";
+import type { CredentialPool } from "../credentials/pool.js";
 import { GameError } from "../errors.js";
 import type { jevConfig } from "../jev/config.js";
 import { runJevMatch, type RunJevOptions } from "../jev/runner.js";
@@ -22,6 +23,7 @@ import { WatchStore } from "./store.js";
 
 export type WatchSettings = {
 	jev: ReturnType<typeof jevConfig>;
+	credentialPool?: CredentialPool;
 	makeConfig: () => GameConfig;
 	intermissionMs: number;
 	now?: () => number;
@@ -140,7 +142,9 @@ export class WatchChannel {
 								current.endReason ?? "",
 							)))
 				) {
-					if (!this.settings.jev.apiKey)
+					if (this.settings.credentialPool)
+						this.settings.credentialPool.assertAvailable();
+					else if (!this.settings.jev.apiKey)
 						throw new Error(
 							`Set ${this.settings.jev.keyEnv} before resuming continuous watch`,
 						);
@@ -154,9 +158,10 @@ export class WatchChannel {
 						nextStartAt: null,
 						serverTime: this.now(),
 					};
-					const state = this.service.resume(current.id, controlToken, () =>
-						this.store.write(record),
-					);
+					const state = this.service.resume(current.id, controlToken, () => {
+						this.settings.credentialPool?.ensureRound(current.id);
+						this.store.write(record);
+					});
 					recovery = { state, controlToken, generation: record.generation };
 				} else if (current.status === "ready" || current.status === "running") {
 					this.stopMatch(current, "server_restart");
@@ -218,7 +223,9 @@ export class WatchChannel {
 		}
 	}
 	private validatedConfig() {
-		if (!this.settings.jev.apiKey)
+		if (this.settings.credentialPool)
+			this.settings.credentialPool.assertAvailable();
+		else if (!this.settings.jev.apiKey)
 			throw new Error(
 				`Set ${this.settings.jev.keyEnv} before starting continuous watch`,
 			);
@@ -392,6 +399,7 @@ export class WatchChannel {
 				config,
 			},
 			(id) => {
+				this.settings.credentialPool?.bindNew(id);
 				this.store.assign(
 					{
 						generation,
@@ -425,6 +433,7 @@ export class WatchChannel {
 					state,
 					controlToken,
 					jev: this.settings.jev,
+					credentials: this.settings.credentialPool?.forMatch(state.id),
 					signal: this.controller?.signal,
 					log: this.settings.log,
 				}),

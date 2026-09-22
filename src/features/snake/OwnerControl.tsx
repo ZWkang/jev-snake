@@ -6,6 +6,7 @@ import type {
 	WatchCommandResult,
 	WatchSnapshot,
 } from "../../../shared/snake/watch";
+import { CommunityAdmin } from "../community/CommunityAdmin";
 
 export function OwnerControl(props: {
 	state: WatchSnapshot | undefined;
@@ -175,6 +176,11 @@ export function OwnerControl(props: {
 						注销管理
 					</button>
 				</div>
+				<CommunityAdmin
+					onUnauthorized={() =>
+						setSession({ authenticated: false, expiresAt: null })
+					}
+				/>
 			</Show>
 			<Show when={pending()}>
 				<p role="status">正在确认管理请求…</p>

@@ -4,6 +4,10 @@ import type { WSContext } from "hono/ws";
 import type WebSocket from "ws";
 import { watchSchema } from "../shared/snake/schema.js";
 import { publicState } from "../shared/snake/types.js";
+import {
+	mountCommunityRoutes,
+	type CommunityServices,
+} from "./community/routes.js";
 import { GameError } from "./errors.js";
 import { JEV_PROVIDERS } from "./jev/config.js";
 import { digest, type MatchService, secretEqual } from "./matches/service.js";
@@ -37,9 +41,11 @@ export function createApp(
 	options: {
 		adminToken: string;
 		jevConfigured: boolean;
+		jevAvailable?: () => boolean;
 		jevProvider?: string;
 		jevModel?: string;
 		watch?: { channel: WatchChannel; owner: OwnerSessions };
+		community?: CommunityServices;
 	},
 ) {
 	if (options.adminToken.length < 32)
@@ -47,6 +53,30 @@ export function createApp(
 	const app = new Hono();
 	const adminHash = digest(options.adminToken);
 	app.onError((error, c) => {
+		const communityRequest =
+			/^\/api\/(community(?:$|\/)|feedback(?:$|\/)|key-contributions(?:$|\/)|watch-admin\/(feedback|credentials)(?:$|\/))/.test(
+				c.req.path,
+			);
+		if (communityRequest && !(error instanceof GameError)) {
+			const code = (error as Error & { code?: unknown }).code;
+			console.error("[community error]", {
+				type: error.name,
+				code:
+					typeof code === "string" && code.startsWith("SQLITE_")
+						? code
+						: "internal_error",
+				frames: error.stack?.split("\n").slice(1).join("\n"),
+			});
+			return c.json(
+				{
+					error: {
+						code: "community_storage_error",
+						message: "社区服务操作失败，请检查服务端存储状态",
+					},
+				},
+				500,
+			);
+		}
 		if (!(error instanceof GameError))
 			console.error("[http error]", error.message);
 		return c.json(
@@ -54,6 +84,8 @@ export function createApp(
 			(error instanceof GameError ? error.status : 500) as 400,
 		);
 	});
+	if (options.community && options.watch)
+		mountCommunityRoutes(app, options.community, options.watch.owner);
 	if (options.watch)
 		mountWatchRoutes(app, options.watch.channel, options.watch.owner);
 	app.get("/api/health", (c) =>
@@ -61,7 +93,9 @@ export function createApp(
 			{
 				status: service.fault ? "error" : "ok",
 				error: service.fault,
-				jevConfigured: options.jevConfigured,
+				jevConfigured: options.jevAvailable
+					? options.jevAvailable()
+					: options.jevConfigured,
 				model: options.jevModel ?? JEV_PROVIDERS.typesafe.model,
 				provider: options.jevProvider ?? "typesafe",
 				protocolVersion: 1,
